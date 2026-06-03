@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yêu cầu báo giá đã được tiếp nhận — {{ COMPANY_NAME }}</title>
+<style>
+  body { font-family: Arial, Helvetica, sans-serif; background: #f1f5f9; margin: 0; padding: 0; }
+  .wrap { max-width: 600px; margin: 24px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,.08); }
+  .header { background: linear-gradient(135deg, #16194d 0%, #2e3de6 100%); padding: 36px 32px; text-align: center; }
+  .header-logo { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .header-icon { width: 36px; height: 36px; border: 2px solid rgba(46,61,230,.6); border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; }
+  .header h1 { color: #ffffff; margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .header-sub { color: #aaf0ff; margin: 8px 0 0; font-size: 13px; letter-spacing: .5px; }
+  .body { padding: 36px 32px; }
+  .greeting { font-size: 15px; color: #0f172a; margin: 0 0 12px; }
+  .intro { font-size: 14px; color: #475569; line-height: 1.7; margin: 0 0 28px; }
+  .ref-box { background: #eff1ff; border: 1px solid #c7cdff; border-radius: 10px; padding: 20px; text-align: center; margin-bottom: 28px; }
+  .ref-label { color: #2e3de6; font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; margin: 0 0 6px; }
+  .ref-number { color: #16194d; font-size: 22px; font-weight: 700; font-family: 'Courier New', monospace; letter-spacing: .05em; margin: 0; }
+  .summary-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin-bottom: 28px; }
+  .summary-title { font-size: 12px; font-weight: 700; color: #64748b; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 14px; }
+  .summary-row { display: flex; gap: 10px; margin-bottom: 9px; font-size: 13px; }
+  .summary-row:last-child { margin-bottom: 0; }
+  .summary-key { color: #94a3b8; min-width: 140px; flex-shrink: 0; }
+  .summary-val { color: #1e293b; font-weight: 600; }
+  .message-box { background: #f8fafc; border-left: 3px solid #2e3de6; border-radius: 0 8px 8px 0; padding: 14px 16px; margin-bottom: 28px; }
+  .message-label { font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 8px; }
+  .message-text { font-size: 13px; color: #475569; line-height: 1.6; margin: 0; }
+  .steps-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px; margin-bottom: 28px; }
+  .steps-title { font-size: 14px; font-weight: 700; color: #0f172a; margin: 0 0 16px; }
+  .step { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+  .step:last-child { margin-bottom: 0; }
+  .step-num { background: #2e3de6; color: #ffffff; width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+  .step-body { flex: 1; }
+  .step-body strong { display: block; font-size: 13px; color: #1e293b; margin-bottom: 2px; }
+  .step-body span { font-size: 12px; color: #64748b; }
+  .sla-box { border: 1px solid #c7cdff; background: #eff1ff; border-radius: 10px; padding: 16px 20px; margin-bottom: 28px; display: flex; align-items: center; gap: 12px; }
+  .sla-dot { width: 10px; height: 10px; background: #2e3de6; border-radius: 50%; flex-shrink: 0; }
+  .sla-text { font-size: 13px; color: #2e3de6; line-height: 1.5; }
+  .sla-text strong { color: #16194d; }
+  .cta-wrap { text-align: center; margin-bottom: 28px; }
+  .cta-btn { display: inline-block; background: #2e3de6; color: #ffffff !important; font-size: 14px; font-weight: 700; text-decoration: none; padding: 14px 32px; border-radius: 10px; letter-spacing: .3px; }
+  .urgent { font-size: 13px; color: #64748b; line-height: 1.6; margin: 0 0 0; }
+  .urgent strong { color: #0f172a; }
+  .divider { border: none; border-top: 1px solid #e2e8f0; margin: 28px 0; }
+  .footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 24px 32px; text-align: center; }
+  .footer-brand { font-size: 13px; font-weight: 700; color: #0f172a; margin: 0 0 4px; letter-spacing: .5px; text-transform: uppercase; }
+  .footer-info { font-size: 12px; color: #94a3b8; margin: 4px 0 0; line-height: 1.8; }
+  .footer-info a { color: #0891be; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-logo">
+      <div class="header-icon">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#06b8e0" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+      </div>
+      <span style="color:#ffffff;font-size:18px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">{{ COMPANY_NAME }}</span>
+    </div>
+    <h1>Yêu cầu báo giá<br>đã được tiếp nhận</h1>
+    <p class="header-sub">Chúng tôi sẽ liên hệ sớm nhất — cảm ơn bạn đã tin tưởng</p>
+  </div>
+
+  <!-- Body -->
+  <div class="body">
+
+    <p class="greeting">Xin chào <strong>{{ quote.name }}</strong>,</p>
+    <p class="intro">
+      Chúng tôi đã nhận được yêu cầu báo giá của bạn và đã phân công kỹ sư kỹ thuật xem xét.
+      Dưới đây là tóm tắt thông tin yêu cầu để bạn tiện theo dõi.
+    </p>
+
+    <!-- Reference number -->
+    <div class="ref-box">
+      <p class="ref-label">Mã tham chiếu của bạn</p>
+      <p class="ref-number">{{ quote.reference }}</p>
+    </div>
+
+    <!-- Request summary -->
+    <div class="summary-box">
+      <p class="summary-title">Thông tin yêu cầu</p>
+      <div class="summary-row">
+        <span class="summary-key">Họ và tên</span>
+        <span class="summary-val">{{ quote.name }}</span>
+      </div>
+      {% if quote.company %}
+      <div class="summary-row">
+        <span class="summary-key">Công ty</span>
+        <span class="summary-val">{{ quote.company }}</span>
+      </div>
+      {% endif %}
+      <div class="summary-row">
+        <span class="summary-key">Email</span>
+        <span class="summary-val">{{ quote.email }}</span>
+      </div>
+      {% if quote.phone %}
+      <div class="summary-row">
+        <span class="summary-key">Điện thoại</span>
+        <span class="summary-val">{{ quote.phone }}</span>
+      </div>
+      {% endif %}
+      {% if quote.solution %}
+      <div class="summary-row">
+        <span class="summary-key">Giải pháp quan tâm</span>
+        <span class="summary-val">{{ quote.solution.title }}</span>
+      </div>
+      {% endif %}
+      {% if quote.application %}
+      <div class="summary-row">
+        <span class="summary-key">Ứng dụng / Ngành</span>
+        <span class="summary-val">{{ quote.application }}</span>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Message preview -->
+    {% if quote.message %}
+    <div class="message-box">
+      <p class="message-label">Nội dung yêu cầu</p>
+      <p class="message-text">{{ quote.message|truncatechars:300 }}</p>
+    </div>
+    {% endif %}
+
+    <!-- SLA commitment -->
+    <div class="sla-box">
+      <div class="sla-dot"></div>
+      <p class="sla-text" style="margin:0;">
+        <strong>Cam kết xử lý:</strong> Kỹ sư sẽ phản hồi trong <strong>4 giờ làm việc</strong>
+        và gửi báo giá chi tiết trong vòng <strong>24 giờ làm việc</strong>.
+      </p>
+    </div>
+
+    <!-- Steps -->
+    <div class="steps-box">
+      <p class="steps-title">Bước tiếp theo</p>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Kỹ sư xem xét yêu cầu</strong>
+          <span>Trong vòng 4 giờ làm việc, kỹ sư chuyên môn sẽ phân tích thông số kỹ thuật và nhu cầu của bạn.</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Chuẩn bị đề xuất kỹ thuật &amp; thương mại</strong>
+          <span>Chúng tôi lựa chọn thiết bị phù hợp, xây dựng cấu hình hệ thống và lập báo giá chi tiết.</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Gửi báo giá hoàn chỉnh</strong>
+          <span>Bạn nhận được báo giá đầy đủ bao gồm thiết bị, phần mềm, triển khai và bảo hành trong 24 giờ làm việc.</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Tư vấn &amp; xác nhận</strong>
+          <span>Kỹ sư trao đổi thêm nếu cần điều chỉnh, sau đó xác nhận đơn hàng hoặc lên lịch demo.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-wrap">
+      <a href="{{ SITE_URL }}/orders/quote/success/" class="cta-btn">Xem trạng thái báo giá</a>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Urgent contact -->
+    <p class="urgent">
+      Cần hỗ trợ khẩn cấp? Gọi trực tiếp cho chúng tôi tại
+      <strong>{{ COMPANY_PHONE }}</strong> và cung cấp mã tham chiếu
+      <strong>{{ quote.reference }}</strong> để được xử lý ưu tiên.
+    </p>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p class="footer-brand">{{ COMPANY_NAME }}</p>
+    <p class="footer-info">
+      {{ COMPANY_ADDRESS }}<br>
+      <a href="mailto:{{ COMPANY_EMAIL }}">{{ COMPANY_EMAIL }}</a> &nbsp;·&nbsp; {{ COMPANY_PHONE }}
+    </p>
+    <p style="font-size:11px;color:#cbd5e1;margin:12px 0 0;">
+      Đây là email giao dịch tự động — vui lòng không trả lời trực tiếp email này.
+    </p>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,387 @@
+{% extends "base.html" %}
+{% load static %}
+{% load currency %}
+{% load humanize %}
+
+{% block title %}Giải pháp IoT Công nghiệp — {{ COMPANY_NAME }}{% endblock %}
+{% block meta_description %}Khám phá các giải pháp IoT công nghiệp: nông nghiệp thông minh, giám sát nhà máy, quản lý năng lượng — {{ COMPANY_NAME }}{% endblock %}
+
+{% block content %}
+
+{# ══════════════════════════════════════════════════ PAGE HEADER ══════════════════════════════════════════════════ #}
+<section class="relative bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 pt-24 pb-16 overflow-hidden"
+          style="padding-top: 96px !important;">
+
+  {# Background decorations #}
+  <div class="absolute inset-0 grid-bg opacity-60"></div>
+  <div class="absolute inset-0 noise-overlay"></div>
+  <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full pointer-events-none"
+       style="background: radial-gradient(ellipse, rgba(6,184,224,.08) 0%, transparent 70%);"></div>
+  <div class="absolute top-0 right-20 w-px h-full hidden lg:block opacity-10"
+       style="background: linear-gradient(to bottom, transparent, rgba(6,184,224,1) 40%, rgba(6,184,224,1) 60%, transparent);"></div>
+
+  {# Content #}
+  <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+
+    {# Breadcrumb #}
+    <nav class="flex items-center gap-2 text-xs font-mono text-slate-700 dark:text-slate-400 mb-8">
+      <a href="{% url 'core:home' %}" class="hover:text-slate-600 dark:hover:text-slate-400 transition-colors">Trang chủ</a>
+      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+      </svg>
+      <span class="text-slate-600 dark:text-slate-400">Giải pháp</span>
+    </nav>
+
+    <div class="inline-flex items-center gap-2 border border-brand-200 dark:border-brand-700/40
+                bg-brand-50 dark:bg-brand-950/40 px-3 py-1.5 rounded-full mb-5">
+      <span class="relative flex h-1.5 w-1.5">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-brand-400"></span>
+      </span>
+      <span class="font-mono text-[10px] uppercase tracking-[.2em] text-brand-600 dark:text-brand-400">
+        Industrial IoT &nbsp;/&nbsp; End-to-end Solutions
+      </span>
+    </div>
+
+    {# Title + Stats row #}
+    <div class="grid lg:grid-cols-[1fr_auto] gap-8 items-end">
+      <div>
+        <h1 class="font-display font-extrabold text-slate-900 dark:text-white 
+                  text-4xl lg:text-5xl leading-tight tracking-tight">
+          Giải pháp IoT Công nghiệp
+        </h1>
+        <div class="w-12 h-0.5 bg-brand-500 mt-4 mb-4"></div>
+        <p class="text-slate-700 dark:text-slate-400 text-base leading-relaxed max-w-xl">
+          Từ nông nghiệp thông minh đến giám sát nhà máy — mỗi giải pháp được
+          thiết kế end-to-end với phần cứng, phần mềm và hỗ trợ kỹ thuật chuyên sâu.
+        </p>
+      </div>
+
+      {# Stats panel #}
+      <div class="flex gap-px border border-slate-400 dark:border-slate-700/60 rounded-xl overflow-hidden
+                  bg-slate-200 dark:bg-slate-800 flex-shrink-0 self-end">
+        <div class="bg-white dark:bg-slate-950 px-7 py-5 text-center">
+          <p class="font-display font-bold text-3xl text-slate-900 dark:text-white leading-none">{{ total }}</p>
+          <p class="font-mono text-[10px] uppercase tracking-widest text-slate-700 dark:text-slate-400 mt-1.5">Giải pháp</p>
+        </div>
+        <div class="bg-white dark:bg-slate-950 px-7 py-5 text-center">
+          <p class="font-display font-bold text-3xl text-brand-600 dark:text-brand-400 leading-none">500+</p>
+          <p class="font-mono text-[10px] uppercase tracking-widest text-slate-700 dark:text-slate-400 mt-1.5">Dự án</p>
+        </div>
+      </div>
+    </div>
+
+    {# Category filter tabs #}
+    {% if solution_categories %}
+    <div class="flex items-center gap-2 flex-wrap mt-8 pt-6 border-t border-slate-200 dark:border-slate-800/60">
+      
+      <!-- Nút "Tất cả" -->
+      <a href="{% url 'solutions:list' %}"
+        class="px-4 py-2 rounded-lg font-semibold text-[12px] uppercase tracking-wider transition-all duration-200
+                {% if not active_category %}
+                  bg-brand-600 text-white border border-brand-600
+                {% else %}
+                  border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-400
+                  hover:text-slate-900 dark:hover:text-slate-200
+                  hover:border-slate-400 dark:hover:border-slate-600
+                {% endif %}">
+        Tất cả
+      </a>
+
+      {% for cat in solution_categories %}
+      <!-- Các nút danh mục -->
+      <a href="{% url 'solutions:by_category' category_slug=cat.slug %}"
+        class="px-4 py-2 rounded-lg font-semibold text-[12px] uppercase tracking-wider transition-all duration-200
+                {% if active_category == cat.slug %}
+                  bg-brand-600 text-white border border-brand-600
+                {% else %}
+                  border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-500
+                  hover:text-slate-900 dark:hover:text-slate-200
+                  hover:border-slate-400 dark:hover:border-slate-600
+                {% endif %}">
+        {{ cat.name }}
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+
+{# ══════════════════════════════════════════════════ SOLUTION GRID ══════════════════════════════════════════════════ #}
+<section class="bg-slate-50 dark:bg-slate-950 min-h-screen py-14">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    {% if not solutions %}
+    {# ── Empty state ── #}
+    <div class="flex flex-col items-center justify-center py-32 text-center">
+      <div class="w-16 h-16 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800
+                  flex items-center justify-center mb-5">
+        <svg class="w-8 h-8 text-slate-300 dark:text-slate-700" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor" stroke-width="1">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <h3 class="text-slate-900 dark:text-white font-semibold text-lg mb-2">Chưa có giải pháp nào</h3>
+      <p class="text-slate-500 dark:text-slate-500 text-sm mb-6">Vui lòng quay lại sau.</p>
+      <a href="{% url 'solutions:list' %}" class="btn-primary text-sm">Xem tất cả giải pháp</a>
+    </div>
+
+    {% else %}
+
+    {# ── Featured solution — large card ── #}
+    {% for solution in solutions %}
+    {% if forloop.first and solution.is_featured %}
+    <article class="group relative cursor-pointer rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden mb-6
+                    hover:border-brand-300 dark:hover:border-brand-700/50
+                    hover:shadow-lg dark:hover:shadow-none
+                    transition-all duration-500 bg-white dark:bg-[rgba(10,16,22,.9)]">
+      <a href="{% url 'solutions:detail' solution.slug %}"
+         class="absolute inset-0 z-10"
+         aria-label="{{ solution.title }}"></a>
+      <div class="grid lg:grid-cols-[1fr_420px]">
+
+        {# Image #}
+        <div class="relative overflow-hidden aspect-[16/9] lg:aspect-auto">
+          {% if solution.thumbnail %}
+          <img src="{{ solution.thumbnail|media_url }}"
+               alt="{{ solution.title }}"
+               class="w-full h-full object-cover opacity-80 dark:opacity-60
+                      group-hover:opacity-100 dark:group-hover:opacity-80
+                      group-hover:scale-[1.03] transition-all duration-700"
+               loading="lazy" />
+          {% else %}
+          <div class="w-full h-full min-h-[300px] grid-bg flex items-center justify-center">
+            <svg class="w-16 h-16 text-slate-300 dark:text-slate-800" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="1">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
+            </svg>
+          </div>
+          {% endif %}
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent to-white/80 dark:to-slate-950/80 hidden lg:block"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-white/80 dark:from-slate-950/80 to-transparent lg:hidden"></div>
+          <div class="absolute top-4 left-4">
+            <span class="flex items-center gap-1.5 bg-brand-600/90 backdrop-blur-sm
+                         text-white font-mono text-[10px] uppercase tracking-wider
+                         px-3 py-1.5 rounded-full border border-brand-500/50">
+              <span class="w-1.5 h-1.5 font-bold bg-white rounded-full animate-pulse"></span>
+              Nổi bật
+            </span>
+          </div>
+        </div>
+
+        {# Content #}
+        <div class="flex flex-col justify-center p-8 lg:p-10 border-t lg:border-t-0 lg:border-l border-slate-100 dark:border-slate-800">
+          <div class="mb-4">
+            {% if solution.category_name %}
+            <span class="tag tag-blue mb-3 inline-block">{{ solution.category_name }}</span>
+            {% endif %}
+            <p class="font-mono text-[10px] uppercase tracking-[.2em] text-slate-700 dark:text-slate-400 mb-2">
+              {{ forloop.counter|stringformat:"02d" }} / {{ solutions|length|stringformat:"02d" }}
+            </p>
+          </div>
+          <h2 class="font-display font-bold uppercase text-slate-900 dark:text-white leading-tight mb-3
+                     group-hover:text-brand-600 dark:group-hover:text-brand-300 transition-colors"
+              style="font-size: clamp(1.6rem,3vw,2.4rem);">
+            {{ solution.title }}
+          </h2>
+          {% if solution.subtitle %}
+          <p class="text-brand-600/70 dark:text-brand-400/70 font-mono text-sm mb-4">{{ solution.subtitle }}</p>
+          {% endif %}
+          <p class="text-slate-700 dark:text-slate-400 text-sm leading-relaxed mb-8 line-clamp-3">
+            {{ solution.short_description }}
+          </p>
+          <div class="flex items-center gap-4 mb-8 text-xs text-slate-400 dark:text-slate-600 font-mono">
+            <span class="flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+              {{ solution.view_count|default:0 }} lượt xem
+            </span>
+          </div>
+          <a href="{% url 'solutions:detail' solution.slug %}"
+             class="relative z-20 inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-500
+                    text-white font-bold text-sm px-6 py-3.5 rounded-xl
+                    transition-all duration-200 shadow-lg shadow-brand-200/40 dark:shadow-brand-950/50 self-start">
+            Khám phá giải pháp
+            <svg class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </article>
+    {% endif %}
+    {% endfor %}
+
+    {# ── Solution grid ── #}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {% for solution in solutions %}
+      {% if not forloop.first or not solution.is_featured %}
+      <article class="group relative cursor-pointer flex flex-col rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden
+                      hover:border-brand-300 dark:hover:border-brand-700/50
+                      hover:shadow-lg dark:hover:shadow-xl dark:hover:shadow-brand-950/30
+                      transition-all duration-300 bg-white dark:bg-slate-900/40">
+        <a href="{% url 'solutions:detail' solution.slug %}"
+           class="absolute inset-0 z-10"
+           aria-label="{{ solution.title }}"></a>
+
+        {# Thumbnail #}
+        <div class="relative aspect-[16/9] overflow-hidden bg-slate-100 dark:bg-slate-950">
+          {% if solution.thumbnail %}
+          <img src="{{ solution.thumbnail|media_url }}"
+               alt="{{ solution.title }}"
+               class="w-full h-full object-cover opacity-80 dark:opacity-60
+                      group-hover:opacity-100 dark:group-hover:opacity-85
+                      group-hover:scale-[1.04] transition-all duration-500"
+               loading="lazy" />
+          {% else %}
+          <div class="w-full h-full grid-bg flex items-center justify-center">
+            <svg class="w-12 h-12 text-slate-300 dark:text-slate-800" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="1">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
+            </svg>
+          </div>
+          {% endif %}
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-100/80 dark:from-slate-900/90 via-transparent to-transparent"></div>
+          <div class="absolute top-3 right-3 font-mono text-[10px] text-slate-500 dark:text-slate-600
+                      bg-white/80 dark:bg-slate-950/60 backdrop-blur-sm px-2 py-1 rounded">
+            {{ forloop.counter|stringformat:"02d" }}
+          </div>
+          {% if solution.is_featured %}
+          <div class="absolute top-3 left-3">
+            <span class="tag tag-amber font-bold">Nổi bật</span>
+          </div>
+          {% endif %}
+        </div>
+
+        {# Content #}
+        <div class="flex flex-col flex-1 p-5">
+          <div class="flex items-center justify-between mb-3">
+            {% if solution.category_name %}
+            <span class="tag tag-blue">{{ solution.category_name }}</span>
+            {% else %}
+            <span></span>
+            {% endif %}
+            <span class="font-mono text-[10px] text-slate-700 dark:text-slate-400 flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+              {{ solution.view_count|default:0 }}
+            </span>
+          </div>
+
+          <h3 class="font-display font-bold uppercase text-slate-900 dark:text-white text-lg leading-tight mb-2
+                     group-hover:text-brand-600 dark:group-hover:text-brand-300 transition-colors flex-1">
+            {{ solution.title }}
+          </h3>
+          {% if solution.subtitle %}
+          <p class="text-brand-600/60 dark:text-brand-400/60 font-bold text-xs mb-2">{{ solution.subtitle }}</p>
+          {% endif %}
+          <p class="text-slate-700 dark:text-slate-400 text-sm leading-relaxed line-clamp-2 mb-5">
+            {{ solution.short_description }}
+          </p>
+
+          <div class="mt-auto">
+            <a href="{% url 'solutions:detail' solution.slug %}"
+               class="relative z-20 flex items-center justify-between w-full border
+                      border-slate-200 dark:border-slate-700
+                      hover:border-brand-400 dark:hover:border-brand-600
+                      hover:bg-brand-50 dark:hover:bg-brand-950/30
+                      text-slate-500 dark:text-slate-400
+                      hover:text-brand-600 dark:hover:text-brand-300
+                      px-4 py-3 rounded-xl transition-all duration-200 group/btn">
+              <span class="font-mono text-[11px] uppercase tracking-wider font-semibold">
+                Xem giải pháp
+              </span>
+              <svg class="w-4 h-4 transition-transform duration-200 group-hover/btn:translate-x-1"
+                   fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </article>
+      {% endif %}
+      {% endfor %}
+    </div>
+
+    {# ── Pagination ── #}
+    {% if has_next or has_previous %}
+    <nav class="flex items-center justify-center gap-3 mt-14">
+      {% if has_previous %}
+      <a href="?page={{ page|add:'-1' }}{% if active_category %}&category={{ active_category }}{% endif %}"
+         class="inline-flex items-center gap-2
+                border border-slate-200 dark:border-slate-700
+                hover:border-brand-400 dark:hover:border-brand-600
+                text-slate-500 dark:text-slate-400
+                hover:text-brand-600 dark:hover:text-brand-300
+                font-mono text-[11px] uppercase tracking-wider
+                px-5 py-2.5 rounded-xl transition-all duration-200">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Trang trước
+      </a>
+      {% endif %}
+      <span class="font-mono text-[11px] text-slate-400 dark:text-slate-600 px-4">
+        Trang {{ page }}
+      </span>
+      {% if has_next %}
+      <a href="?page={{ page|add:'1' }}{% if active_category %}&category={{ active_category }}{% endif %}"
+         class="inline-flex items-center gap-2
+                border border-slate-200 dark:border-slate-700
+                hover:border-brand-400 dark:hover:border-brand-600
+                text-slate-500 dark:text-slate-400
+                hover:text-brand-600 dark:hover:text-brand-300
+                font-mono text-[11px] uppercase tracking-wider
+                px-5 py-2.5 rounded-xl transition-all duration-200">
+        Trang sau
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+        </svg>
+      </a>
+      {% endif %}
+    </nav>
+    {% endif %}
+
+    {% endif %}{# end if solutions #}
+
+  </div>
+</section>
+
+
+{# ══════════════════════════════════════════════════ CTA STRIP ══════════════════════════════════════════════════ #}
+<section class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-14">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div>
+        <h3 class="font-display font-bold uppercase text-slate-900 dark:text-white text-xl mb-1">
+          Chưa tìm thấy giải pháp phù hợp?
+        </h3>
+        <p class="text-slate-700 dark:text-slate-400 text-sm">
+          Đội kỹ sư sẽ thiết kế giải pháp riêng cho ngành của bạn.
+        </p>
+      </div>
+      <div class="flex gap-3 flex-shrink-0">
+        {% url 'contacts:contact' as url_contact %}
+        <a href="{{ url_contact|default:'#' }}" class="btn-primary text-sm">
+          Tư vấn miễn phí
+        </a>
+        {% url 'orders:quote_request' as url_quote %}
+        <a href="{{ url_quote|default:'#' }}" class="btn-ghost text-sm">
+          Báo giá
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

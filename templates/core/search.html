@@ -1,0 +1,435 @@
+﻿{% extends "base.html" %}
+{% load static %}
+{% load currency %}
+{% load humanize %}
+{% block title %}
+{% if query %}Kết quả: "{{ query }}"{% else %}Tìm kiếm{% endif %} — {{ COMPANY_NAME }}
+{% endblock %}
+{% block meta_description %}Tìm kiếm sản phẩm và giải pháp IoT công nghiệp — {{ COMPANY_NAME }}{% endblock %}
+{% block content %}
+{# ══════════════════════════════════════════════════ PAGE HEADER ══════════════════════════════════════════════════ #}
+<section class="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 pt-24 pb-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+{# Breadcrumb #}
+<nav class="flex items-center gap-2 text-xs font-mono text-slate-400 dark:text-slate-500 mb-8">
+  <a href="{% url 'core:home' %}" class="hover:text-slate-600 dark:hover:text-slate-300 transition-colors">Trang chủ</a>
+  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+  </svg>
+  <span class="text-slate-600 dark:text-slate-400">Tìm kiếm</span>
+</nav>
+
+{# Search form #}
+<div class="max-w-2xl">
+  {% comment %} <p class="section-label mb-3">— Tìm kiếm</p> {% endcomment %}
+  <h1 class="font-display font-bold uppercase text-slate-900 dark:text-white text-3xl lg:text-4xl tracking-tight mb-6">
+    {% if query %}Kết quả cho "{{ query }}"{% else %}Tìm kiếm{% endif %}
+  </h1>
+
+  <form action="{% url 'core:search' %}" method="get" class="flex gap-3">
+    <div class="relative flex-1">
+      <div class="absolute left-4 top-1/2 -translate-y-1/2 pointer-devices-none">
+        <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+        </svg>
+      </div>
+      <input type="text" name="q" value="{{ query }}"
+             placeholder="Tên sản phẩm, SKU, giải pháp..."
+             autofocus
+             class="w-full bg-white dark:bg-slate-900
+                    border border-slate-300 dark:border-slate-700
+                    focus:border-brand-500 dark:focus:border-brand-600
+                    text-slate-800 dark:text-white text-sm
+                    placeholder-slate-400 dark:placeholder-slate-600
+                    pl-11 pr-4 py-3 rounded-xl outline-none
+                    focus:ring-2 focus:ring-brand-500/10 dark:focus:ring-brand-700/40
+                    transition-all" />
+      {% if search_type %}
+      <input type="hidden" name="type" value="{{ search_type }}" />
+      {% endif %}
+    </div>
+    <button type="submit" class="btn-primary px-6 py-3 text-sm flex-shrink-0">
+      Tìm kiếm
+    </button>
+  </form>
+</div>
+  </div>
+</section>
+{# ══════════════════════════════════════════════════ TOOLBAR ══════════════════════════════════════════════════ #}
+{% if query %}
+<div class="bg-white/95 dark:bg-[rgba(8,13,18,.94)] border-b border-slate-200 dark:border-slate-800/60 sticky top-[72px] z-30 backdrop-blur-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between gap-4">
+  {# Type tabs #}
+  <div class="flex">
+    <a href="?q={{ query|urlencode }}&type=products"
+       class="flex items-center gap-2 px-5 py-4 text-sm font-semibold border-b-2 transition-all
+              {% if search_type == 'products' or not search_type %}
+                border-brand-500 text-brand-600 dark:text-brand-400
+              {% else %}
+                border-transparent text-slate-500 dark:text-slate-500
+                hover:text-slate-700 dark:hover:text-slate-300
+                hover:border-slate-300 dark:hover:border-slate-600
+              {% endif %}">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+      </svg>
+      Sản phẩm
+    </a>
+    <a href="?q={{ query|urlencode }}&type=solutions"
+       class="flex items-center gap-2 px-5 py-4 text-sm font-semibold border-b-2 transition-all
+              {% if search_type == 'solutions' %}
+                border-brand-500 text-brand-600 dark:text-brand-400
+              {% else %}
+                border-transparent text-slate-500 dark:text-slate-500
+                hover:text-slate-700 dark:hover:text-slate-300
+                hover:border-slate-300 dark:hover:border-slate-600
+              {% endif %}">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
+      </svg>
+      Giải pháp
+    </a>
+  </div>
+
+  {# Result count #}
+  <p class="text-slate-500 dark:text-slate-500 text-sm flex-shrink-0">
+    <span class="text-slate-800 dark:text-slate-300 font-semibold">{{ total_count|default:0|intcomma }}</span>
+    kết quả
+  </p>
+</div>
+  </div>
+</div>
+{% endif %}
+{# ══════════════════════════════════════════════════ RESULTS ══════════════════════════════════════════════════ #}
+<section class="bg-slate-50 dark:bg-slate-950 min-h-screen py-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+{% if not query %}
+{# ── No query ── #}
+<div class="flex flex-col items-center justify-center py-32 text-center">
+  <div class="w-16 h-16 rounded-2xl bg-white dark:bg-slate-900
+              border border-slate-200 dark:border-slate-800
+              flex items-center justify-center mb-5 shadow-sm">
+    <svg class="w-8 h-8 text-slate-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24"
+         stroke="currentColor" stroke-width="1">
+      <path stroke-linecap="round" stroke-linejoin="round"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+    </svg>
+  </div>
+  <h2 class="font-display font-bold uppercase text-slate-900 dark:text-white text-xl mb-2">
+    Nhập từ khoá để tìm kiếm
+  </h2>
+  <p class="text-slate-500 dark:text-slate-500 text-sm max-w-sm leading-relaxed">
+    Tìm theo tên sản phẩm, SKU, mã linh kiện hoặc tên giải pháp.
+  </p>
+
+  {# Quick links #}
+  <div class="flex flex-wrap items-center justify-center gap-2 mt-8">
+    <span class="text-slate-400 dark:text-slate-600 text-xs font-mono">Gợi ý:</span>
+    {% for hint in search_hints %}
+      <a href="?q={{ hint|urlencode }}"
+         class="tag tag-blue hover:border-brand-500/60 hover:text-brand-600 dark:hover:text-brand-300 transition-colors cursor-pointer">
+        {{ hint }}
+      </a>
+    {% endfor %}
+  </div>
+</div>
+
+{% elif not results %}
+{# ── No results ── #}
+<div class="flex flex-col items-center justify-center py-28 text-center">
+  <div class="w-16 h-16 rounded-2xl bg-white dark:bg-slate-900
+              border border-slate-200 dark:border-slate-800
+              flex items-center justify-center mb-5 shadow-sm">
+    <svg class="w-8 h-8 text-slate-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24"
+         stroke="currentColor" stroke-width="1">
+      <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+  </div>
+  <h2 class="font-display font-bold uppercase text-slate-900 dark:text-white text-xl mb-2">
+    Không tìm thấy kết quả
+  </h2>
+  <p class="text-slate-500 dark:text-slate-500 text-sm mb-6 max-w-sm leading-relaxed">
+    Không có kết quả nào phù hợp với "<span class="text-slate-700 dark:text-slate-300">{{ query }}</span>".
+    Hãy thử từ khoá khác hoặc duyệt danh mục.
+  </p>
+  <div class="flex gap-3">
+    <a href="{% url 'products:list' %}" class="btn-primary text-sm">
+      Xem tất cả sản phẩm
+    </a>
+    <a href="{% url 'solutions:list' %}" class="btn-ghost text-sm">
+      Xem giải pháp
+    </a>
+  </div>
+</div>
+
+{% else %}
+
+{# ══ PRODUCTS results ══ #}
+{% if search_type == 'products' or not search_type %}
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+  {% for product in results %}
+  <article class="group flex flex-col bg-white dark:bg-slate-900 rounded-2xl
+                  border border-slate-200 dark:border-slate-800
+                  hover:border-brand-400/60 dark:hover:border-brand-700/60
+                  hover:shadow-md dark:hover:shadow-brand-950/40
+                  transition-all duration-300 overflow-hidden">
+
+    {# Thumbnail #}
+    <div class="relative aspect-square bg-slate-100 dark:bg-slate-800/50 overflow-hidden">
+      {% if product.thumbnail %}
+      <img src="{{ product.thumbnail.url }}"
+           alt="{{ product.name }}"
+           class="w-full h-full object-contain p-4 transition-transform
+                  duration-300 group-hover:scale-[1.07]"
+           loading="lazy" />
+      {% else %}
+      <div class="w-full h-full flex items-center justify-center">
+        <svg class="w-10 h-10 text-slate-300 dark:text-slate-700" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor" stroke-width="1">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586
+                   a2 2 0 012.828 0L20 14m-6-6h.01"/>
+        </svg>
+      </div>
+      {% endif %}
+
+      {# Badges #}
+      <div class="absolute top-2.5 left-2.5 flex flex-col gap-1.5">
+        {% if product.is_new %}
+        <span class="bg-brand-600 text-white text-[10px] font-bold uppercase
+                     tracking-wider px-2 py-0.5 rounded-full">Mới</span>
+        {% endif %}
+        {% if product.is_featured %}
+        <span class="bg-amber-500 text-white text-[10px] font-bold uppercase
+                     tracking-wider px-2 py-0.5 rounded-full">Nổi bật</span>
+        {% endif %}
+      </div>
+
+      {# Quick-view overlay #}
+      <div class="absolute inset-0 bg-slate-950/70 opacity-0 group-hover:opacity-100
+                  transition-opacity duration-200 flex items-center justify-center">
+        <a href="{% url 'products:detail' product.slug %}"
+           class="bg-white text-slate-900 text-xs font-bold px-4 py-2 rounded-xl
+                  translate-y-2 group-hover:translate-y-0 transition-transform duration-200
+                  hover:bg-brand-50">
+          Xem nhanh
+        </a>
+      </div>
+    </div>
+
+    {# Info #}
+    <div class="flex flex-col flex-1 p-4">
+      <p class="text-slate-700 dark:text-slate-400 text-[10px] font-mono mb-1 truncate">{{ product.sku }}</p>
+      <h3 class="font-semibold text-slate-800 dark:text-slate-200 text-sm leading-snug mb-auto
+                 line-clamp-2 group-hover:text-brand-600 dark:group-hover:text-brand-300 transition-colors">
+        {{ product.name }}
+      </h3>
+
+      {% if product.brand %}
+      <p class="text-slate-700 dark:text-slate-400 text-[11px] mt-2">{{ product.brand }}</p>
+      {% endif %}
+
+      <div class="flex items-center justify-between mt-3 mb-3">
+        <div>
+          {% if product.pricing_type == 'fixed' and product.price %}
+          <span class="text-brand-600 dark:text-brand-400 font-bold text-sm">
+            {{ product.price|vnd }}
+          </span>
+          {% elif product.pricing_type == 'quote' %}
+          <span class="text-amber-600 dark:text-amber-400 font-semibold text-xs
+                       bg-amber-50 dark:bg-amber-950/50
+                       border border-amber-200 dark:border-amber-800/50
+                       px-2 py-0.5 rounded-md">Báo giá</span>
+          {% else %}
+          <span class="text-slate-400 dark:text-slate-500 text-xs">Liên hệ</span>
+          {% endif %}
+        </div>
+
+        <span class="text-[11px] font-medium flex items-center gap-1
+          {% if product.stock_status == 'in_stock' %}text-emerald-600 dark:text-emerald-400
+          {% elif product.stock_status == 'low_stock' %}text-amber-600 dark:text-amber-400
+          {% else %}text-red-600 dark:text-red-400{% endif %}">
+          <span class="w-1.5 h-1.5 rounded-full flex-shrink-0
+            {% if product.stock_status == 'in_stock' %}bg-emerald-500 dark:bg-emerald-400
+            {% elif product.stock_status == 'low_stock' %}bg-amber-500 dark:bg-amber-400
+            {% else %}bg-red-500 dark:bg-red-400{% endif %}"></span>
+          {% if product.stock_status == 'in_stock' %}Còn hàng
+          {% elif product.stock_status == 'low_stock' %}Sắp hết
+          {% else %}Hết hàng{% endif %}
+        </span>
+      </div>
+
+      <a href="{% url 'products:detail' product.slug %}"
+         class="block text-center text-xs font-semibold py-2.5 rounded-xl
+                border border-slate-200 dark:border-slate-700
+                text-slate-600 dark:text-slate-400
+                hover:bg-brand-600 hover:text-white hover:border-brand-600
+                dark:hover:bg-brand-600 dark:hover:text-white dark:hover:border-brand-600
+                transition-all duration-200">
+        Xem chi tiết
+      </a>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+
+{# ══ SOLUTIONS results ══ #}
+{% elif search_type == 'solutions' %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {% for solution in results %}
+  <article class="group flex flex-col bg-white dark:bg-slate-900 rounded-2xl
+                  border border-slate-200 dark:border-slate-800
+                  hover:border-brand-400/60 dark:hover:border-brand-700/50
+                  hover:shadow-md dark:hover:shadow-brand-950/30
+                  transition-all duration-300 overflow-hidden">
+
+    {# Thumbnail #}
+    <div class="relative aspect-[16/9] overflow-hidden bg-slate-100 dark:bg-slate-950">
+      {% if solution.thumbnail %}
+      <img src="{{ solution.thumbnail.url }}"
+           alt="{{ solution.title }}"
+           class="w-full h-full object-cover opacity-90 dark:opacity-60
+                  group-hover:opacity-100 dark:group-hover:opacity-85
+                  group-hover:scale-[1.04] transition-all duration-500"
+           loading="lazy" />
+      {% else %}
+      <div class="w-full h-full bg-slate-100 dark:grid-bg flex items-center justify-center">
+        <svg class="w-12 h-12 text-slate-300 dark:text-slate-800" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor" stroke-width="1">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18
+                   m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
+        </svg>
+      </div>
+      {% endif %}
+      <div class="absolute inset-0 bg-gradient-to-t from-white/60 dark:from-slate-900/80 to-transparent"></div>
+    </div>
+
+    {# Content #}
+    <div class="flex flex-col flex-1 p-5">
+      {% if solution.solution_category %}
+      <span class="tag tag-blue mb-3 self-start">{{ solution.solution_category }}</span>
+      {% endif %}
+
+      <h3 class="font-display font-bold uppercase text-slate-900 dark:text-white text-lg leading-tight mb-2
+                 group-hover:text-brand-600 dark:group-hover:text-brand-300 transition-colors flex-1">
+        {{ solution.title }}
+      </h3>
+
+      <p class="text-slate-600 dark:text-slate-500 text-sm leading-relaxed line-clamp-2 mb-5">
+        {{ solution.short_description }}
+      </p>
+
+      <a href="{% url 'solutions:detail' solution.slug %}"
+         class="flex items-center justify-between
+                border border-slate-200 dark:border-slate-700
+                hover:border-brand-500 dark:hover:border-brand-600
+                hover:bg-brand-50 dark:hover:bg-brand-950/30
+                text-slate-600 dark:text-slate-400
+                hover:text-brand-700 dark:hover:text-brand-300
+                px-4 py-3 rounded-xl transition-all duration-200 group/btn">
+        <span class="font-mono text-[11px] uppercase tracking-wider font-semibold">
+          Xem giải pháp
+        </span>
+        <svg class="w-4 h-4 transition-transform duration-200 group-hover/btn:translate-x-1"
+             fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+        </svg>
+      </a>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% endif %}
+
+{# ══ Pagination ══ #}
+{% if is_paginated or page_obj.has_other_pages %}
+<nav class="flex items-center justify-center gap-1.5 mt-14" aria-label="Phân trang">
+  {% if page_obj.has_previous %}
+  <a href="?q={{ query|urlencode }}&type={{ search_type|default:'products' }}&page={{ page_obj.previous_page_number }}"
+     class="w-9 h-9 flex items-center justify-center rounded-xl
+            border border-slate-300 dark:border-slate-700
+            bg-white dark:bg-transparent
+            text-slate-500 dark:text-slate-400
+            hover:border-brand-500 dark:hover:border-brand-600
+            hover:text-brand-600 dark:hover:text-brand-400
+            transition-all">
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+    </svg>
+  </a>
+  {% endif %}
+
+  {% for num in page_obj.paginator.page_range %}
+    {% if page_obj.number == num %}
+    <span class="w-9 h-9 flex items-center justify-center rounded-xl bg-brand-600
+                 text-white text-sm font-bold">{{ num }}</span>
+    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+    <a href="?q={{ query|urlencode }}&type={{ search_type|default:'products' }}&page={{ num }}"
+       class="w-9 h-9 flex items-center justify-center rounded-xl
+              border border-slate-300 dark:border-slate-700
+              bg-white dark:bg-transparent
+              text-slate-500 dark:text-slate-400
+              hover:border-brand-500 dark:hover:border-brand-600
+              hover:text-brand-600 dark:hover:text-brand-400
+              text-sm transition-all">
+      {{ num }}
+    </a>
+    {% endif %}
+  {% endfor %}
+
+  {% if page_obj.has_next %}
+  <a href="?q={{ query|urlencode }}&type={{ search_type|default:'products' }}&page={{ page_obj.next_page_number }}"
+     class="w-9 h-9 flex items-center justify-center rounded-xl
+            border border-slate-300 dark:border-slate-700
+            bg-white dark:bg-transparent
+            text-slate-500 dark:text-slate-400
+            hover:border-brand-500 dark:hover:border-brand-600
+            hover:text-brand-600 dark:hover:text-brand-400
+            transition-all">
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+    </svg>
+  </a>
+  {% endif %}
+</nav>
+{% endif %}
+
+{% endif %}{# end if results #}
+  </div>
+</section>
+{# ══════════════════════════════════════════════════ CTA STRIP ══════════════════════════════════════════════════ #}
+{% if query %}
+<section class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-5">
+      <div>
+        <h3 class="font-display font-bold uppercase text-slate-900 dark:text-white text-lg mb-1">
+          Không tìm thấy sản phẩm phù hợp?
+        </h3>
+        <p class="text-slate-500 dark:text-slate-500 text-sm">
+          Đội kỹ sư sẵn sàng tư vấn và tìm thiết bị đáp ứng đúng yêu cầu của bạn.
+        </p>
+      </div>
+      <div class="flex gap-3 flex-shrink-0">
+        {% url 'contacts:contact' as url_contact %}
+        <a href="{{ url_contact|default:'#' }}?subject=Hỏi+về+{{ query|urlencode }}"
+           class="btn-primary text-sm">
+          Liên hệ tư vấn
+        </a>
+        {% url 'orders:quote_request' as url_quote %}
+        <a href="{{ url_quote|default:'#' }}" class="btn-ghost text-sm">
+          Yêu cầu báo giá
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

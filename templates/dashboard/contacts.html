@@ -1,0 +1,786 @@
+{% extends "base.html" %}
+{% load static %}
+{% load currency %}
+{% block title %}Quản lý liên hệ — Dashboard{% endblock %}
+
+{% block content %}
+
+{# ── Đếm stats bằng template tags ── #}
+{% with contacts_new=contacts|length %}
+{% with ns=0 %}
+
+{# Đếm thủ công qua vòng lặp — lưu vào biến riêng #}
+{% comment %}Django không có filter count-by-value nên ta dùng forloop{% endcomment %}
+
+<div class="min-h-screen bg-white dark:bg-slate-950 pt-24 pb-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    {# ── Page header ── #}
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <p class="section-label mb-2">— Quản trị nội bộ</p>
+        <h1 class="font-display font-bold uppercase text-slate-900 dark:text-white
+                   text-3xl tracking-tight">
+          Liên hệ khách hàng
+        </h1>
+      </div>
+      <a href="{% url 'contacts:contact' %}"
+         class="btn-ghost text-sm" target="_blank">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M7 17L17 7M17 7H8M17 7v9"/>
+        </svg>
+        Form liên hệ
+      </a>
+    </div>
+
+    {# ── Dashboard nav tabs ── #}
+    <nav class="flex gap-1 mb-8 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
+      {% url 'dashboard:home'      as url_dash_home %}
+      {% url 'dashboard:products'  as url_dash_products %}
+      {% url 'dashboard:orders'    as url_dash_orders %}
+      {% url 'dashboard:quotes'    as url_dash_quotes %}
+      {% url 'dashboard:contacts'  as url_dash_contacts %}
+      {% url 'dashboard:analytics' as url_dash_analytics %}
+
+      <a href="{{ url_dash_home }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                {% if request.path == url_dash_home %}
+                  border-brand-500 text-brand-600 dark:text-brand-400
+                {% else %}
+                  border-transparent text-slate-500 hover:text-slate-700
+                  dark:text-slate-500 dark:hover:text-slate-300
+                {% endif %}">
+        Tổng quan
+      </a>
+      <a href="{{ url_dash_products }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                {% if request.path == url_dash_products %}
+                  border-brand-500 text-brand-600 dark:text-brand-400
+                {% else %}
+                  border-transparent text-slate-500 hover:text-slate-700
+                  dark:text-slate-500 dark:hover:text-slate-300
+                {% endif %}">
+        Sản phẩm
+      </a>
+      <a href="{{ url_dash_orders }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                {% if request.path == url_dash_orders %}
+                  border-brand-500 text-brand-600 dark:text-brand-400
+                {% else %}
+                  border-transparent text-slate-500 hover:text-slate-700
+                  dark:text-slate-500 dark:hover:text-slate-300
+                {% endif %}">
+        Đơn hàng
+      </a>
+      <a href="{{ url_dash_quotes }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                {% if request.path == url_dash_quotes %}
+                  border-brand-500 text-brand-600 dark:text-brand-400
+                {% else %}
+                  border-transparent text-slate-500 hover:text-slate-700
+                  dark:text-slate-500 dark:hover:text-slate-300
+                {% endif %}">
+        Báo giá
+      </a>
+      <a href="{{ url_dash_contacts }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                {% if request.path == url_dash_contacts %}
+                  border-brand-500 text-brand-600 dark:text-brand-400
+                {% else %}
+                  border-transparent text-slate-500 hover:text-slate-700
+                  dark:text-slate-500 dark:hover:text-slate-300
+                {% endif %}">
+        Liên hệ
+        {# Unread badge #}
+        {% for c in contacts %}{% if c.status == 'new' %}<span id="unread-tab-badge" class="hidden ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-500 text-white text-[9px] font-bold leading-none">!</span>{% endif %}{% endfor %}
+      </a>
+      <a href="{{ url_dash_analytics }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                {% if request.path == url_dash_analytics %}
+                  border-brand-500 text-brand-600 dark:text-brand-400
+                {% else %}
+                  border-transparent text-slate-500 hover:text-slate-700
+                  dark:text-slate-500 dark:hover:text-slate-300
+                {% endif %}">
+        Analytics
+      </a>
+    </nav>
+
+    {# ── Stats row ── #}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+
+      {# Total #}
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border
+                  border-slate-200 dark:border-slate-800 p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800
+                      flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-slate-500 dark:text-slate-400"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0
+                       002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <p class="text-slate-400 dark:text-slate-500 text-[10px] font-mono
+                    uppercase tracking-wider">
+            Tổng liên hệ
+          </p>
+        </div>
+        <p class="font-display text-3xl font-bold text-slate-900 dark:text-white leading-none"
+           id="stat-total">{{ contacts|length }}</p>
+      </div>
+
+      {# New / Unread #}
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border
+                  border-amber-200 dark:border-amber-900/50 p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 rounded-lg bg-amber-50 dark:bg-amber-950/60
+                      flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002
+                       6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388
+                       6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3
+                       0 11-6 0v-1m6 0H9"/>
+            </svg>
+          </div>
+          <p class="text-slate-400 dark:text-slate-500 text-[10px] font-mono
+                    uppercase tracking-wider">
+            Chưa đọc
+          </p>
+        </div>
+        <p class="font-display text-3xl font-bold text-amber-600 dark:text-amber-400
+                  leading-none" id="stat-new">
+          {% with count=0 %}
+          {# Count via JS on render #}
+          0
+          {% endwith %}
+        </p>
+      </div>
+
+      {# Replied #}
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border
+                  border-slate-200 dark:border-slate-800 p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/60
+                      flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          <p class="text-slate-400 dark:text-slate-500 text-[10px] font-mono
+                    uppercase tracking-wider">
+            Đã trả lời
+          </p>
+        </div>
+        <p class="font-display text-3xl font-bold text-emerald-600 dark:text-emerald-400
+                  leading-none" id="stat-replied">0</p>
+      </div>
+
+      {# Closed #}
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border
+                  border-slate-200 dark:border-slate-800 p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800
+                      flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-slate-500 dark:text-slate-400"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <p class="text-slate-400 dark:text-slate-500 text-[10px] font-mono
+                    uppercase tracking-wider">
+            Đã đóng
+          </p>
+        </div>
+        <p class="font-display text-3xl font-bold text-slate-500 dark:text-slate-400
+                  leading-none" id="stat-closed">0</p>
+      </div>
+
+    </div>
+
+    {# ── Filter bar ── #}
+    <div class="flex flex-wrap items-center gap-2 mb-4">
+      <div class="relative">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5
+                    text-slate-400 pointer-events-none"
+             fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+        </svg>
+        <input id="contacts-search"
+               type="text"
+               placeholder="Tìm tên, email, công ty..."
+               class="pl-9 pr-4 py-2 text-sm rounded-xl border outline-none transition-all
+                      bg-white border-slate-200 text-slate-800 placeholder-slate-400
+                      focus:border-brand-400 focus:ring-2 focus:ring-brand-500/10
+                      dark:bg-slate-900 dark:border-slate-700 dark:text-slate-200
+                      dark:placeholder-slate-600 dark:focus:border-brand-600
+                      dark:focus:ring-brand-700/20 w-60" />
+      </div>
+
+      <select id="filter-status"
+              class="py-2 px-3 text-sm rounded-xl border outline-none transition-all cursor-pointer
+                     bg-white border-slate-200 text-slate-700
+                     focus:border-brand-400 dark:bg-slate-900 dark:border-slate-700
+                     dark:text-slate-300 dark:focus:border-brand-600">
+        <option value="">Tất cả trạng thái</option>
+        <option value="new">Mới</option>
+        <option value="read">Đã đọc</option>
+        <option value="replied">Đã trả lời</option>
+        <option value="closed">Đã đóng</option>
+      </select>
+
+      <select id="filter-type"
+              class="py-2 px-3 text-sm rounded-xl border outline-none transition-all cursor-pointer
+                     bg-white border-slate-200 text-slate-700
+                     focus:border-brand-400 dark:bg-slate-900 dark:border-slate-700
+                     dark:text-slate-300 dark:focus:border-brand-600">
+        <option value="">Tất cả loại</option>
+        <option value="general">Chung</option>
+        <option value="technical">Kỹ thuật</option>
+        <option value="sales">Kinh doanh</option>
+        <option value="support">Hỗ trợ</option>
+        <option value="partnership">Hợp tác</option>
+      </select>
+
+      <span class="font-mono text-[11px] text-slate-400 dark:text-slate-600 ml-auto">
+        <span id="visible-count">{{ contacts|length }}</span> liên hệ
+      </span>
+    </div>
+
+    {# ── 2-Pane layout ── #}
+    {% if contacts %}
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border
+                border-slate-200 dark:border-slate-800 overflow-hidden
+                flex flex-col lg:flex-row"
+         style="min-height: 560px;">
+
+      {# ══ LEFT PANE — list ══ #}
+      <div class="w-full lg:w-2/5 border-b lg:border-b-0 lg:border-r
+                  border-slate-200 dark:border-slate-800
+                  overflow-y-auto"
+           style="max-height: 70vh;"
+           id="contacts-list">
+
+        {% for contact in contacts %}
+        <div class="contact-item relative flex items-start gap-3 px-4 py-3.5
+                    border-b border-slate-100 dark:border-slate-800/60 last:border-b-0
+                    cursor-pointer transition-all duration-150 select-none
+                    hover:bg-slate-50 dark:hover:bg-slate-800/40"
+             data-contact-id="{{ contact.id }}"
+             data-search="{{ contact.name|lower }}-{{ contact.email|lower }}-{{ contact.company|lower }}-{{ contact.subject|lower }}"
+             data-status="{{ contact.status }}"
+             data-type="{{ contact.inquiry_type }}">
+
+          {# Unread dot #}
+          {% if contact.status == 'new' %}
+          <span class="absolute top-4 right-3 w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></span>
+          {% endif %}
+
+          {# Avatar #}
+          <div class="w-9 h-9 rounded-full flex items-center justify-center
+                      flex-shrink-0 font-bold text-sm leading-none
+                      {% if contact.inquiry_type == 'technical' %}
+                        bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300
+                      {% elif contact.inquiry_type == 'sales' %}
+                        bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300
+                      {% elif contact.inquiry_type == 'support' %}
+                        bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300
+                      {% elif contact.inquiry_type == 'partnership' %}
+                        bg-violet-100 text-violet-700 dark:bg-violet-900/60 dark:text-violet-300
+                      {% else %}
+                        bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300
+                      {% endif %}">
+            {{ contact.name|slice:":1"|upper }}
+          </div>
+
+          {# Content #}
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-2 mb-0.5">
+              <p class="font-semibold text-sm text-slate-800 dark:text-slate-200 truncate
+                        {% if contact.status == 'new' %}font-bold{% endif %}">
+                {{ contact.name }}
+              </p>
+              <span class="font-mono text-[10px] text-slate-400 dark:text-slate-600
+                           flex-shrink-0">
+                {{ contact.created_at|date:"d/m" }}
+              </span>
+            </div>
+
+            {% if contact.company %}
+            <p class="text-[11px] text-slate-400 dark:text-slate-600 truncate mb-1">
+              {{ contact.company }}
+            </p>
+            {% endif %}
+
+            <p class="text-xs text-slate-600 dark:text-slate-400 truncate mb-2">
+              {{ contact.subject }}
+            </p>
+
+            <div class="flex items-center gap-1.5 flex-wrap">
+              {# Status badge #}
+              <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md
+                {% if contact.status == 'new' %}
+                  bg-amber-50 text-amber-700 border border-amber-200
+                  dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/40
+                {% elif contact.status == 'read' %}
+                  bg-blue-50 text-blue-700 border border-blue-200
+                  dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800/40
+                {% elif contact.status == 'replied' %}
+                  bg-emerald-50 text-emerald-700 border border-emerald-200
+                  dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/40
+                {% else %}
+                  bg-slate-100 text-slate-500 border border-slate-200
+                  dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700
+                {% endif %}">
+                {{ contact.get_status_display }}
+              </span>
+
+              {# Inquiry type badge #}
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-md
+                {% if contact.inquiry_type == 'technical' %}
+                  bg-blue-50 text-blue-600 border border-blue-100
+                  dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/50
+                {% elif contact.inquiry_type == 'sales' %}
+                  bg-emerald-50 text-emerald-600 border border-emerald-100
+                  dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900/50
+                {% elif contact.inquiry_type == 'support' %}
+                  bg-amber-50 text-amber-600 border border-amber-100
+                  dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900/50
+                {% elif contact.inquiry_type == 'partnership' %}
+                  bg-violet-50 text-violet-600 border border-violet-100
+                  dark:bg-violet-950/40 dark:text-violet-400 dark:border-violet-900/50
+                {% else %}
+                  bg-slate-50 text-slate-500 border border-slate-100
+                  dark:bg-slate-800/60 dark:text-slate-400 dark:border-slate-700/50
+                {% endif %}">
+                {{ contact.get_inquiry_type_display }}
+              </span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+
+        {# Empty state when filtered #}
+        <div id="contacts-empty" class="hidden px-4 py-12 text-center">
+          <svg class="w-8 h-8 text-slate-300 dark:text-slate-700 mx-auto mb-3"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9
+                     0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <p class="text-sm text-slate-400 dark:text-slate-600 mb-2">
+            Không tìm thấy liên hệ phù hợp
+          </p>
+          <button id="reset-filter"
+                  class="text-xs font-mono text-brand-600 dark:text-brand-400
+                         hover:underline">
+            Xóa bộ lọc
+          </button>
+        </div>
+
+      </div>
+
+      {# ══ RIGHT PANE — detail ══ #}
+      <div class="flex-1 overflow-y-auto" style="max-height: 70vh;">
+
+        {# Placeholder #}
+        <div id="detail-placeholder"
+             class="h-full flex flex-col items-center justify-center gap-4
+                    py-20 px-8 text-center">
+          <div class="w-14 h-14 rounded-2xl border border-slate-200 dark:border-slate-800
+                      bg-slate-50 dark:bg-slate-800/40 flex items-center justify-center">
+            <svg class="w-6 h-6 text-slate-300 dark:text-slate-600"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136
+                       7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12
+                       2.122"/>
+            </svg>
+          </div>
+          <div>
+            <p class="font-semibold text-slate-600 dark:text-slate-400 text-sm mb-1">
+              Chọn một liên hệ
+            </p>
+            <p class="text-xs text-slate-400 dark:text-slate-600">
+              Click vào liên hệ bên trái để xem chi tiết
+            </p>
+          </div>
+        </div>
+
+        {# Contact detail panels — mỗi contact 1 panel #}
+        {% for contact in contacts %}
+        <div id="contact-detail-{{ contact.id }}"
+             class="contact-detail hidden h-full flex-col">
+
+          {# Detail header #}
+          <div class="flex items-start justify-between gap-4 px-6 py-5
+                      border-b border-slate-100 dark:border-slate-800">
+            <div class="flex items-center gap-3.5">
+              <div class="w-12 h-12 rounded-full flex items-center justify-center
+                          font-bold text-base leading-none flex-shrink-0
+                          {% if contact.inquiry_type == 'technical' %}
+                            bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300
+                          {% elif contact.inquiry_type == 'sales' %}
+                            bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300
+                          {% elif contact.inquiry_type == 'support' %}
+                            bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300
+                          {% elif contact.inquiry_type == 'partnership' %}
+                            bg-violet-100 text-violet-700 dark:bg-violet-900/60 dark:text-violet-300
+                          {% else %}
+                            bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300
+                          {% endif %}">
+                {{ contact.name|slice:":1"|upper }}
+              </div>
+              <div>
+                <p class="font-bold text-slate-900 dark:text-white text-base leading-tight">
+                  {{ contact.name }}
+                </p>
+                {% if contact.company %}
+                <p class="text-xs text-slate-500 dark:text-slate-500 mt-0.5">
+                  {{ contact.company }}
+                </p>
+                {% endif %}
+                <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                  <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md
+                    {% if contact.status == 'new' %}
+                      bg-amber-50 text-amber-700 border border-amber-200
+                      dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/40
+                    {% elif contact.status == 'read' %}
+                      bg-blue-50 text-blue-700 border border-blue-200
+                      dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800/40
+                    {% elif contact.status == 'replied' %}
+                      bg-emerald-50 text-emerald-700 border border-emerald-200
+                      dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/40
+                    {% else %}
+                      bg-slate-100 text-slate-500 border border-slate-200
+                      dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700
+                    {% endif %}">
+                    {{ contact.get_status_display }}
+                  </span>
+                  <span class="text-[10px] font-mono px-2 py-0.5 rounded-md
+                    {% if contact.inquiry_type == 'technical' %}
+                      bg-blue-50 text-blue-600 border border-blue-100
+                      dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/50
+                    {% elif contact.inquiry_type == 'sales' %}
+                      bg-emerald-50 text-emerald-600 border border-emerald-100
+                      dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900/50
+                    {% elif contact.inquiry_type == 'support' %}
+                      bg-amber-50 text-amber-600 border border-amber-100
+                      dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900/50
+                    {% elif contact.inquiry_type == 'partnership' %}
+                      bg-violet-50 text-violet-600 border border-violet-100
+                      dark:bg-violet-950/40 dark:text-violet-400 dark:border-violet-900/50
+                    {% else %}
+                      bg-slate-50 text-slate-500 border border-slate-100
+                      dark:bg-slate-800/60 dark:text-slate-400 dark:border-slate-700/50
+                    {% endif %}">
+                    {{ contact.get_inquiry_type_display }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <span class="font-mono text-[10px] text-slate-400 dark:text-slate-600">
+                {{ contact.created_at|date:"d/m/Y H:i" }}
+              </span>
+              <a href="/admin/contacts/contactinquiry/{{ contact.id }}/change/"
+                 class="btn-ghost text-xs py-1.5 px-3" target="_blank">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2
+                           2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+                Admin
+              </a>
+            </div>
+          </div>
+
+          {# Scrollable body #}
+          <div class="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+
+            {# Thông tin liên hệ #}
+            <div>
+              <h3 class="font-mono text-[10px] uppercase tracking-[.18em]
+                         text-slate-400 dark:text-slate-600 mb-3">
+                Thông tin liên hệ
+              </h3>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <p class="font-mono text-[10px] uppercase tracking-wider
+                             text-slate-400 dark:text-slate-600 mb-0.5">Email</p>
+                  <a href="mailto:{{ contact.email }}"
+                     class="text-sm text-brand-600 dark:text-brand-400 hover:underline
+                            truncate block">
+                    {{ contact.email }}
+                  </a>
+                </div>
+                {% if contact.phone %}
+                <div>
+                  <p class="font-mono text-[10px] uppercase tracking-wider
+                             text-slate-400 dark:text-slate-600 mb-0.5">Điện thoại</p>
+                  <a href="tel:{{ contact.phone }}"
+                     class="text-sm text-slate-700 dark:text-slate-300 hover:text-brand-600
+                            dark:hover:text-brand-400">
+                    {{ contact.phone }}
+                  </a>
+                </div>
+                {% endif %}
+                {% if contact.country %}
+                <div>
+                  <p class="font-mono text-[10px] uppercase tracking-wider
+                             text-slate-400 dark:text-slate-600 mb-0.5">Quốc gia</p>
+                  <p class="text-sm text-slate-700 dark:text-slate-300">{{ contact.country }}</p>
+                </div>
+                {% endif %}
+                {% if contact.source_url %}
+                <div>
+                  <p class="font-mono text-[10px] uppercase tracking-wider
+                             text-slate-400 dark:text-slate-600 mb-0.5">Nguồn</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-500 truncate
+                             font-mono" title="{{ contact.source_url }}">
+                    {{ contact.source_url|truncatechars:40 }}
+                  </p>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            {# Nội dung #}
+            <div>
+              <h3 class="font-mono text-[10px] uppercase tracking-[.18em]
+                         text-slate-400 dark:text-slate-600 mb-3">
+                Nội dung
+              </h3>
+              <p class="font-semibold text-slate-800 dark:text-slate-200 text-sm mb-3">
+                {{ contact.subject }}
+              </p>
+              <div class="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-4
+                          border border-slate-100 dark:border-slate-800">
+                <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed
+                           whitespace-pre-wrap">{{ contact.message }}</p>
+              </div>
+            </div>
+
+            {# Ghi chú nội bộ #}
+            <div>
+              <h3 class="font-mono text-[10px] uppercase tracking-[.18em]
+                         text-slate-400 dark:text-slate-600 mb-3">
+                Ghi chú nội bộ
+              </h3>
+              {% if contact.internal_notes %}
+              <blockquote class="border-l-2 border-brand-400 dark:border-brand-600
+                                  pl-4 py-1">
+                <p class="text-sm text-slate-600 dark:text-slate-400 italic leading-relaxed">
+                  {{ contact.internal_notes }}
+                </p>
+              </blockquote>
+              {% else %}
+              <p class="text-xs text-slate-400 dark:text-slate-600 italic">
+                Chưa có ghi chú nội bộ.
+              </p>
+              {% endif %}
+            </div>
+
+          </div>
+
+          {# Detail footer actions #}
+          <div class="flex items-center justify-between gap-3 px-6 py-4
+                      border-t border-slate-100 dark:border-slate-800">
+            <p class="font-mono text-[10px] text-slate-400 dark:text-slate-600 truncate">
+              {% if contact.ip_address %}IP: {{ contact.ip_address }}{% endif %}
+            </p>
+            <div class="flex items-center gap-2">
+              <a href="/admin/contacts/contactinquiry/{{ contact.id }}/change/"
+                 class="btn-ghost text-xs py-2 px-3" target="_blank">
+                Mở Admin
+              </a>
+              <a href="mailto:{{ contact.email }}?subject=Re: {{ contact.subject }}"
+                 class="btn-primary text-xs py-2 px-3">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+                </svg>
+                Trả lời qua Email
+              </a>
+            </div>
+          </div>
+
+        </div>
+        {% endfor %}
+
+      </div>
+    </div>
+
+    {% else %}
+    {# Empty state — chưa có liên hệ nào #}
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border
+                border-slate-200 dark:border-slate-800 py-24 text-center">
+      <svg class="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-4"
+           fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2
+                 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+      </svg>
+      <p class="text-slate-500 dark:text-slate-500 font-semibold mb-1">
+        Chưa có liên hệ nào
+      </p>
+      <p class="text-sm text-slate-400 dark:text-slate-600">
+        Các liên hệ từ form công khai sẽ xuất hiện tại đây.
+      </p>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endwith %}
+{% endwith %}
+
+<script>
+(function () {
+  'use strict';
+
+  // ── Stats count by data-status ──────────────────────────────────────────
+  const items = Array.from(document.querySelectorAll('.contact-item'));
+  const counts = { new: 0, read: 0, replied: 0, closed: 0 };
+  items.forEach(el => {
+    const s = el.dataset.status;
+    if (counts[s] !== undefined) counts[s]++;
+  });
+  const statNew     = document.getElementById('stat-new');
+  const statReplied = document.getElementById('stat-replied');
+  const statClosed  = document.getElementById('stat-closed');
+  if (statNew)     statNew.textContent     = counts.new;
+  if (statReplied) statReplied.textContent = counts.replied;
+  if (statClosed)  statClosed.textContent  = counts.closed;
+
+  // Show unread badge on tab if any new
+  if (counts.new > 0) {
+    const badge = document.getElementById('unread-tab-badge');
+    if (badge) {
+      badge.textContent = counts.new > 9 ? '9+' : counts.new;
+      badge.classList.remove('hidden');
+      badge.classList.add('inline-flex');
+    }
+  }
+
+  // ── 2-pane interaction ──────────────────────────────────────────────────
+  const placeholder = document.getElementById('detail-placeholder');
+  const allDetails  = document.querySelectorAll('.contact-detail');
+  let activeId = null;
+
+  function activateContact(id) {
+    // Deactivate all list items
+    items.forEach(el => {
+      el.classList.remove(
+        'bg-brand-50', 'dark:bg-brand-950/40',
+        'border-l-2', 'border-brand-500'
+      );
+    });
+    // Activate clicked
+    const activeItem = document.querySelector(`.contact-item[data-contact-id="${id}"]`);
+    if (activeItem) {
+      activeItem.classList.add(
+        'bg-brand-50', 'dark:bg-brand-950/40',
+        'border-l-2', 'border-brand-500'
+      );
+    }
+    // Hide all details
+    allDetails.forEach(el => {
+      el.classList.add('hidden');
+      el.classList.remove('flex');
+    });
+    // Show target detail
+    const detail = document.getElementById(`contact-detail-${id}`);
+    if (detail) {
+      detail.classList.remove('hidden');
+      detail.classList.add('flex', 'flex-col');
+    }
+    // Hide placeholder
+    if (placeholder) placeholder.classList.add('hidden');
+    activeId = id;
+  }
+
+  items.forEach(item => {
+    item.addEventListener('click', () => {
+      activateContact(item.dataset.contactId);
+    });
+  });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', e => {
+    if (!['ArrowUp', 'ArrowDown'].includes(e.key)) return;
+    const visibleItems = items.filter(el => el.style.display !== 'none');
+    if (!visibleItems.length) return;
+    e.preventDefault();
+    const currentIdx = visibleItems.findIndex(el => el.dataset.contactId === String(activeId));
+    let nextIdx;
+    if (e.key === 'ArrowDown') {
+      nextIdx = currentIdx < visibleItems.length - 1 ? currentIdx + 1 : 0;
+    } else {
+      nextIdx = currentIdx > 0 ? currentIdx - 1 : visibleItems.length - 1;
+    }
+    const nextItem = visibleItems[nextIdx];
+    if (nextItem) {
+      activateContact(nextItem.dataset.contactId);
+      nextItem.scrollIntoView({ block: 'nearest' });
+    }
+  });
+
+  // ── Client-side filtering ───────────────────────────────────────────────
+  const searchInput   = document.getElementById('contacts-search');
+  const filterStatus  = document.getElementById('filter-status');
+  const filterType    = document.getElementById('filter-type');
+  const emptyEl       = document.getElementById('contacts-empty');
+  const visibleCount  = document.getElementById('visible-count');
+  const resetBtn      = document.getElementById('reset-filter');
+
+  function applyFilters() {
+    const q      = (searchInput?.value || '').toLowerCase().trim();
+    const status = filterStatus?.value || '';
+    const type   = filterType?.value || '';
+    let shown = 0;
+
+    items.forEach(el => {
+      const matchSearch = !q || (el.dataset.search || '').includes(q);
+      const matchStatus = !status || el.dataset.status === status;
+      const matchType   = !type   || el.dataset.type   === type;
+      const visible = matchSearch && matchStatus && matchType;
+      el.style.display = visible ? '' : 'none';
+      if (visible) shown++;
+    });
+
+    if (emptyEl) emptyEl.classList.toggle('hidden', shown > 0);
+    if (visibleCount) visibleCount.textContent = shown;
+  }
+
+  searchInput?.addEventListener('input', applyFilters);
+  filterStatus?.addEventListener('change', applyFilters);
+  filterType?.addEventListener('change', applyFilters);
+
+  resetBtn?.addEventListener('click', () => {
+    if (searchInput) searchInput.value = '';
+    if (filterStatus) filterStatus.value = '';
+    if (filterType) filterType.value = '';
+    applyFilters();
+  });
+
+  // Activate first item by default if list has items
+  if (items.length > 0) {
+    activateContact(items[0].dataset.contactId);
+  }
+
+})();
+</script>
+
+{% endblock %}

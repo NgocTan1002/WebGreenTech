@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+{% block title %}Đăng ký tài khoản — {{ COMPANY_NAME }}{% endblock %}
+{% block content %}
+
+<div class="min-h-screen px-4 pt-28 pb-16 bg-white dark:bg-slate-950">
+  <div class="max-w-2xl mx-auto">
+
+    {# Header #}
+    <div class="text-center mb-8">
+      <div class="w-14 h-14 bg-brand-600 rounded-2xl flex items-center justify-center
+                  mx-auto mb-4 shadow-lg shadow-brand-950/30">
+        <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+        </svg>
+      </div>
+      <h1 class="font-display text-3xl font-bold uppercase tracking-tight
+                 text-slate-900 dark:text-white">
+        Tạo tài khoản
+      </h1>
+      <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">
+        Đăng ký để quản lý đơn hàng, báo giá và tải tài liệu kỹ thuật.
+      </p>
+    </div>
+
+    {# Card #}
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border
+                border-slate-200 dark:border-slate-800 p-8 shadow-sm">
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        {# Non-field errors #}
+        {% if form.non_field_errors %}
+        <div class="flex items-center gap-2.5 bg-red-50 dark:bg-red-950/40
+                    text-red-600 dark:text-red-400
+                    border border-red-200 dark:border-red-800/60
+                    rounded-xl px-4 py-3 text-sm mb-6">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24"
+               stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+          </svg>
+          {{ form.non_field_errors.0 }}
+        </div>
+        {% endif %}
+
+        {# Input style — reused across all forms #}
+        {% with input_cls="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-all border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 dark:border-slate-700 dark:bg-slate-800/60 dark:text-white dark:placeholder-slate-600 dark:focus:border-brand-600 dark:focus:ring-brand-700/20" %}
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+          {# Email — full width #}
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                          text-slate-600 dark:text-slate-400">
+              Email <span class="text-red-500">*</span>
+            </label>
+            <input type="email" name="email"
+                   value="{{ form.email.value|default:'' }}"
+                   autocomplete="email"
+                   placeholder="email@congty.vn"
+                   class="{{ input_cls }} {% if form.email.errors %}!border-red-400 dark:!border-red-700{% endif %}" />
+            {% if form.email.errors %}
+            <p class="text-red-500 dark:text-red-400 text-xs mt-1.5 flex items-center gap-1">
+              <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24"
+                   stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01"/>
+              </svg>
+              {{ form.email.errors.0 }}
+            </p>
+            {% endif %}
+          </div>
+
+          {# First name #}
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                          text-slate-600 dark:text-slate-400">
+              Họ <span class="text-red-500">*</span>
+            </label>
+            <input type="text" name="first_name"
+                   value="{{ form.first_name.value|default:'' }}"
+                   placeholder="Nguyễn"
+                   class="{{ input_cls }} {% if form.first_name.errors %}!border-red-400 dark:!border-red-700{% endif %}" />
+            {% if form.first_name.errors %}
+            <p class="text-red-500 dark:text-red-400 text-xs mt-1.5">{{ form.first_name.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          {# Last name #}
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                          text-slate-600 dark:text-slate-400">
+              Tên <span class="text-red-500">*</span>
+            </label>
+            <input type="text" name="last_name"
+                   value="{{ form.last_name.value|default:'' }}"
+                   placeholder="Văn An"
+                   class="{{ input_cls }} {% if form.last_name.errors %}!border-red-400 dark:!border-red-700{% endif %}" />
+            {% if form.last_name.errors %}
+            <p class="text-red-500 dark:text-red-400 text-xs mt-1.5">{{ form.last_name.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          {# Phone #}
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                          text-slate-600 dark:text-slate-400">
+              Số điện thoại
+            </label>
+            <input type="text" name="phone"
+                   value="{{ form.phone.value|default:'' }}"
+                   placeholder="0901 234 567"
+                   class="{{ input_cls }}" />
+          </div>
+
+          {# Company name #}
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                          text-slate-600 dark:text-slate-400">
+              Tên công ty
+            </label>
+            <input type="text" name="company_name"
+                   value="{{ form.company_name.value|default:'' }}"
+                   placeholder="Công ty TNHH ABC"
+                   class="{{ input_cls }}" />
+          </div>
+
+          {# Company type #}
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                          text-slate-600 dark:text-slate-400">
+              Loại hình doanh nghiệp
+            </label>
+            <select name="company_type"
+                    class="{{ input_cls }} appearance-none"
+                    style="background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 12px center;background-size:14px">
+              <option value="">— Chọn loại hình (tuỳ chọn) —</option>
+              {% for value, label in form.company_type.field.choices %}
+              {% if value %}
+              <option value="{{ value }}"
+                      {% if form.company_type.value == value %}selected{% endif %}>
+                {{ label }}
+              </option>
+              {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+
+          {# Job title #}
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                          text-slate-600 dark:text-slate-400">
+              Chức danh
+            </label>
+            <input type="text" name="job_title"
+                   value="{{ form.job_title.value|default:'' }}"
+                   placeholder="Kỹ sư tự động hoá, Giám đốc kỹ thuật..."
+                   class="{{ input_cls }}" />
+          </div>
+
+          {# Password 1 #}
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                          text-slate-600 dark:text-slate-400">
+              Mật khẩu <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <input type="password" name="password1"
+                     autocomplete="new-password"
+                     placeholder="••••••••"
+                     class="{{ input_cls }} pr-12 {% if form.password1.errors %}!border-red-400 dark:!border-red-700{% endif %}" />
+              <button type="button"
+                      class="password-toggle absolute inset-y-0 right-0 w-11 flex items-center justify-center
+                             text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-200
+                             transition-colors"
+                      aria-label="Hiện mật khẩu"
+                      data-password-toggle>
+                <svg class="password-eye w-4 h-4" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <svg class="password-eye-off hidden w-4 h-4" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M3 3l18 18M10.58 10.58A2 2 0 0012 14a2 2 0 001.42-.58M9.88 4.33A10.53 10.53 0 0112 4.13c6 0 9.75 7.87 9.75 7.87a17.54 17.54 0 01-2.86 3.86M6.55 6.55A17.22 17.22 0 002.25 12S6 19.87 12 19.87a10.64 10.64 0 004.64-1.1"/>
+                </svg>
+              </button>
+            </div>
+            {% if form.password1.errors %}
+            <p class="text-red-500 dark:text-red-400 text-xs mt-1.5">{{ form.password1.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          {# Password 2 #}
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                          text-slate-600 dark:text-slate-400">
+              Xác nhận mật khẩu <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <input type="password" name="password2"
+                     autocomplete="new-password"
+                     placeholder="••••••••"
+                     class="{{ input_cls }} pr-12 {% if form.password2.errors %}!border-red-400 dark:!border-red-700{% endif %}" />
+              <button type="button"
+                      class="password-toggle absolute inset-y-0 right-0 w-11 flex items-center justify-center
+                             text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-200
+                             transition-colors"
+                      aria-label="Hiện mật khẩu"
+                      data-password-toggle>
+                <svg class="password-eye w-4 h-4" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <svg class="password-eye-off hidden w-4 h-4" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M3 3l18 18M10.58 10.58A2 2 0 0012 14a2 2 0 001.42-.58M9.88 4.33A10.53 10.53 0 0112 4.13c6 0 9.75 7.87 9.75 7.87a17.54 17.54 0 01-2.86 3.86M6.55 6.55A17.22 17.22 0 002.25 12S6 19.87 12 19.87a10.64 10.64 0 004.64-1.1"/>
+                </svg>
+              </button>
+            </div>
+            {% if form.password2.errors %}
+            <p class="text-red-500 dark:text-red-400 text-xs mt-1.5">{{ form.password2.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+        </div>
+        {% endwith %}
+
+        {# Submit #}
+        <button type="submit"
+                class="btn-primary w-full justify-center mt-6 py-3.5 text-sm">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+               stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+          </svg>
+          Tạo tài khoản
+        </button>
+
+      </form>
+
+      {# Divider #}
+      <div class="flex items-center gap-3 my-5">
+        <div class="flex-1 h-px bg-slate-100 dark:bg-slate-800"></div>
+        <span class="text-[11px] font-mono text-slate-400 dark:text-slate-600 uppercase tracking-wider">
+          hoặc
+        </span>
+        <div class="flex-1 h-px bg-slate-100 dark:bg-slate-800"></div>
+      </div>
+
+      <p class="text-center text-sm text-slate-500 dark:text-slate-500">
+        Đã có tài khoản?
+        <a href="{% url 'customers:login' %}"
+           class="text-brand-600 dark:text-brand-400 font-semibold hover:underline ml-1">
+          Đăng nhập
+        </a>
+      </p>
+    </div>
+
+    {# Trust note #}
+    <p class="text-center text-xs font-mono text-slate-400 dark:text-slate-700 mt-5">
+      Thông tin được bảo mật · Không chia sẻ bên thứ 3
+    </p>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+(function () {
+  document.querySelectorAll('[data-password-toggle]').forEach((button) => {
+    const input = button.parentElement.querySelector('input');
+    const eye = button.querySelector('.password-eye');
+    const eyeOff = button.querySelector('.password-eye-off');
+
+    button.addEventListener('click', () => {
+      const show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      button.setAttribute('aria-label', show ? 'Ẩn mật khẩu' : 'Hiện mật khẩu');
+      eye.classList.toggle('hidden', show);
+      eyeOff.classList.toggle('hidden', !show);
+    });
+  });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,775 @@
+{% extends "base.html" %}
+{% load currency %}
+{% load humanize %}
+{% block title %}Yêu Cầu Báo Giá — Dashboard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-white dark:bg-slate-950 pt-24 pb-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    {# ── Page header ── #}
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <p class="section-label mb-2">— Quản trị nội bộ</p>
+        <h1 class="font-display font-bold uppercase text-slate-900 dark:text-white
+                   text-3xl tracking-tight">
+          Yêu Cầu Báo Giá
+        </h1>
+      </div>
+      <a href="/admin/orders/quoterequest/"
+         class="btn-ghost text-sm">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        Quản lý Admin
+      </a>
+    </div>
+
+    {# ── Dashboard nav tabs ── #}
+    <nav class="flex gap-1 mb-8 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
+      {% url 'dashboard:home'      as url_dash_home %}
+      {% url 'dashboard:products'  as url_dash_products %}
+      {% url 'dashboard:orders'    as url_dash_orders %}
+      {% url 'dashboard:quotes'    as url_dash_quotes %}
+      {% url 'dashboard:contacts'  as url_dash_contacts %}
+      {% url 'dashboard:analytics' as url_dash_analytics %}
+
+      <a href="{{ url_dash_home }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                {% if request.path == url_dash_home %}
+                  border-brand-500 text-brand-600 dark:text-brand-400
+                {% else %}
+                  border-transparent text-slate-500 hover:text-slate-700
+                  dark:text-slate-500 dark:hover:text-slate-300
+                {% endif %}">
+        Tổng quan
+      </a>
+      <a href="{{ url_dash_products }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                {% if request.path == url_dash_products %}
+                  border-brand-500 text-brand-600 dark:text-brand-400
+                {% else %}
+                  border-transparent text-slate-500 hover:text-slate-700
+                  dark:text-slate-500 dark:hover:text-slate-300
+                {% endif %}">
+        Sản phẩm
+      </a>
+      <a href="{{ url_dash_orders }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                {% if request.path == url_dash_orders %}
+                  border-brand-500 text-brand-600 dark:text-brand-400
+                {% else %}
+                  border-transparent text-slate-500 hover:text-slate-700
+                  dark:text-slate-500 dark:hover:text-slate-300
+                {% endif %}">
+        Đơn hàng
+      </a>
+      <a href="{{ url_dash_quotes }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                {% if request.path == url_dash_quotes %}
+                  border-brand-500 text-brand-600 dark:text-brand-400
+                {% else %}
+                  border-transparent text-slate-500 hover:text-slate-700
+                  dark:text-slate-500 dark:hover:text-slate-300
+                {% endif %}">
+        Báo giá
+      </a>
+      <a href="{{ url_dash_contacts }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                {% if request.path == url_dash_contacts %}
+                  border-brand-500 text-brand-600 dark:text-brand-400
+                {% else %}
+                  border-transparent text-slate-500 hover:text-slate-700
+                  dark:text-slate-500 dark:hover:text-slate-300
+                {% endif %}">
+        Liên hệ
+      </a>
+      <a href="{{ url_dash_analytics }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                {% if request.path == url_dash_analytics %}
+                  border-brand-500 text-brand-600 dark:text-brand-400
+                {% else %}
+                  border-transparent text-slate-500 hover:text-slate-700
+                  dark:text-slate-500 dark:hover:text-slate-300
+                {% endif %}">
+        Analytics
+      </a>
+    </nav>
+
+    {# ── Stats KPI ── #}
+    {% with total=quotes|length %}
+    {% with count_new=0 count_review=0 count_quoted=0 count_accepted=0 count_declined=0 %}
+    {# Count via template — iterate once #}
+    {% for q in quotes %}{% endfor %}
+
+    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
+
+      {# Total #}
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border
+                  border-slate-200 dark:border-slate-800 p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+          </div>
+          <p class="text-slate-400 dark:text-slate-500 text-[10px] font-mono uppercase tracking-wider">
+            Tổng RFQ
+          </p>
+        </div>
+        <p class="font-display text-3xl font-bold text-slate-900 dark:text-white leading-none">
+          {{ quotes|length }}
+        </p>
+      </div>
+
+      {# New #}
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-amber-200 dark:border-amber-900/50 p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 rounded-lg bg-amber-50 dark:bg-amber-950/60 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+          </div>
+          <p class="text-amber-600 dark:text-amber-400 text-[10px] font-mono uppercase tracking-wider">
+            Mới
+          </p>
+        </div>
+        <p class="font-display text-3xl font-bold text-amber-600 dark:text-amber-400 leading-none" id="stat-new">
+          0
+        </p>
+      </div>
+
+      {# In review #}
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-violet-200 dark:border-violet-900/50 p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 rounded-lg bg-violet-50 dark:bg-violet-950/60 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+          </div>
+          <p class="text-violet-600 dark:text-violet-400 text-[10px] font-mono uppercase tracking-wider">
+            Đang xem
+          </p>
+        </div>
+        <p class="font-display text-3xl font-bold text-violet-600 dark:text-violet-400 leading-none" id="stat-in_review">
+          0
+        </p>
+      </div>
+
+      {# Quoted #}
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-blue-200 dark:border-blue-900/50 p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/60 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+            </svg>
+          </div>
+          <p class="text-blue-600 dark:text-blue-400 text-[10px] font-mono uppercase tracking-wider">
+            Đã báo giá
+          </p>
+        </div>
+        <p class="font-display text-3xl font-bold text-blue-600 dark:text-blue-400 leading-none" id="stat-quoted">
+          0
+        </p>
+      </div>
+
+      {# Accepted #}
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-emerald-200 dark:border-emerald-900/50 p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          <p class="text-emerald-600 dark:text-emerald-400 text-[10px] font-mono uppercase tracking-wider">
+            Chấp nhận
+          </p>
+        </div>
+        <p class="font-display text-3xl font-bold text-emerald-600 dark:text-emerald-400 leading-none" id="stat-accepted">
+          0
+        </p>
+      </div>
+
+    </div>
+    {% endwith %}
+    {% endwith %}
+
+    {# ── Pipeline funnel ── #}
+    <div class="grid grid-cols-5 gap-2 mb-6" id="pipeline-funnel">
+      <div class="bg-white dark:bg-slate-900 rounded-xl border border-amber-200 dark:border-amber-900/50 p-3 cursor-pointer hover:border-amber-400 transition-colors"
+           data-filter-status="new" onclick="filterByStatus(this, 'new')">
+        <p class="font-mono text-[9px] uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-1.5">Mới</p>
+        <p class="font-display font-bold text-xl text-slate-900 dark:text-white mb-2 funnel-count" data-status="new">0</p>
+        <div class="h-1 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+          <div class="h-full rounded-full bg-amber-400 funnel-bar transition-all duration-500" style="width:0%" data-status="new"></div>
+        </div>
+      </div>
+      <div class="bg-white dark:bg-slate-900 rounded-xl border border-violet-200 dark:border-violet-900/50 p-3 cursor-pointer hover:border-violet-400 transition-colors"
+           data-filter-status="in_review" onclick="filterByStatus(this, 'in_review')">
+        <p class="font-mono text-[9px] uppercase tracking-wider text-violet-600 dark:text-violet-400 mb-1.5">Đang xem</p>
+        <p class="font-display font-bold text-xl text-slate-900 dark:text-white mb-2 funnel-count" data-status="in_review">0</p>
+        <div class="h-1 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+          <div class="h-full rounded-full bg-violet-400 funnel-bar transition-all duration-500" style="width:0%" data-status="in_review"></div>
+        </div>
+      </div>
+      <div class="bg-white dark:bg-slate-900 rounded-xl border border-blue-200 dark:border-blue-900/50 p-3 cursor-pointer hover:border-blue-400 transition-colors"
+           data-filter-status="quoted" onclick="filterByStatus(this, 'quoted')">
+        <p class="font-mono text-[9px] uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-1.5">Đã báo giá</p>
+        <p class="font-display font-bold text-xl text-slate-900 dark:text-white mb-2 funnel-count" data-status="quoted">0</p>
+        <div class="h-1 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+          <div class="h-full rounded-full bg-blue-400 funnel-bar transition-all duration-500" style="width:0%" data-status="quoted"></div>
+        </div>
+      </div>
+      <div class="bg-white dark:bg-slate-900 rounded-xl border border-emerald-200 dark:border-emerald-900/50 p-3 cursor-pointer hover:border-emerald-400 transition-colors"
+           data-filter-status="accepted" onclick="filterByStatus(this, 'accepted')">
+        <p class="font-mono text-[9px] uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-1.5">Chấp nhận</p>
+        <p class="font-display font-bold text-xl text-slate-900 dark:text-white mb-2 funnel-count" data-status="accepted">0</p>
+        <div class="h-1 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+          <div class="h-full rounded-full bg-emerald-400 funnel-bar transition-all duration-500" style="width:0%" data-status="accepted"></div>
+        </div>
+      </div>
+      <div class="bg-white dark:bg-slate-900 rounded-xl border border-red-200 dark:border-red-900/50 p-3 cursor-pointer hover:border-red-400 transition-colors"
+           data-filter-status="declined" onclick="filterByStatus(this, 'declined')">
+        <p class="font-mono text-[9px] uppercase tracking-wider text-red-600 dark:text-red-400 mb-1.5">Từ chối</p>
+        <p class="font-display font-bold text-xl text-slate-900 dark:text-white mb-2 funnel-count" data-status="declined">0</p>
+        <div class="h-1 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+          <div class="h-full rounded-full bg-red-400 funnel-bar transition-all duration-500" style="width:0%" data-status="declined"></div>
+        </div>
+      </div>
+    </div>
+
+    {# ── Filter bar ── #}
+    <div class="flex flex-col sm:flex-row gap-3 mb-4 items-start sm:items-center justify-between">
+      <div class="flex gap-2 flex-wrap">
+        <div class="relative">
+          <select id="status-filter"
+                  onchange="applyFilters()"
+                  class="appearance-none text-sm font-semibold pl-3 pr-8 py-2 rounded-lg border outline-none transition-all
+                         border-slate-200 bg-white text-slate-700
+                         focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10
+                         dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300
+                         dark:focus:border-brand-600">
+            <option value="">Tất cả trạng thái</option>
+            <option value="new">Mới</option>
+            <option value="in_review">Đang xem xét</option>
+            <option value="quoted">Đã báo giá</option>
+            <option value="accepted">Đã chấp nhận</option>
+            <option value="declined">Từ chối</option>
+          </select>
+          <div class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
+            <svg class="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="relative">
+          <div class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+            </svg>
+          </div>
+          <input id="search-filter"
+                 type="text"
+                 placeholder="Tìm mã, tên, công ty, email..."
+                 oninput="applyFilters()"
+                 class="pl-9 pr-4 py-2 text-sm rounded-lg border outline-none transition-all w-64
+                        border-slate-200 bg-white text-slate-700 placeholder-slate-400
+                        focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10
+                        dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:placeholder-slate-600
+                        dark:focus:border-brand-600" />
+        </div>
+
+        <button id="reset-filter"
+                onclick="resetFilters()"
+                class="hidden items-center gap-1.5 text-sm font-semibold px-3 py-2 rounded-lg border transition-all
+                       border-red-200 text-red-600 hover:bg-red-50
+                       dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-950/30">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+          Xoá bộ lọc
+        </button>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span id="filter-counter" class="font-mono text-[11px] text-slate-400 dark:text-slate-600 uppercase tracking-wider"></span>
+        <span class="font-mono text-[11px] text-slate-400 dark:text-slate-600 uppercase tracking-wider">
+          {{ quotes|length }} RFQ
+        </span>
+      </div>
+    </div>
+
+    {# ── Main table ── #}
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+
+      {% if quotes %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm" id="quotes-table">
+          <thead>
+            <tr class="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700">
+              <th class="px-5 py-3.5 text-left text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-500 w-8">
+              </th>
+              <th class="px-5 py-3.5 text-left text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-500">
+                Mã RFQ
+              </th>
+              <th class="px-5 py-3.5 text-left text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-500">
+                Người gửi
+              </th>
+              <th class="px-5 py-3.5 text-left text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-500">
+                Giải pháp
+              </th>
+              <th class="px-5 py-3.5 text-left text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-500">
+                Trạng thái
+              </th>
+              <th class="px-5 py-3.5 text-left text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-500">
+                Phụ trách
+              </th>
+              <th class="px-5 py-3.5 text-left text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-500">
+                Ngày gửi
+              </th>
+              <th class="px-5 py-3.5 text-right text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-500">
+                Thao tác
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-800" id="quotes-tbody">
+            {% for quote in quotes %}
+            <tr class="quote-row hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors cursor-pointer group"
+                data-status="{{ quote.status }}"
+                data-search="{{ quote.reference|lower }}-{{ quote.name|lower }}-{{ quote.company|lower }}-{{ quote.email|lower }}"
+                data-quote-id="{{ quote.pk }}"
+                onclick="toggleDetail({{ quote.pk }}, event)">
+
+              {# Expand chevron #}
+              <td class="pl-5 py-3.5 w-8">
+                <svg class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200 chevron-{{ quote.pk }}"
+                     fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                </svg>
+              </td>
+
+              {# Mã RFQ #}
+              <td class="px-5 py-3.5">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-mono text-sm font-semibold text-slate-800 dark:text-slate-200 reference-text">
+                    {{ quote.reference }}
+                  </span>
+                  <button class="copy-btn opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded"
+                          data-ref="{{ quote.reference }}"
+                          onclick="copyRef(event, '{{ quote.reference }}', this)"
+                          title="Sao chép mã">
+                    <svg class="copy-icon w-3 h-3 text-slate-400 hover:text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                    </svg>
+                    <svg class="check-icon w-3 h-3 text-emerald-500 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+
+              {# Người gửi #}
+              <td class="px-5 py-3.5">
+                <p class="font-semibold text-slate-800 dark:text-slate-200 leading-tight">{{ quote.name }}</p>
+                {% if quote.company %}
+                <p class="text-xs text-slate-500 dark:text-slate-400 leading-tight mt-0.5">{{ quote.company }}</p>
+                {% endif %}
+                <p class="text-[11px] font-mono text-slate-400 dark:text-slate-500 leading-tight mt-0.5">{{ quote.email }}</p>
+              </td>
+
+              {# Giải pháp #}
+              <td class="px-5 py-3.5">
+                {% if quote.solution %}
+                <span class="tag tag-blue text-[10px]">{{ quote.solution.title|truncatechars:28 }}</span>
+                {% else %}
+                <span class="text-slate-400 dark:text-slate-600 text-xs">—</span>
+                {% endif %}
+              </td>
+
+              {# Trạng thái #}
+              <td class="px-5 py-3.5">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold
+                  {% if quote.status == 'new' %}bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800/50
+                  {% elif quote.status == 'in_review' %}bg-violet-50 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300 border border-violet-200 dark:border-violet-800/50
+                  {% elif quote.status == 'quoted' %}bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50
+                  {% elif quote.status == 'accepted' %}bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50
+                  {% elif quote.status == 'declined' %}bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-300 border border-red-200 dark:border-red-800/50
+                  {% else %}bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400{% endif %}">
+                  {% if quote.status == 'new' %}
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5 animate-pulse"></span>
+                  {% endif %}
+                  {{ quote.get_status_display }}
+                </span>
+              </td>
+
+              {# Phụ trách #}
+              <td class="px-5 py-3.5">
+                {% if quote.assigned_to %}
+                <div class="flex items-center gap-2">
+                  <span class="w-6 h-6 rounded-full bg-brand-100 dark:bg-brand-950/60 border border-brand-200 dark:border-brand-800/50
+                               flex items-center justify-center text-[10px] font-bold text-brand-700 dark:text-brand-400 flex-shrink-0">
+                    {{ quote.assigned_to.first_name|first|upper }}{{ quote.assigned_to.last_name|first|upper }}
+                  </span>
+                  <span class="text-sm text-slate-700 dark:text-slate-300 truncate max-w-[100px]">
+                    {{ quote.assigned_to.get_full_name|truncatechars:16 }}
+                  </span>
+                </div>
+                {% else %}
+                <span class="text-xs text-slate-400 dark:text-slate-600 italic">Chưa phân công</span>
+                {% endif %}
+              </td>
+
+              {# Ngày gửi #}
+              <td class="px-5 py-3.5">
+                <span class="font-mono text-xs text-slate-600 dark:text-slate-400"
+                      title="{{ quote.created_at|date:'d/m/Y H:i' }}">
+                  {{ quote.created_at|date:"d/m/Y" }}
+                </span>
+                <p class="font-mono text-[10px] text-slate-400 dark:text-slate-600">
+                  {{ quote.created_at|date:"H:i" }}
+                </p>
+              </td>
+
+              {# Thao tác #}
+              <td class="px-5 py-3.5 text-right">
+                <a href="/admin/orders/quoterequest/{{ quote.pk }}/change/"
+                   target="_blank"
+                   class="w-7 h-7 inline-flex items-center justify-center rounded-lg border
+                          border-slate-200 text-slate-400 hover:text-brand-600 hover:border-brand-300
+                          dark:border-slate-700 dark:hover:border-brand-700 dark:hover:text-brand-400
+                          transition-all"
+                   onclick="event.stopPropagation()"
+                   title="Mở trong Admin">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                  </svg>
+                </a>
+              </td>
+            </tr>
+
+            {# ── Expandable detail row ── #}
+            <tr class="detail-row-{{ quote.pk }} hidden" data-detail="{{ quote.pk }}">
+              <td colspan="8" class="px-0 py-0">
+                <div class="bg-slate-50 dark:bg-slate-800/50 border-t border-b border-slate-200 dark:border-slate-700 px-8 py-5">
+                  <div class="grid lg:grid-cols-2 gap-6">
+
+                    {# Col 1: Sản phẩm + Message #}
+                    <div>
+                      <p class="font-mono text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-600 mb-3">
+                        Sản phẩm yêu cầu
+                      </p>
+                      {% if quote.items.all %}
+                      <div class="rounded-xl border overflow-hidden border-slate-200 dark:border-slate-700">
+                        <table class="w-full text-xs">
+                          <thead>
+                            <tr class="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700">
+                              <th class="px-4 py-2.5 text-left font-mono text-[9px] uppercase tracking-wider text-slate-500">Sản phẩm</th>
+                              <th class="px-4 py-2.5 text-left font-mono text-[9px] uppercase tracking-wider text-slate-500">SKU</th>
+                              <th class="px-4 py-2.5 text-center font-mono text-[9px] uppercase tracking-wider text-slate-500">SL</th>
+                              <th class="px-4 py-2.5 text-left font-mono text-[9px] uppercase tracking-wider text-slate-500">Ghi chú</th>
+                            </tr>
+                          </thead>
+                          <tbody class="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-900/40">
+                            {% for item in quote.items.all %}
+                            <tr>
+                              <td class="px-4 py-2.5 font-medium text-slate-800 dark:text-slate-200">{{ item.product_name|truncatechars:30 }}</td>
+                              <td class="px-4 py-2.5 font-mono text-slate-500 dark:text-slate-400">{{ item.product_sku }}</td>
+                              <td class="px-4 py-2.5 text-center font-semibold text-slate-700 dark:text-slate-300">{{ item.quantity }}</td>
+                              <td class="px-4 py-2.5 text-slate-500 dark:text-slate-400 italic">{{ item.notes|default:"—"|truncatechars:40 }}</td>
+                            </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                      {% else %}
+                      <div class="rounded-xl border border-dashed border-slate-200 dark:border-slate-700 px-4 py-4 text-center">
+                        <p class="text-xs italic text-slate-400 dark:text-slate-600">
+                          Chưa có sản phẩm cụ thể trong yêu cầu này.
+                        </p>
+                      </div>
+                      {% endif %}
+
+                      {% if quote.message %}
+                      <div class="mt-4">
+                        <p class="font-mono text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-600 mb-2">
+                          Nội dung yêu cầu
+                        </p>
+                        <blockquote class="border-l-2 border-brand-500 pl-3 py-1 bg-white dark:bg-slate-900/40 rounded-r-lg text-xs text-slate-600 dark:text-slate-400 leading-relaxed italic">
+                          {{ quote.message|linebreaksbr }}
+                        </blockquote>
+                      </div>
+                      {% endif %}
+                    </div>
+
+                    {# Col 2: Thông tin liên hệ + Notes #}
+                    <div>
+                      <p class="font-mono text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-600 mb-3">
+                        Thông tin liên hệ
+                      </p>
+                      <div class="space-y-2 mb-4">
+                        <div class="flex items-center gap-2.5 text-xs">
+                          <span class="font-mono text-[9px] uppercase tracking-wider text-slate-400 dark:text-slate-600 w-16 flex-shrink-0">Email</span>
+                          <span class="font-mono text-slate-700 dark:text-slate-300">{{ quote.email }}</span>
+                        </div>
+                        {% if quote.phone %}
+                        <div class="flex items-center gap-2.5 text-xs">
+                          <span class="font-mono text-[9px] uppercase tracking-wider text-slate-400 dark:text-slate-600 w-16 flex-shrink-0">Điện thoại</span>
+                          <span class="text-slate-700 dark:text-slate-300">{{ quote.phone }}</span>
+                        </div>
+                        {% endif %}
+                        {% if quote.company %}
+                        <div class="flex items-center gap-2.5 text-xs">
+                          <span class="font-mono text-[9px] uppercase tracking-wider text-slate-400 dark:text-slate-600 w-16 flex-shrink-0">Công ty</span>
+                          <span class="text-slate-700 dark:text-slate-300">{{ quote.company }}</span>
+                        </div>
+                        {% endif %}
+                        {% if quote.application %}
+                        <div class="flex items-center gap-2.5 text-xs">
+                          <span class="font-mono text-[9px] uppercase tracking-wider text-slate-400 dark:text-slate-600 w-16 flex-shrink-0">Ứng dụng</span>
+                          <span class="text-slate-700 dark:text-slate-300">{{ quote.application }}</span>
+                        </div>
+                        {% endif %}
+                        {% if quote.solution %}
+                        <div class="flex items-center gap-2.5 text-xs">
+                          <span class="font-mono text-[9px] uppercase tracking-wider text-slate-400 dark:text-slate-600 w-16 flex-shrink-0">Giải pháp</span>
+                          <a href="{% url 'solutions:detail' quote.solution.slug %}"
+                             class="text-brand-600 dark:text-brand-400 hover:underline"
+                             onclick="event.stopPropagation()">
+                            {{ quote.solution.title }}
+                          </a>
+                        </div>
+                        {% endif %}
+                      </div>
+
+                      {% if quote.internal_notes %}
+                      <div class="mb-4">
+                        <p class="font-mono text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-600 mb-2">
+                          Ghi chú nội bộ
+                        </p>
+                        <div class="text-xs text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900/40 rounded-xl border border-slate-200 dark:border-slate-700 p-3 leading-relaxed">
+                          {{ quote.internal_notes|linebreaksbr }}
+                        </div>
+                      </div>
+                      {% endif %}
+
+                      {# Converted order badge #}
+                      {% if quote.converted_to_order %}
+                      <div class="mb-4">
+                        <a href="/admin/orders/order/{{ quote.converted_to_order.pk }}/change/"
+                           class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border
+                                  border-emerald-200 bg-emerald-50 text-emerald-700 text-xs font-semibold
+                                  dark:border-emerald-800/50 dark:bg-emerald-950/40 dark:text-emerald-400
+                                  hover:border-emerald-400 transition-colors"
+                           onclick="event.stopPropagation()">
+                          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                          </svg>
+                          Đã chuyển → {{ quote.converted_to_order.order_number }}
+                        </a>
+                      </div>
+                      {% endif %}
+
+                      <a href="/admin/orders/quoterequest/{{ quote.pk }}/change/"
+                         target="_blank"
+                         class="btn-ghost text-xs py-2 px-3 gap-1.5"
+                         onclick="event.stopPropagation()">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                        </svg>
+                        Mở trong Admin
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {# Empty state after filter #}
+      <div id="no-results" class="hidden flex flex-col items-center justify-center py-16 text-center">
+        <svg class="w-10 h-10 text-slate-300 dark:text-slate-700 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <p class="text-slate-400 dark:text-slate-600 text-sm">Không tìm thấy RFQ phù hợp</p>
+        <button onclick="resetFilters()" class="mt-3 text-xs text-brand-600 dark:text-brand-400 hover:underline">Xoá bộ lọc</button>
+      </div>
+
+      {% else %}
+      {# Empty state - no data at all #}
+      <div class="flex flex-col items-center justify-center py-20 text-center">
+        <svg class="w-12 h-12 text-slate-300 dark:text-slate-700 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <p class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">Chưa có yêu cầu báo giá nào.</p>
+        <p class="text-slate-400 dark:text-slate-600 text-xs mb-4">Các RFQ từ khách hàng sẽ hiển thị tại đây.</p>
+        <a href="/admin/orders/quoterequest/"
+           class="btn-ghost text-xs py-2">
+          Quản lý trong Admin
+        </a>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+(function () {
+  // ── Count stats from DOM ──────────────────────────────────────────────
+  const statIds = ['new', 'in_review', 'quoted', 'accepted', 'declined'];
+  const counts  = {};
+  statIds.forEach(s => counts[s] = 0);
+
+  const allRows = Array.from(document.querySelectorAll('.quote-row'));
+  allRows.forEach(row => {
+    const st = row.dataset.status;
+    if (counts.hasOwnProperty(st)) counts[st]++;
+  });
+
+  const total = allRows.length;
+
+  // Update stat cards
+  const statNew = document.getElementById('stat-new');
+  const statReview = document.getElementById('stat-in_review');
+  const statQuoted = document.getElementById('stat-quoted');
+  const statAccepted = document.getElementById('stat-accepted');
+
+  if (statNew)      statNew.textContent      = counts['new'];
+  if (statReview)   statReview.textContent   = counts['in_review'];
+  if (statQuoted)   statQuoted.textContent   = counts['quoted'];
+  if (statAccepted) statAccepted.textContent = counts['accepted'];
+
+  // Update funnel counts + bars
+  statIds.forEach(s => {
+    const countEls = document.querySelectorAll(`.funnel-count[data-status="${s}"]`);
+    const barEls   = document.querySelectorAll(`.funnel-bar[data-status="${s}"]`);
+    const pct      = total > 0 ? Math.round((counts[s] / total) * 100) : 0;
+    countEls.forEach(el => el.textContent = counts[s]);
+    barEls.forEach(el => el.style.width   = pct + '%');
+  });
+
+
+  // ── Copy to clipboard ─────────────────────────────────────────────────
+  window.copyRef = function (e, ref, btn) {
+    e.stopPropagation();
+    navigator.clipboard.writeText(ref).then(() => {
+      const copy  = btn.querySelector('.copy-icon');
+      const check = btn.querySelector('.check-icon');
+      copy.classList.add('hidden');
+      check.classList.remove('hidden');
+      setTimeout(() => {
+        copy.classList.remove('hidden');
+        check.classList.add('hidden');
+      }, 1500);
+    });
+  };
+
+
+  // ── Toggle expandable detail ──────────────────────────────────────────
+  window.toggleDetail = function (id, e) {
+    if (e.target.closest('a') || e.target.closest('button')) return;
+    const detail  = document.querySelector(`.detail-row-${id}`);
+    const chevron = document.querySelector(`.chevron-${id}`);
+    if (!detail) return;
+    const isOpen = !detail.classList.contains('hidden');
+    detail.classList.toggle('hidden', isOpen);
+    if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(90deg)';
+  };
+
+
+  // ── Filters ───────────────────────────────────────────────────────────
+  window.applyFilters = function () {
+    const statusVal = document.getElementById('status-filter')?.value ?? '';
+    const searchVal = (document.getElementById('search-filter')?.value ?? '').toLowerCase().trim();
+    const resetBtn  = document.getElementById('reset-filter');
+    const counter   = document.getElementById('filter-counter');
+    const noResults = document.getElementById('no-results');
+
+    const isFiltering = statusVal || searchVal;
+    resetBtn?.classList.toggle('hidden',  !isFiltering);
+    resetBtn?.classList.toggle('inline-flex', !!isFiltering);
+
+    let visible = 0;
+    allRows.forEach(row => {
+      const matchStatus = !statusVal || row.dataset.status === statusVal;
+      const matchSearch = !searchVal || row.dataset.search.includes(searchVal);
+      const show        = matchStatus && matchSearch;
+
+      row.classList.toggle('hidden', !show);
+
+      // Also hide its detail row if parent hidden
+      const detailId  = row.dataset.quoteId;
+      const detailRow = document.querySelector(`[data-detail="${detailId}"]`);
+      if (detailRow && !show) {
+        detailRow.classList.add('hidden');
+        const chev = document.querySelector(`.chevron-${detailId}`);
+        if (chev) chev.style.transform = '';
+      }
+
+      if (show) visible++;
+    });
+
+    if (counter) counter.textContent = isFiltering ? `${visible} kết quả` : '';
+    if (noResults) noResults.classList.toggle('hidden', visible > 0 || !isFiltering);
+  };
+
+  window.resetFilters = function () {
+    const statusSel = document.getElementById('status-filter');
+    const searchInp = document.getElementById('search-filter');
+    if (statusSel) statusSel.value = '';
+    if (searchInp) searchInp.value = '';
+
+    // Reset funnel highlight
+    document.querySelectorAll('#pipeline-funnel > div').forEach(el => {
+      el.classList.remove('ring-2', 'ring-brand-500');
+    });
+
+    applyFilters();
+  };
+
+  // Filter by clicking funnel bucket
+  window.filterByStatus = function (el, status) {
+    const statusSel = document.getElementById('status-filter');
+    if (!statusSel) return;
+
+    // Toggle: clicking same status resets
+    if (statusSel.value === status) {
+      statusSel.value = '';
+      document.querySelectorAll('#pipeline-funnel > div').forEach(d => {
+        d.classList.remove('ring-2', 'ring-brand-500', 'ring-offset-1');
+      });
+    } else {
+      statusSel.value = status;
+      document.querySelectorAll('#pipeline-funnel > div').forEach(d => {
+        d.classList.remove('ring-2', 'ring-brand-500', 'ring-offset-1');
+      });
+      el.classList.add('ring-2', 'ring-brand-500', 'ring-offset-1');
+    }
+    applyFilters();
+  };
+
+})();
+</script>
+{% endblock %}

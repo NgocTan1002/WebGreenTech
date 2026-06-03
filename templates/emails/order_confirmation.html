@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xác nhận đơn hàng {{ order.order_number }} — {{ COMPANY_NAME }}</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; background: #f1f5f9; margin: 0; padding: 0; -webkit-text-size-adjust: 100%; }
+    .wrapper { max-width: 600px; margin: 24px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 8px rgba(0,0,0,.08); }
+    .header { background: #2e3de6; padding: 32px 40px; text-align: center; }
+    .header-logo { font-size: 22px; font-weight: bold; color: #ffffff; letter-spacing: .08em; text-transform: uppercase; margin: 0 0 4px; }
+    .header-sub { font-size: 13px; color: rgba(255,255,255,.75); margin: 0; letter-spacing: .05em; }
+    .body { padding: 36px 40px; }
+    .greeting { font-size: 15px; color: #1e293b; margin: 0 0 8px; }
+    .intro { font-size: 14px; color: #475569; line-height: 1.6; margin: 0 0 28px; }
+    /* Order number badge */
+    .order-badge { background: #eff1ff; border: 1px solid #c7cdff; border-radius: 10px; padding: 18px 20px; text-align: center; margin-bottom: 28px; }
+    .order-badge-label { font-size: 10px; color: #64748b; letter-spacing: .15em; text-transform: uppercase; margin: 0 0 6px; font-family: 'Courier New', monospace; }
+    .order-badge-number { font-size: 20px; font-weight: bold; color: #2e3de6; font-family: 'Courier New', monospace; margin: 0; }
+    /* Meta row */
+    .meta-row { display: table; width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; margin-bottom: 28px; border-spacing: 0; }
+    .meta-cell { display: table-cell; padding: 14px 18px; border-right: 1px solid #e2e8f0; vertical-align: top; width: 50%; }
+    .meta-cell:last-child { border-right: none; }
+    .meta-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: .12em; margin: 0 0 4px; font-family: 'Courier New', monospace; }
+    .meta-value { font-size: 13px; color: #1e293b; font-weight: 600; margin: 0; }
+    .meta-value-light { font-size: 13px; color: #475569; margin: 0; }
+    /* Badge */
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; }
+    .badge-purchase { background: #dcfce7; color: #166534; }
+    .badge-quote { background: #fef9c3; color: #854d0e; }
+    /* Section heading */
+    .section-heading { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: .15em; margin: 0 0 12px; font-family: 'Courier New', monospace; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9; }
+    /* Items table */
+    table.items { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+    table.items thead tr { background: #f8fafc; }
+    table.items th { padding: 10px 12px; text-align: left; font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
+    table.items th.right, table.items td.right { text-align: right; }
+    table.items td { padding: 12px; font-size: 13px; color: #334155; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+    table.items td .product-name { font-weight: 600; color: #1e293b; margin: 0 0 3px; }
+    table.items td .product-sku { font-family: 'Courier New', monospace; font-size: 11px; color: #94a3b8; margin: 0; }
+    table.items tfoot tr { background: #f8fafc; }
+    table.items tfoot td { padding: 12px; font-size: 14px; font-weight: bold; color: #2e3de6; border-top: 2px solid #e2e8f0; border-bottom: none; }
+    /* Address box */
+    .address-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; margin-bottom: 28px; font-size: 13px; color: #475569; line-height: 1.7; }
+    /* Notes box */
+    .notes-box { background: #fefce8; border: 1px solid #fde047; border-left: 3px solid #facc15; border-radius: 6px; padding: 12px 16px; margin-bottom: 28px; }
+    .notes-box p { font-size: 13px; color: #713f12; margin: 0; line-height: 1.6; }
+    /* Next steps */
+    .steps-wrap { margin-bottom: 28px; }
+    .step { display: table; width: 100%; margin-bottom: 14px; }
+    .step-num { display: table-cell; width: 32px; vertical-align: top; padding-top: 2px; }
+    .step-circle { width: 26px; height: 26px; background: #2e3de6; border-radius: 50%; color: #fff; font-size: 12px; font-weight: bold; text-align: center; line-height: 26px; font-family: 'Courier New', monospace; }
+    .step-body { display: table-cell; padding-left: 10px; vertical-align: top; }
+    .step-title { font-size: 13px; font-weight: 700; color: #1e293b; margin: 0 0 2px; }
+    .step-desc { font-size: 12px; color: #64748b; margin: 0; line-height: 1.5; }
+    /* CTA button */
+    .btn-wrap { text-align: center; margin: 28px 0; }
+    .btn { display: inline-block; background: #2e3de6; color: #ffffff; padding: 13px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px; letter-spacing: .03em; }
+    /* Divider */
+    .divider { border: none; border-top: 1px solid #f1f5f9; margin: 28px 0; }
+    /* Contact inline */
+    .contact-line { font-size: 13px; color: #475569; line-height: 1.7; margin: 0 0 4px; }
+    .contact-line a { color: #2e3de6; text-decoration: none; }
+    /* Footer */
+    .footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 24px 40px; text-align: center; }
+    .footer p { font-size: 12px; color: #94a3b8; margin: 0 0 4px; line-height: 1.6; }
+    .footer a { color: #64748b; text-decoration: none; }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <div class="header">
+    <p class="header-logo">{{ COMPANY_NAME }}</p>
+    <p class="header-sub">Xác nhận đơn hàng</p>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <p class="greeting">Xin chào {{ order.first_name }} {{ order.last_name }}{% if order.company_name %} — <strong>{{ order.company_name }}</strong>{% endif %},</p>
+    <p class="intro">Chúng tôi đã nhận được đơn hàng của bạn và sẽ xử lý trong thời gian sớm nhất. Đội kỹ thuật sẽ liên hệ xác nhận trong vòng <strong>24 giờ làm việc</strong>.</p>
+
+    <!-- ORDER BADGE -->
+    <div class="order-badge">
+      <p class="order-badge-label">Mã đơn hàng</p>
+      <p class="order-badge-number">{{ order.order_number }}</p>
+    </div>
+
+    <!-- META INFO -->
+    <div class="meta-row">
+      <div class="meta-cell">
+        <p class="meta-label">Loại đơn</p>
+        <p class="meta-value">
+          {% if order.order_type == 'quote' %}
+          <span class="badge badge-quote">Yêu cầu báo giá</span>
+          {% else %}
+          <span class="badge badge-purchase">Đơn mua hàng</span>
+          {% endif %}
+        </p>
+      </div>
+      <div class="meta-cell">
+        <p class="meta-label">Trạng thái</p>
+        <p class="meta-value-light">Chờ xác nhận</p>
+      </div>
+    </div>
+
+    <!-- ITEMS TABLE -->
+    <p class="section-heading">Chi tiết đơn hàng</p>
+    <table class="items">
+      <thead>
+        <tr>
+          <th>Sản phẩm</th>
+          <th class="right">SL</th>
+          <th class="right">Đơn giá</th>
+          <th class="right">Thành tiền</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <td>
+            <p class="product-name">{{ item.product_name }}</p>
+            <p class="product-sku">SKU: {{ item.product_sku }}</p>
+          </td>
+          <td class="right">{{ item.quantity }}</td>
+          <td class="right">{{ item.unit_price|floatformat:0 }} ₫</td>
+          <td class="right"><strong>{{ item.line_total|floatformat:0 }} ₫</strong></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3" style="text-align:right;">Tổng cộng</td>
+          <td class="right">{{ order.total|floatformat:0 }} ₫</td>
+        </tr>
+      </tfoot>
+    </table>
+    <p style="font-size:11px;color:#94a3b8;margin:0 0 28px;text-align:right;">* Giá chưa bao gồm phí vận chuyển và VAT. Sẽ được xác nhận sau khi liên hệ.</p>
+
+    <!-- SHIPPING ADDRESS -->
+    {% if order.shipping_address %}
+    <p class="section-heading">Địa chỉ giao hàng</p>
+    <div class="address-box">
+      {{ order.first_name }} {{ order.last_name }}{% if order.company_name %} — {{ order.company_name }}{% endif %}<br>
+      {% if order.shipping_address.address_line1 %}{{ order.shipping_address.address_line1 }}<br>{% endif %}
+      {% if order.shipping_address.address_line2 %}{{ order.shipping_address.address_line2 }}<br>{% endif %}
+      {% if order.shipping_address.city %}{{ order.shipping_address.city }}{% if order.shipping_address.state %}, {{ order.shipping_address.state }}{% endif %}<br>{% endif %}
+      {% if order.shipping_address.country %}{{ order.shipping_address.country }}{% endif %}
+    </div>
+    {% endif %}
+
+    <!-- NOTES -->
+    {% if order.customer_notes %}
+    <p class="section-heading">Ghi chú đơn hàng</p>
+    <div class="notes-box">
+      <p>{{ order.customer_notes }}</p>
+    </div>
+    {% endif %}
+
+    <!-- NEXT STEPS -->
+    <p class="section-heading">Bước tiếp theo</p>
+    <div class="steps-wrap">
+      <div class="step">
+        <div class="step-num"><div class="step-circle">1</div></div>
+        <div class="step-body">
+          <p class="step-title">Xác nhận đơn hàng</p>
+          <p class="step-desc">Kỹ sư của chúng tôi sẽ liên hệ qua email hoặc điện thoại trong vòng 24 giờ làm việc để xác nhận đơn.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"><div class="step-circle">2</div></div>
+        <div class="step-body">
+          <p class="step-title">Xác nhận giá & Điều khoản</p>
+          <p class="step-desc">Chúng tôi sẽ gửi báo giá chính thức và thống nhất điều khoản thanh toán, thời gian giao hàng.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"><div class="step-circle">3</div></div>
+        <div class="step-body">
+          <p class="step-title">Xử lý & Giao hàng</p>
+          <p class="step-desc">Sau khi xác nhận, đơn hàng được xử lý và giao đến địa chỉ của bạn kèm tài liệu kỹ thuật đầy đủ.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA BUTTON -->
+    <div class="btn-wrap">
+      <a href="{{ SITE_URL }}/orders/confirmation/{{ order.order_number }}/" class="btn">Xem chi tiết đơn hàng</a>
+    </div>
+
+    <hr class="divider">
+
+    <!-- CONTACT -->
+    <p class="contact-line">Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ đội kỹ thuật:</p>
+    <p class="contact-line">📧 <a href="mailto:{{ COMPANY_EMAIL }}">{{ COMPANY_EMAIL }}</a></p>
+    <p class="contact-line">📞 <a href="tel:{{ COMPANY_PHONE }}">{{ COMPANY_PHONE }}</a></p>
+    <p class="contact-line" style="margin-top:12px;font-size:12px;color:#94a3b8;">Email này được gửi tự động sau khi đơn hàng được tiếp nhận. Vui lòng không trả lời email này nếu bạn không đặt hàng.</p>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p><strong>{{ COMPANY_NAME }}</strong></p>
+    {% if COMPANY_ADDRESS %}<p>{{ COMPANY_ADDRESS }}</p>{% endif %}
+    <p>
+      <a href="mailto:{{ COMPANY_EMAIL }}">{{ COMPANY_EMAIL }}</a>
+      &nbsp;·&nbsp;
+      <a href="tel:{{ COMPANY_PHONE }}">{{ COMPANY_PHONE }}</a>
+    </p>
+    <p style="margin-top:12px;">
+      <a href="{{ SITE_URL }}">{{ SITE_URL }}</a>
+    </p>
+  </div>
+
+</div>
+</body>
+</html>

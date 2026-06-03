@@ -1,0 +1,760 @@
+{% extends "base.html" %}
+{% load static %}
+{% load currency %}
+{% load humanize %}
+
+{% block title %}Sản phẩm — {{ COMPANY_NAME }}{% endblock %}
+{% block meta_description %}Danh mục thiết bị IoT công nghiệp, cảm biến, gateway, PLC và giải pháp tự động hoá — {{ COMPANY_NAME }}{% endblock %}
+
+{% block content %}
+
+{# ══════════════════════════════════════════════════════════════════ PAGE HEADER ══════════════════════════════════════════════════════════════════ #}
+<section class="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 pt-24 pb-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    {# Breadcrumb #}
+    <nav class="flex items-center gap-2 text-xs font-mono text-slate-400 dark:text-slate-500 mb-8">
+      <a href="{% url 'core:home' %}" class="hover:text-slate-700 dark:hover:text-slate-300 transition-colors">Trang chủ</a>
+      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+      </svg>
+      <span class="text-slate-600 dark:text-slate-400">Sản phẩm</span>
+    </nav>
+
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+      <div>
+        <h1 class="font-display font-extrabold text-slate-900 dark:text-white 
+                  text-4xl lg:text-5xl leading-tight tracking-tight">
+          Danh mục sản phẩm
+        </h1>
+        <div class="w-12 h-0.5 bg-brand-500 mt-4 mb-4"></div>
+        <p class="text-slate-600 dark:text-slate-400 text-base max-w-lg leading-relaxed">
+          {{ total_count|intcomma }} sản phẩm — từ cảm biến hiện trường đến
+          gateway công nghiệp và hệ thống điều khiển.
+        </p>
+      </div>
+
+      {# Active filters summary #}
+      {% if active_filters %}
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-slate-500 dark:text-slate-500 text-xs font-mono">Đang lọc:</span>
+        {% for f in active_filters %}
+        <a href="{{ f.remove_url }}"
+           class="inline-flex items-center gap-1.5 bg-brand-50 dark:bg-brand-900/60 border border-brand-200 dark:border-brand-700/60
+                  text-brand-700 dark:text-brand-300 text-xs px-3 py-1.5 rounded-full hover:bg-red-50 dark:hover:bg-red-900/40
+                  hover:border-red-200 dark:hover:border-red-700/50 hover:text-red-600 dark:hover:text-red-300 transition-all group">
+          {{ f.label }}
+          <svg class="w-3 h-3 opacity-60 group-hover:opacity-100" fill="none" viewBox="0 0 24 24"
+               stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </a>
+        {% endfor %}
+        <a href="{% url 'products:list' %}"
+           class="text-slate-400 dark:text-slate-500 text-xs hover:text-slate-600 dark:hover:text-slate-300 transition-colors underline underline-offset-2">
+          Xoá tất cả
+        </a>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+
+
+{# ══════════════════════════════════════════════════════════════════ MAIN CONTENT: SIDEBAR + PRODUCT GRID ══════════════════════════════════════════════════════════════════ #}
+<div class="bg-slate-50 dark:bg-slate-950 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="flex gap-8">
+
+      {# ───────────────────────────────────────── SIDEBAR — Filters (desktop) ───────────────────────────────────────── #}
+      <aside class="hidden lg:block w-56 xl:w-64 flex-shrink-0">
+        <form method="get" id="filter-form">
+
+          {# Tìm kiếm #}
+          <div class="mb-6">
+            <label class="block text-[11px] font-mono text-slate-700 dark:text-slate-400 uppercase
+                          tracking-widest mb-2">Tìm kiếm</label>
+            <div class="relative">
+              <input type="text" name="q" value="{{ request.GET.q }}"
+                     placeholder="Tên hoặc mã sản phẩm"
+                     class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700
+                            text-slate-800 dark:text-slate-200
+                            text-sm px-3 py-2.5 pr-9 rounded-xl placeholder-slate-400 dark:placeholder-slate-600
+                            focus:outline-none focus:border-brand-500 dark:focus:border-brand-600 focus:ring-1
+                            focus:ring-brand-500/20 dark:focus:ring-brand-700 transition-colors" />
+              <button type="submit"
+                      class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500
+                             hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {# Danh mục #}
+          {% if categories %}
+          <div class="mb-6">
+            <p class="text-[11px] font-mono text-slate-700 dark:text-slate-400 uppercase tracking-widest mb-3">
+              Danh mục
+            </p>
+            <ul class="space-y-1">
+              <li>
+                <a href="{% url 'products:list' %}{% if request.GET.q %}?q={{ request.GET.q }}{% endif %}"
+                   class="flex items-center justify-between px-3 py-2 rounded-lg text-sm
+                          transition-colors
+                          {% if not request.GET.category %}
+                            bg-brand-50 dark:bg-brand-900/50 text-brand-700 dark:text-brand-300 border border-brand-200 dark:border-brand-800/60
+                          {% else %}
+                            text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50
+                          {% endif %}">
+                  <span>Tất cả</span>
+                  <span class="text-[11px] font-mono text-slate-400 dark:text-slate-600">{{ total_count }}</span>
+                </a>
+              </li>
+              {% for cat in categories %}
+              <li>
+                <a href="?category={{ cat.slug }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                   class="flex items-center justify-between px-3 py-2 rounded-lg text-sm
+                          transition-colors
+                          {% if request.GET.category == cat.slug %}
+                            bg-brand-50 dark:bg-brand-900/50 text-brand-700 dark:text-brand-300 border border-brand-200 dark:border-brand-800/60
+                          {% else %}
+                            text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50
+                          {% endif %}">
+                  <span>{{ cat.name }}</span>
+                  <span class="text-[11px] font-mono text-slate-400 dark:text-slate-600">{{ cat.count }}</span>
+                </a>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+
+          {# Thương hiệu #}
+          {% if brands %}
+          <div class="mb-6">
+            <p class="text-[10px] font-mono text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-3">
+              Thương hiệu
+            </p>
+            <ul class="space-y-1">
+              {% for brand in brands %}
+              <li>
+                <label class="flex items-center gap-2.5 px-3 py-2 rounded-lg cursor-pointer
+                              hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors group">
+                  <input type="checkbox" name="brand" value="{{ brand.slug }}"
+                         {% if brand.slug in selected_brands %}checked{% endif %}
+                         onchange="document.getElementById('filter-form').submit()"
+                         class="w-3.5 h-3.5 rounded border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800
+                                text-brand-600 focus:ring-brand-500 dark:focus:ring-brand-700 focus:ring-offset-0" />
+                  <span class="text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 text-sm
+                               transition-colors flex-1">{{ brand.name }}</span>
+                  <span class="text-[11px] font-mono text-slate-400 dark:text-slate-600">{{ brand.count }}</span>
+                </label>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+
+          {# Tình trạng kho #}
+          <div class="mb-6">
+            <p class="text-[11px] font-mono text-slate-700 dark:text-slate-400 uppercase tracking-widest mb-3">
+              Tình trạng
+            </p>
+            <ul class="space-y-1">
+              {% for val, label, color in stock_choices %}
+              <li>
+                <label class="flex items-center gap-2.5 px-3 py-2 rounded-lg cursor-pointer
+                              hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors group">
+                  <input type="checkbox" name="stock" value="{{ val }}"
+                         {% if val in selected_stock %}checked{% endif %}
+                         onchange="document.getElementById('filter-form').submit()"
+                         class="w-3.5 h-3.5 rounded border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800
+                                text-brand-600 focus:ring-brand-500 dark:focus:ring-brand-700 focus:ring-offset-0" />
+                  <span class="flex items-center gap-1.5 text-sm text-slate-600 dark:text-slate-400
+                               group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">
+                    <span class="w-1.5 h-1.5 rounded-full {{ color }} flex-shrink-0"></span>
+                    {{ label }}
+                  </span>
+                </label>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+
+          {# Giá #}
+          <div class="mb-6">
+            <p class="text-[11px] font-mono text-slate-700 dark:text-slate-400 uppercase tracking-widest mb-3">
+              Loại giá
+            </p>
+            <ul class="space-y-1">
+              {% for val, label in pricing_choices %}
+              <li>
+                <label class="flex items-center gap-2.5 px-3 py-2 rounded-lg cursor-pointer
+                              hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors group">
+                  <input type="checkbox" name="pricing" value="{{ val }}"
+                         {% if val in selected_pricing %}checked{% endif %}
+                         onchange="document.getElementById('filter-form').submit()"
+                         class="w-3.5 h-3.5 rounded border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800
+                                text-brand-600 focus:ring-brand-500 dark:focus:ring-brand-700 focus:ring-offset-0" />
+                  <span class="text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 text-sm
+                               transition-colors">{{ label }}</span>
+                </label>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+
+        </form>
+      </aside>
+
+      {# ───────────────────────────────────────── RIGHT COLUMN: Toolbar + Grid ───────────────────────────────────────── #}
+      <div class="flex-1 min-w-0">
+
+        {# ── Toolbar ── #}
+        <div class="flex items-center justify-between gap-4 mb-6">
+
+          {# Mobile: open filter drawer #}
+          <button type="button" id="mobile-filter-btn"
+                  class="lg:hidden inline-flex items-center gap-2 bg-white dark:bg-slate-900 border
+                         border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-sm px-4 py-2.5 rounded-xl
+                         hover:border-slate-300 dark:hover:border-slate-500 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+            </svg>
+            Lọc
+            {% if active_filter_count %}<span class="bg-brand-600 text-white text-[10px]
+              font-bold w-4 h-4 rounded-full flex items-center justify-center">
+              {{ active_filter_count }}</span>{% endif %}
+          </button>
+
+          <p class="text-slate-500 dark:text-slate-500 text-sm hidden lg:block">
+            <span class="text-slate-800 dark:text-slate-300 font-semibold">{{ page_obj.paginator.count|intcomma }}</span>
+            kết quả
+          </p>
+
+          <div class="flex items-center gap-3 ml-auto">
+            {# Sort #}
+            <form method="get" id="sort-form" class="flex items-center gap-2">
+              {% for key, val in request.GET.items %}
+                {% if key != 'sort' and key != 'page' %}
+                <input type="hidden" name="{{ key }}" value="{{ val }}" />
+                {% endif %}
+              {% endfor %}
+              <label class="text-slate-500 dark:text-slate-500 text-xs font-mono hidden sm:block">Sắp xếp</label>
+              <select name="sort" onchange="document.getElementById('sort-form').submit()"
+                      class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700
+                             text-slate-700 dark:text-slate-300 text-sm
+                             px-3 py-2 rounded-xl focus:outline-none focus:border-brand-500 dark:focus:border-brand-600
+                             transition-colors appearance-none pr-8 cursor-pointer"
+                      style="background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 8px center;background-size:14px">
+                <option value="newest" {% if request.GET.sort == 'newest' or not request.GET.sort %}selected{% endif %}>Mới nhất</option>
+                <option value="name_asc"  {% if request.GET.sort == 'name_asc' %}selected{% endif %}>Tên A → Z</option>
+                <option value="name_desc" {% if request.GET.sort == 'name_desc' %}selected{% endif %}>Tên Z → A</option>
+                <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Giá thấp → cao</option>
+                <option value="price_desc"{% if request.GET.sort == 'price_desc' %}selected{% endif %}>Giá cao → thấp</option>
+              </select>
+            </form>
+
+            {# View toggle #}
+            <div class="flex border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+              <button type="button" data-view="grid"
+                      class="view-btn px-3 py-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200
+                             hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors active-view">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                </svg>
+              </button>
+              <button type="button" data-view="list"
+                      class="view-btn px-3 py-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200
+                             hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border-l border-slate-200 dark:border-slate-700">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {# ── Empty state ── #}
+        {% if not products %}
+        <div class="flex flex-col items-center justify-center py-24 text-center">
+          <div class="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800
+                      flex items-center justify-center mb-5">
+            <svg class="w-8 h-8 text-slate-400 dark:text-slate-600" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="1">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <h3 class="text-slate-800 dark:text-white font-semibold text-lg mb-2">Không tìm thấy sản phẩm</h3>
+          <p class="text-slate-500 dark:text-slate-500 text-sm mb-6">Thử điều chỉnh bộ lọc hoặc từ khoá tìm kiếm.</p>
+          <a href="{% url 'products:list' %}"
+             class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-500
+                    text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors">
+            Xoá bộ lọc
+          </a>
+        </div>
+
+        {% else %}
+
+        {# ── Product Grid ── #}
+        <div id="product-grid"
+             class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+          {% for product in products %}
+          <article class="group flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800
+                          hover:border-brand-400 dark:hover:border-brand-700/60 hover:shadow-md dark:hover:shadow-xl dark:hover:shadow-brand-950/40
+                          transition-all duration-300 overflow-hidden">
+
+            {# Thumbnail #}
+            <div class="relative aspect-square bg-slate-50 dark:bg-slate-800/50 overflow-hidden">
+              {% if product.thumbnail %}
+              <img src="{{ MEDIA_URL }}{{ product.thumbnail }}"
+                   alt="{{ product.name }}"
+                   class="w-full h-full object-contain p-5 transition-transform
+                          duration-300 group-hover:scale-[1.07]"
+                   loading="lazy" />
+              {% else %}
+              <div class="w-full h-full flex items-center justify-center">
+                <svg class="w-12 h-12 text-slate-300 dark:text-slate-700" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="1">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586
+                           a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0
+                           002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+              </div>
+              {% endif %}
+
+              {# Badges #}
+              <div class="absolute top-2.5 left-2.5 flex flex-col gap-1.5">
+                {% if product.is_new %}
+                <span class="bg-brand-600 text-white text-[10px] font-bold uppercase
+                             tracking-wider px-2 py-0.5 rounded-full">Mới</span>
+                {% endif %}
+                {% if product.is_featured %}
+                <span class="bg-amber-500 text-white text-[10px] font-bold uppercase
+                             tracking-wider px-2 py-0.5 rounded-full">Nổi bật</span>
+                {% endif %}
+              </div>
+
+              {# Quick-view overlay #}
+              <div class="absolute inset-0 bg-slate-900/60 dark:bg-slate-950/70 opacity-0 group-hover:opacity-100
+                          transition-opacity duration-200 flex items-center justify-center">
+                <button type="button"
+                   class="quick-view-btn bg-white text-slate-900 text-xs font-bold px-4 py-2 rounded-xl
+                          translate-y-2 group-hover:translate-y-0 transition-transform duration-200
+                          hover:bg-brand-50"
+                   data-name="{{ product.name|escape }}"
+                   data-sku="{{ product.sku|escape }}"
+                   data-brand="{{ product.brand_name|default:''|escape }}"
+                   data-description="{{ product.short_description|default:''|escape }}"
+                   data-image="{% if product.thumbnail %}{{ MEDIA_URL }}{{ product.thumbnail }}{% endif %}"
+                   data-detail-url="{% url 'products:detail' product.slug %}"
+                   data-price="{% if product.pricing_type == 'fixed' and product.price %}{{ product.price|vnd }}{% elif product.pricing_type == 'quote' %}Báo giá{% else %}Liên hệ{% endif %}"
+                   data-stock="{% if product.stock_status == 'in_stock' %}Còn hàng{% elif product.stock_status == 'low_stock' %}Sắp hết{% else %}Hết hàng{% endif %}">
+                  Xem nhanh
+                </button>
+              </div>
+            </div>
+
+            {# Info #}
+            <div class="flex flex-col flex-1 p-4">
+              <p class="text-slate-700 dark:text-slate-400 text-[10px] font-mono mb-1 truncate">{{ product.sku }}</p>
+              <h3 class="font-semibold text-slate-800 dark:text-slate-200 text-sm leading-snug mb-3
+                         line-clamp-2 group-hover:text-brand-600 dark:group-hover:text-brand-300 transition-colors flex-1">
+                {{ product.name }}
+              </h3>
+
+              {# Brand #}
+              {% if product.brand_name %}
+              <p class="text-slate-700 dark:text-slate-400 text-[11px] mb-2">{{ product.brand_name }}</p>
+              {% endif %}
+
+              <div class="flex items-center justify-between mb-3">
+                {# Price #}
+                <div>
+                  {% if product.pricing_type == 'fixed' and product.price %}
+                  <span class="text-brand-600 dark:text-brand-400 font-bold text-sm">
+                    {{ product.price|vnd }}
+                  </span>
+                  {% elif product.pricing_type == 'quote' %}
+                  <span class="text-amber-600 dark:text-amber-400 font-semibold text-xs bg-amber-50 dark:bg-amber-950/50
+                               border border-amber-200 dark:border-amber-800/50 px-2 py-0.5 rounded-md">Báo giá</span>
+                  {% else %}
+                  <span class="text-slate-400 dark:text-slate-500 text-xs">Liên hệ</span>
+                  {% endif %}
+                </div>
+
+                {# Stock #}
+                <span class="text-[11px] font-medium flex items-center gap-1
+                  {% if product.stock_status == 'in_stock' %}text-emerald-600 dark:text-emerald-400
+                  {% elif product.stock_status == 'low_stock' %}text-amber-600 dark:text-amber-400
+                  {% else %}text-red-600 dark:text-red-400{% endif %}">
+                  <span class="w-1.5 h-1.5 rounded-full flex-shrink-0
+                    {% if product.stock_status == 'in_stock' %}bg-emerald-500 dark:bg-emerald-400
+                    {% elif product.stock_status == 'low_stock' %}bg-amber-500 dark:bg-amber-400
+                    {% else %}bg-red-500 dark:bg-red-400{% endif %}">
+                  </span>
+                  {% if product.stock_status == 'in_stock' %}Còn hàng
+                  {% elif product.stock_status == 'low_stock' %}Sắp hết
+                  {% else %}Hết hàng{% endif %}
+                </span>
+              </div>
+
+              <a href="{% url 'products:detail' product.slug %}"
+                 class="block text-center text-xs font-semibold py-2.5 rounded-xl
+                        border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400
+                        hover:bg-brand-600 hover:text-white hover:border-brand-600
+                        dark:hover:bg-brand-600 dark:hover:text-white dark:hover:border-brand-600
+                        transition-all duration-200">
+                Xem chi tiết
+              </a>
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+
+        {# ── Product List (hidden by default) ── #}
+        <div id="product-list" class="hidden space-y-3">
+          {% for product in products %}
+          <article class="group flex gap-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800
+                          hover:border-brand-400 dark:hover:border-brand-700/60 hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-brand-950/30
+                          transition-all duration-200 overflow-hidden p-4">
+
+            <div class="relative w-24 h-24 flex-shrink-0 bg-slate-50 dark:bg-slate-800/50 rounded-xl overflow-hidden">
+              {% if product.thumbnail %}
+              <img src="{{ product.thumbnail.url }}"
+                   alt="{{ product.name }}"
+                   class="w-full h-full object-contain p-2
+                          transition-transform duration-300 group-hover:scale-105"
+                   loading="lazy" />
+              {% endif %}
+            </div>
+
+            <div class="flex flex-1 flex-col sm:flex-row sm:items-center gap-3 min-w-0">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <p class="text-slate-400 dark:text-slate-600 text-[10px] font-mono">{{ product.sku }}</p>
+                  {% if product.is_new %}
+                  <span class="bg-brand-600 text-white text-[10px] font-bold uppercase
+                               tracking-wider px-1.5 py-0.5 rounded-full">Mới</span>
+                  {% endif %}
+                </div>
+                <h3 class="font-semibold text-slate-800 dark:text-slate-200 text-sm mb-1
+                           group-hover:text-brand-600 dark:group-hover:text-brand-300
+                           transition-colors line-clamp-1">{{ product.name }}</h3>
+                <p class="text-slate-500 dark:text-slate-500 text-xs line-clamp-1">{{ product.short_description }}</p>
+              </div>
+
+              <div class="flex items-center gap-5 flex-shrink-0">
+                <div class="text-right">
+                  {% if product.pricing_type == 'fixed' and product.price %}
+                  <span class="text-brand-600 dark:text-brand-400 font-bold text-sm block">
+                    {{ product.price|vnd }}
+                  </span>
+                  {% elif product.pricing_type == 'quote' %}
+                  <span class="text-amber-600 dark:text-amber-400 text-xs font-semibold">Báo giá</span>
+                  {% else %}
+                  <span class="text-slate-400 dark:text-slate-500 text-xs">Liên hệ</span>
+                  {% endif %}
+                  <span class="text-[11px] flex items-center gap-1 justify-end mt-0.5
+                    {% if product.stock_status == 'in_stock' %}text-emerald-600 dark:text-emerald-400
+                    {% elif product.stock_status == 'low_stock' %}text-amber-600 dark:text-amber-400
+                    {% else %}text-red-600 dark:text-red-400{% endif %}">
+                    <span class="w-1.5 h-1.5 rounded-full flex-shrink-0
+                      {% if product.stock_status == 'in_stock' %}bg-emerald-500 dark:bg-emerald-400
+                      {% elif product.stock_status == 'low_stock' %}bg-amber-500 dark:bg-amber-400
+                      {% else %}bg-red-500 dark:bg-red-400{% endif %}"></span>
+                    {% if product.stock_status == 'in_stock' %}Còn hàng
+                    {% elif product.stock_status == 'low_stock' %}Sắp hết
+                    {% else %}Hết hàng{% endif %}
+                  </span>
+                </div>
+                <a href="{% url 'products:detail' product.slug %}"
+                   class="flex-shrink-0 text-xs font-semibold px-4 py-2.5 rounded-xl
+                          border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400
+                          hover:bg-brand-600 hover:text-white hover:border-brand-600
+                          dark:hover:bg-brand-600 dark:hover:text-white dark:hover:border-brand-600
+                          transition-all duration-200 whitespace-nowrap">
+                  Xem chi tiết
+                </a>
+              </div>
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+
+        {% endif %}{# end if products #}
+
+        {# ── Pagination ── #}
+        {% if page_obj.has_other_pages %}
+        <nav class="flex items-center justify-center gap-1.5 mt-12"
+             aria-label="Phân trang">
+          {% if page_obj.has_previous %}
+          <a href="?{% for key, val in request.GET.items %}{% if key != 'page' %}{{ key }}={{ val }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}"
+             class="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700
+                    text-slate-600 dark:text-slate-400 hover:border-brand-500 dark:hover:border-brand-600
+                    hover:text-brand-600 dark:hover:text-brand-400 transition-all bg-white dark:bg-transparent">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+            </svg>
+          </a>
+          {% endif %}
+
+          {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <span class="w-9 h-9 flex items-center justify-center rounded-xl bg-brand-600
+                         text-white text-sm font-bold">{{ num }}</span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?{% for key, val in request.GET.items %}{% if key != 'page' %}{{ key }}={{ val }}&{% endif %}{% endfor %}page={{ num }}"
+               class="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700
+                      text-slate-600 dark:text-slate-400 hover:border-brand-500 dark:hover:border-brand-600
+                      hover:text-brand-600 dark:hover:text-brand-400 text-sm transition-all bg-white dark:bg-transparent">{{ num }}</a>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+          <a href="?{% for key, val in request.GET.items %}{% if key != 'page' %}{{ key }}={{ val }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}"
+             class="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700
+                    text-slate-600 dark:text-slate-400 hover:border-brand-500 dark:hover:border-brand-600
+                    hover:text-brand-600 dark:hover:text-brand-400 transition-all bg-white dark:bg-transparent">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+          </a>
+          {% endif %}
+        </nav>
+        {% endif %}
+
+      </div>{# end right column #}
+    </div>{# end flex #}
+  </div>
+</div>
+
+{# ══════════════════════════════════════════════════ QUICK VIEW MODAL ══════════════════════════════════════════════════ #}
+<div id="quick-view-modal"
+     class="fixed inset-0 z-[70] hidden items-center justify-center px-4 py-8">
+  <div id="quick-view-backdrop" class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm"></div>
+
+  <div class="relative w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700
+              bg-white dark:bg-slate-950 shadow-2xl shadow-slate-950/30">
+    <button id="quick-view-close"
+            type="button"
+            class="absolute right-4 top-4 z-10 w-9 h-9 rounded-xl border border-slate-200 dark:border-slate-700
+                   bg-white/90 dark:bg-slate-900/90 text-slate-500 hover:text-slate-900 dark:hover:text-white
+                   flex items-center justify-center transition-colors"
+            aria-label="Đóng xem nhanh">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+
+    <div class="grid md:grid-cols-[280px_1fr]">
+      <div class="bg-slate-50 dark:bg-slate-900/70 aspect-square md:aspect-auto flex items-center justify-center p-8">
+        <img id="quick-view-image"
+             src=""
+             alt=""
+             class="max-w-full max-h-64 object-contain hidden" />
+        <div id="quick-view-image-empty" class="text-slate-300 dark:text-slate-700">
+          <svg class="w-20 h-20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="p-6 md:p-8">
+        <p id="quick-view-sku" class="font-mono text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-600 mb-2"></p>
+        <h3 id="quick-view-name" class="font-display font-bold uppercase text-3xl leading-tight text-slate-900 dark:text-white mb-2"></h3>
+        <p id="quick-view-brand" class="text-sm text-slate-500 dark:text-slate-500 mb-4"></p>
+        <p id="quick-view-description" class="text-sm leading-relaxed text-slate-600 dark:text-slate-400 mb-6"></p>
+
+        <div class="flex flex-wrap items-center gap-3 mb-7">
+          <span id="quick-view-price" class="text-brand-600 dark:text-brand-400 font-bold text-lg"></span>
+          <span id="quick-view-stock"
+                class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-lg
+                       bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400"></span>
+        </div>
+
+        <a id="quick-view-detail"
+           href="#"
+           class="inline-flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-500 text-white
+                  text-sm font-bold px-5 py-3 rounded-xl transition-colors">
+          Xem chi tiết
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{# ══════════════════════════════════════════════════════════════════ MOBILE FILTER DRAWER ══════════════════════════════════════════════════════════════════ #}
+<div id="mobile-filter-overlay"
+     class="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm z-40 hidden lg:hidden">
+</div>
+<aside id="mobile-filter-drawer"
+       class="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800
+              rounded-t-2xl p-6 transform translate-y-full transition-transform duration-300
+              lg:hidden max-h-[85vh] overflow-y-auto">
+  <div class="flex items-center justify-between mb-6">
+    <h3 class="font-semibold text-slate-900 dark:text-white">Bộ lọc</h3>
+    <button id="close-filter-btn" class="text-slate-400 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+  {# Mirror of sidebar form for mobile #}
+  <form method="get">
+    {% if categories %}
+    <div class="mb-6">
+      <p class="text-[10px] font-mono text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-3">Danh mục</p>
+      <div class="grid grid-cols-2 gap-2">
+        {% for cat in categories %}
+        <a href="?category={{ cat.slug }}"
+           class="text-center py-2 px-3 rounded-xl border text-sm transition-all
+                  {% if request.GET.category == cat.slug %}
+                    border-brand-500 bg-brand-50 dark:bg-brand-900/50 text-brand-700 dark:text-brand-300
+                  {% else %}
+                    border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-500
+                  {% endif %}">
+          {{ cat.name }}
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    <button type="submit"
+            class="w-full bg-brand-600 hover:bg-brand-500 text-white font-semibold
+                   py-3 rounded-xl transition-colors">
+      Áp dụng
+    </button>
+  </form>
+</aside>
+
+
+{# ══════════════════════════════════════════════════════════════════ JS: View toggle + Mobile filter drawer ══════════════════════════════════════════════════════════════════ #}
+<script>
+(function () {
+  // ─ View toggle ─
+  const grid  = document.getElementById('product-grid');
+  const list  = document.getElementById('product-list');
+  const btns  = document.querySelectorAll('.view-btn');
+
+  const savedView = localStorage.getItem('product-view') || 'grid';
+  setView(savedView);
+
+  btns.forEach(btn => btn.addEventListener('click', () => {
+    const v = btn.dataset.view;
+    setView(v);
+    localStorage.setItem('product-view', v);
+  }));
+
+  function setView(v) {
+    const isGrid = v === 'grid';
+    grid && grid.classList.toggle('hidden', !isGrid);
+    list && list.classList.toggle('hidden', isGrid);
+    btns.forEach(b => {
+      const active = b.dataset.view === v;
+      b.classList.toggle('bg-slate-100', active);
+      b.classList.toggle('dark:bg-slate-800', active);
+      b.classList.toggle('text-slate-900', active);
+      b.classList.toggle('dark:text-white', active);
+      b.classList.toggle('text-slate-500', !active);
+      b.classList.toggle('dark:text-slate-400', !active);
+    });
+  }
+
+  // ─ Quick view modal ─
+  const quickModal      = document.getElementById('quick-view-modal');
+  const quickBackdrop   = document.getElementById('quick-view-backdrop');
+  const quickClose      = document.getElementById('quick-view-close');
+  const quickImage      = document.getElementById('quick-view-image');
+  const quickImageEmpty = document.getElementById('quick-view-image-empty');
+  const quickSku        = document.getElementById('quick-view-sku');
+  const quickName       = document.getElementById('quick-view-name');
+  const quickBrand      = document.getElementById('quick-view-brand');
+  const quickDesc       = document.getElementById('quick-view-description');
+  const quickPrice      = document.getElementById('quick-view-price');
+  const quickStock      = document.getElementById('quick-view-stock');
+  const quickDetail     = document.getElementById('quick-view-detail');
+
+  function setText(el, text) {
+    if (el) el.textContent = text || '';
+  }
+
+  function openQuickView(button) {
+    if (!quickModal) return;
+
+    const data = button.dataset;
+    setText(quickSku, data.sku);
+    setText(quickName, data.name);
+    setText(quickBrand, data.brand);
+    setText(quickDesc, data.description);
+    setText(quickPrice, data.price);
+    setText(quickStock, data.stock);
+
+    if (quickDetail) quickDetail.href = data.detailUrl || '#';
+
+    if (quickImage && quickImageEmpty) {
+      if (data.image) {
+        quickImage.src = data.image;
+        quickImage.alt = data.name || '';
+        quickImage.classList.remove('hidden');
+        quickImageEmpty.classList.add('hidden');
+      } else {
+        quickImage.removeAttribute('src');
+        quickImage.alt = '';
+        quickImage.classList.add('hidden');
+        quickImageEmpty.classList.remove('hidden');
+      }
+    }
+
+    quickModal.classList.remove('hidden');
+    quickModal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeQuickView() {
+    if (!quickModal) return;
+    quickModal.classList.add('hidden');
+    quickModal.classList.remove('flex');
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('.quick-view-btn').forEach(button => {
+    button.addEventListener('click', () => openQuickView(button));
+  });
+  quickClose && quickClose.addEventListener('click', closeQuickView);
+  quickBackdrop && quickBackdrop.addEventListener('click', closeQuickView);
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && quickModal && !quickModal.classList.contains('hidden')) {
+      closeQuickView();
+    }
+  });
+
+  // ─ Mobile filter drawer ─
+  const mobileBtn = document.getElementById('mobile-filter-btn');
+  const overlay   = document.getElementById('mobile-filter-overlay');
+  const drawer    = document.getElementById('mobile-filter-drawer');
+  const closeBtn  = document.getElementById('close-filter-btn');
+
+  function openDrawer()  { drawer.classList.remove('translate-y-full'); overlay.classList.remove('hidden'); document.body.style.overflow='hidden'; }
+  function closeDrawer() { drawer.classList.add('translate-y-full');    overlay.classList.add('hidden');    document.body.style.overflow=''; }
+
+  mobileBtn && mobileBtn.addEventListener('click', openDrawer);
+  closeBtn  && closeBtn.addEventListener('click',  closeDrawer);
+  overlay   && overlay.addEventListener('click',   closeDrawer);
+})();
+</script>
+
+{% endblock %}

@@ -1,0 +1,388 @@
+{% extends "base.html" %}
+{% load static %}
+{% load currency %}
+{% block title %}Thanh toán — {{ COMPANY_NAME }}{% endblock %}
+{% block meta_description %}Xác nhận thông tin đơn hàng — {{ COMPANY_NAME }}{% endblock %}
+{% block content %}
+<div class="min-h-screen bg-slate-50 dark:bg-[#080d12] pt-24 pb-16">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+{# Breadcrumb #}
+<nav class="flex items-center gap-2 text-xs font-mono text-slate-400 dark:text-slate-600 mb-8">
+  <a href="{% url 'core:home' %}" class="hover:text-slate-600 dark:hover:text-slate-400 transition-colors">Trang chủ</a>
+  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+  </svg>
+  <a href="{% url 'products:list' %}" class="hover:text-slate-600 dark:hover:text-slate-400 transition-colors">Sản phẩm</a>
+  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+  </svg>
+  <a href="{% url 'cart:detail' %}" class="hover:text-slate-600 dark:hover:text-slate-400 transition-colors">Giỏ hàng</a>
+  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+  </svg>
+  <span class="text-slate-600 dark:text-slate-400">Thanh toán</span>
+</nav>
+
+<h1 class="font-display font-bold uppercase text-slate-900 dark:text-white text-3xl lg:text-4xl tracking-tight mb-10">
+  Xác nhận đơn hàng
+</h1>
+
+{% if not cart_items %}
+{# ── Empty cart guard ── #}
+<div class="flex flex-col items-center justify-center py-28 text-center">
+  <div class="w-20 h-20 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800
+              flex items-center justify-center mb-6 shadow-sm">
+    <svg class="w-9 h-9 text-slate-300 dark:text-slate-700" fill="none" viewBox="0 0 24 24"
+         stroke="currentColor" stroke-width="1">
+      <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+    </svg>
+  </div>
+  <h2 class="font-display font-bold uppercase text-slate-800 dark:text-white text-2xl tracking-tight mb-2">
+    Giỏ hàng trống
+  </h2>
+  <p class="text-slate-500 dark:text-slate-400 text-sm max-w-sm leading-relaxed mb-8">
+    Bạn chưa có sản phẩm nào trong giỏ hàng. Vui lòng thêm sản phẩm trước khi thanh toán.
+  </p>
+  <a href="{% url 'cart:detail' %}" class="btn-primary">
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+    </svg>
+    Quay lại giỏ hàng
+  </a>
+</div>
+
+{% else %}
+{# ── Main checkout layout ── #}
+<form method="post" novalidate>
+  {% csrf_token %}
+  <div class="grid lg:grid-cols-[1fr_380px] gap-8 items-start">
+
+    {# ══ LEFT: Contact form ══ #}
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8">
+
+      <h2 class="font-display font-bold uppercase text-slate-900 dark:text-white text-xl tracking-tight mb-6">
+        Thông tin liên hệ
+      </h2>
+
+      {# Non-field errors #}
+      {% if form.non_field_errors %}
+      <div class="flex items-start gap-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/50
+                  rounded-xl px-4 py-3 mb-6">
+        <svg class="w-4 h-4 text-red-500 dark:text-red-400 flex-shrink-0 mt-0.5" fill="none"
+             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+        </svg>
+        <div>
+          {% for error in form.non_field_errors %}
+          <p class="text-red-600 dark:text-red-400 text-sm">{{ error }}</p>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+        {# Email #}
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                        text-slate-600 dark:text-slate-400">
+            Email <span class="text-red-500">*</span>
+          </label>
+          <input type="email" name="email" value="{{ form.email.value|default:'' }}"
+                 placeholder="email@congty.vn" autocomplete="email"
+                 class="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-all
+                        border-slate-200 bg-white text-slate-900 placeholder-slate-400
+                        focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10
+                        dark:border-slate-700 dark:bg-slate-800/60 dark:text-white dark:placeholder-slate-600
+                        dark:focus:border-brand-600 dark:focus:ring-brand-700/20
+                        {% if form.email.errors %}!border-red-400 dark:!border-red-700{% endif %}" />
+          {% if form.email.errors %}
+          <p class="text-red-500 dark:text-red-400 text-xs mt-1.5">{{ form.email.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        {# First name #}
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                        text-slate-600 dark:text-slate-400">
+            Họ <span class="text-red-500">*</span>
+          </label>
+          <input type="text" name="first_name" value="{{ form.first_name.value|default:'' }}"
+                 placeholder="Nguyễn" autocomplete="given-name"
+                 class="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-all
+                        border-slate-200 bg-white text-slate-900 placeholder-slate-400
+                        focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10
+                        dark:border-slate-700 dark:bg-slate-800/60 dark:text-white dark:placeholder-slate-600
+                        dark:focus:border-brand-600 dark:focus:ring-brand-700/20
+                        {% if form.first_name.errors %}!border-red-400 dark:!border-red-700{% endif %}" />
+          {% if form.first_name.errors %}
+          <p class="text-red-500 dark:text-red-400 text-xs mt-1.5">{{ form.first_name.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        {# Last name #}
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                        text-slate-600 dark:text-slate-400">
+            Tên <span class="text-red-500">*</span>
+          </label>
+          <input type="text" name="last_name" value="{{ form.last_name.value|default:'' }}"
+                 placeholder="Văn An" autocomplete="family-name"
+                 class="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-all
+                        border-slate-200 bg-white text-slate-900 placeholder-slate-400
+                        focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10
+                        dark:border-slate-700 dark:bg-slate-800/60 dark:text-white dark:placeholder-slate-600
+                        dark:focus:border-brand-600 dark:focus:ring-brand-700/20
+                        {% if form.last_name.errors %}!border-red-400 dark:!border-red-700{% endif %}" />
+          {% if form.last_name.errors %}
+          <p class="text-red-500 dark:text-red-400 text-xs mt-1.5">{{ form.last_name.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        {# Company name #}
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                        text-slate-600 dark:text-slate-400">
+            Tên công ty
+          </label>
+          <input type="text" name="company_name" value="{{ form.company_name.value|default:'' }}"
+                 placeholder="Công ty TNHH ABC" autocomplete="organization"
+                 class="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-all
+                        border-slate-200 bg-white text-slate-900 placeholder-slate-400
+                        focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10
+                        dark:border-slate-700 dark:bg-slate-800/60 dark:text-white dark:placeholder-slate-600
+                        dark:focus:border-brand-600 dark:focus:ring-brand-700/20" />
+        </div>
+
+        {# Phone #}
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                        text-slate-600 dark:text-slate-400">
+            Số điện thoại
+          </label>
+          <input type="text" name="phone" value="{{ form.phone.value|default:'' }}"
+                 placeholder="0901 234 567" autocomplete="tel"
+                 class="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-all
+                        border-slate-200 bg-white text-slate-900 placeholder-slate-400
+                        focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10
+                        dark:border-slate-700 dark:bg-slate-800/60 dark:text-white dark:placeholder-slate-600
+                        dark:focus:border-brand-600 dark:focus:ring-brand-700/20" />
+        </div>
+
+        {# PO Number #}
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                        text-slate-600 dark:text-slate-400">
+            Mã PO (nếu có)
+          </label>
+          <input type="text" name="po_number" value="{{ form.po_number.value|default:'' }}"
+                 placeholder="PO-2026-001"
+                 class="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-all
+                        border-slate-200 bg-white text-slate-900 placeholder-slate-400
+                        focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10
+                        dark:border-slate-700 dark:bg-slate-800/60 dark:text-white dark:placeholder-slate-600
+                        dark:focus:border-brand-600 dark:focus:ring-brand-700/20" />
+        </div>
+
+      </div>
+
+      {# Divider #}
+      <div class="my-7 border-t border-slate-100 dark:border-slate-800"></div>
+
+      {# Shipping address section #}
+      <h3 class="font-display font-bold uppercase text-slate-900 dark:text-white text-base tracking-tight mb-5">
+        Địa chỉ giao hàng
+      </h3>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+        {# Address line 1 #}
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                        text-slate-600 dark:text-slate-400">
+            Tên đường/tòa nhà
+          </label>
+          <input type="text" name="address_line1" value="{{ form.address_line1.value|default:'' }}"
+                 placeholder="Số nhà, tên đường..." autocomplete="address-line1"
+                 class="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-all
+                        border-slate-200 bg-white text-slate-900 placeholder-slate-400
+                        focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10
+                        dark:border-slate-700 dark:bg-slate-800/60 dark:text-white dark:placeholder-slate-600
+                        dark:focus:border-brand-600 dark:focus:ring-brand-700/20" />
+        </div>
+
+        {# Address line 2 #}
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                        text-slate-600 dark:text-slate-400">
+            Tên Phường(Xã)
+          </label>
+          <input type="text" name="address_line2" value="{{ form.address_line2.value|default:'' }}"
+                 placeholder="Phường, quận..." autocomplete="address-line2"
+                 class="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-all
+                        border-slate-200 bg-white text-slate-900 placeholder-slate-400
+                        focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10
+                        dark:border-slate-700 dark:bg-slate-800/60 dark:text-white dark:placeholder-slate-600
+                        dark:focus:border-brand-600 dark:focus:ring-brand-700/20" />
+        </div>
+
+        {# City #}
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                        text-slate-600 dark:text-slate-400">
+            Thành phố(Tỉnh)
+          </label>
+          <input type="text" name="city" value="{{ form.city.value|default:'' }}"
+                 placeholder="Hà Nội" autocomplete="address-level2"
+                 class="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-all
+                        border-slate-200 bg-white text-slate-900 placeholder-slate-400
+                        focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10
+                        dark:border-slate-700 dark:bg-slate-800/60 dark:text-white dark:placeholder-slate-600
+                        dark:focus:border-brand-600 dark:focus:ring-brand-700/20" />
+        </div>
+
+        {# Postal code #}
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                        text-slate-600 dark:text-slate-400">
+            Mã bưu chính
+          </label>
+          <input type="text" name="postal_code" value="{{ form.postal_code.value|default:'' }}"
+                 placeholder="100000" autocomplete="postal-code"
+                 class="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-all
+                        border-slate-200 bg-white text-slate-900 placeholder-slate-400
+                        focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10
+                        dark:border-slate-700 dark:bg-slate-800/60 dark:text-white dark:placeholder-slate-600
+                        dark:focus:border-brand-600 dark:focus:ring-brand-700/20" />
+        </div>
+
+        {# Notes #}
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                        text-slate-600 dark:text-slate-400">
+            Ghi chú đơn hàng
+          </label>
+          <textarea name="notes" rows="3"
+                    placeholder="Yêu cầu đặc biệt, hướng dẫn giao hàng..."
+                    class="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-all resize-none
+                           border-slate-200 bg-white text-slate-900 placeholder-slate-400
+                           focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10
+                           dark:border-slate-700 dark:bg-slate-800/60 dark:text-white dark:placeholder-slate-600
+                           dark:focus:border-brand-600 dark:focus:ring-brand-700/20">{{ form.notes.value|default:'' }}</textarea>
+        </div>
+
+      </div>
+    </div>
+
+    {# ══ RIGHT: Order summary card (sticky) ══ #}
+    <div class="lg:sticky lg:top-24">
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
+
+        <h2 class="font-display font-bold uppercase text-slate-900 dark:text-white text-xl tracking-tight mb-5">
+          Tóm tắt đơn hàng
+        </h2>
+
+        {# Cart items list #}
+        <div class="space-y-4 mb-5">
+          {% for item in cart_items %}
+          <div class="flex items-start gap-3">
+            {# Thumbnail #}
+            <div class="w-14 h-14 flex-shrink-0 rounded-xl overflow-hidden border
+                        border-slate-100 dark:border-slate-800
+                        bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center">
+              {% if item.thumbnail %}
+              <img src="{{ item.thumbnail }}" alt="{{ item.product_name }}"
+                   class="w-full h-full object-contain p-1.5" loading="lazy" />
+              {% else %}
+              <svg class="w-6 h-6 text-slate-300 dark:text-slate-600" fill="none"
+                   viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01"/>
+              </svg>
+              {% endif %}
+            </div>
+
+            {# Info #}
+            <div class="flex-1 min-w-0">
+              <p class="text-slate-800 dark:text-slate-200 text-sm font-medium leading-snug line-clamp-2">
+                {{ item.product_name }}
+              </p>
+              <p class="text-slate-400 dark:text-slate-600 text-[11px] font-mono mt-0.5">
+                {{ item.product_sku }}
+              </p>
+              <p class="text-slate-500 dark:text-slate-500 text-xs mt-1">
+                {{ item.unit_price|vnd }} × {{ item.quantity }}
+              </p>
+            </div>
+
+            {# Line total #}
+            <div class="flex-shrink-0 text-right">
+              <p class="text-slate-800 dark:text-slate-200 text-sm font-semibold">
+                {{ item.line_total|vnd }}
+              </p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        {# Subtotal #}
+        <div class="border-t border-slate-100 dark:border-slate-800 pt-4 mb-5">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-slate-500 dark:text-slate-400 text-sm">Tạm tính</span>
+            <span class="text-slate-800 dark:text-slate-200 font-semibold text-sm">
+              {{ subtotal|vnd }}
+            </span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-slate-500 dark:text-slate-400 text-sm">Phí vận chuyển</span>
+            <span class="text-slate-400 dark:text-slate-600 text-xs italic">Xác nhận sau</span>
+          </div>
+        </div>
+
+        {# Total #}
+        <div class="border-t border-slate-200 dark:border-slate-700 pt-4 mb-6">
+          <div class="flex items-center justify-between">
+            <span class="text-slate-900 dark:text-white font-bold">Tổng cộng</span>
+            <span class="text-brand-600 dark:text-brand-400 font-display font-bold text-xl">
+              {{ subtotal|vnd }}
+            </span>
+          </div>
+        </div>
+
+        {# Submit button #}
+        <button type="submit"
+                class="btn-primary w-full justify-center py-3.5 text-sm">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          Đặt hàng
+        </button>
+
+        {# Trust note #}
+        <p class="text-slate-400 dark:text-slate-600 text-xs font-mono text-center mt-4 leading-relaxed">
+          Đơn hàng sẽ được xác nhận trong vòng 24 giờ
+        </p>
+
+        {# Back to cart link #}
+        <a href="{% url 'cart:detail' %}"
+           class="flex items-center justify-center gap-1.5 mt-4 text-xs font-mono
+                  text-slate-400 dark:text-slate-600 hover:text-slate-600 dark:hover:text-slate-400
+                  transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+          </svg>
+          Quay lại giỏ hàng
+        </a>
+
+      </div>
+    </div>
+
+  </div>
+</form>
+{% endif %}
+  </div>
+</div>
+{% endblock %}

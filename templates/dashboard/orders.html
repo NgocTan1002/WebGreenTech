@@ -1,0 +1,651 @@
+{% extends "base.html" %}
+{% load static %}
+{% load currency %}
+
+{% block title %}Đơn Hàng — Dashboard — {{ COMPANY_NAME }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-white dark:bg-slate-950 pt-24 pb-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    {# ── Page header ── #}
+    <div class="flex items-center justify-between gap-4 flex-wrap mb-8">
+      <div>
+        <p class="section-label mb-2">— Quản trị nội bộ</p>
+        <div class="flex items-center gap-3 flex-wrap">
+          <h1 class="font-display font-bold uppercase text-slate-900 dark:text-white
+                     text-3xl tracking-tight">
+            Đơn Hàng
+          </h1>
+          <span class="font-mono text-[11px] px-2 py-1 rounded-md
+                       bg-brand-50 text-brand-700 border border-brand-200
+                       dark:bg-brand-950/60 dark:text-brand-300 dark:border-brand-800/60">
+            {{ orders|length }} đơn
+          </span>
+        </div>
+      </div>
+      <a href="/admin/orders/order/"
+         class="btn-ghost text-sm">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        Quản lý Admin
+      </a>
+    </div>
+
+    {# ── Dashboard nav tabs ── #}
+    <nav class="flex gap-1 mb-8 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
+      {% url 'dashboard:home'      as url_dash_home %}
+      {% url 'dashboard:products'  as url_dash_products %}
+      {% url 'dashboard:orders'    as url_dash_orders %}
+      {% url 'dashboard:quotes'    as url_dash_quotes %}
+      {% url 'dashboard:contacts'  as url_dash_contacts %}
+      {% url 'dashboard:analytics' as url_dash_analytics %}
+
+      <a href="{{ url_dash_home }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                border-transparent text-slate-500 hover:text-slate-700
+                dark:text-slate-500 dark:hover:text-slate-300">
+        Tổng quan
+      </a>
+      <a href="{{ url_dash_products }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                border-transparent text-slate-500 hover:text-slate-700
+                dark:text-slate-500 dark:hover:text-slate-300">
+        Sản phẩm
+      </a>
+      <a href="{{ url_dash_orders }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                border-brand-500 text-brand-600 dark:text-brand-400">
+        Đơn hàng
+      </a>
+      <a href="{{ url_dash_quotes }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                border-transparent text-slate-500 hover:text-slate-700
+                dark:text-slate-500 dark:hover:text-slate-300">
+        Báo giá
+      </a>
+      <a href="{{ url_dash_contacts }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                border-transparent text-slate-500 hover:text-slate-700
+                dark:text-slate-500 dark:hover:text-slate-300">
+        Liên hệ
+      </a>
+      <a href="{{ url_dash_analytics }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                border-transparent text-slate-500 hover:text-slate-700
+                dark:text-slate-500 dark:hover:text-slate-300">
+        Analytics
+      </a>
+    </nav>
+
+    {# Filters #}
+    <div class="flex items-center gap-2 flex-wrap justify-end mb-6">
+          <select id="filter-status"
+                  class="text-xs font-mono border rounded-lg px-3 py-2 outline-none transition-all
+                         bg-white border-slate-200 text-slate-700
+                         dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300
+                         focus:border-brand-400 dark:focus:border-brand-600
+                         hover:border-slate-300 dark:hover:border-slate-600">
+            <option value="">Trạng thái: Tất cả</option>
+            <option value="pending">Chờ xử lý</option>
+            <option value="confirmed">Đã xác nhận</option>
+            <option value="processing">Đang xử lý</option>
+            <option value="shipped">Đang giao</option>
+            <option value="delivered">Đã giao</option>
+            <option value="cancelled">Đã huỷ</option>
+            <option value="refunded">Hoàn tiền</option>
+          </select>
+
+          <select id="filter-type"
+                  class="text-xs font-mono border rounded-lg px-3 py-2 outline-none transition-all
+                         bg-white border-slate-200 text-slate-700
+                         dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300
+                         focus:border-brand-400 dark:focus:border-brand-600
+                         hover:border-slate-300 dark:hover:border-slate-600">
+            <option value="">Loại: Tất cả</option>
+            <option value="purchase">Đặt mua</option>
+            <option value="quote">Báo giá</option>
+          </select>
+
+          <div class="relative">
+            <div class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+              </svg>
+            </div>
+            <input id="filter-search" type="text" placeholder="Tìm mã đơn, email, công ty..."
+                   class="text-xs font-mono border rounded-lg pl-8 pr-3 py-2 w-56 outline-none transition-all
+                          bg-white border-slate-200 text-slate-700 placeholder-slate-400
+                          dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300 dark:placeholder-slate-600
+                          focus:border-brand-400 dark:focus:border-brand-600" />
+          </div>
+
+          <button id="filter-reset"
+                  class="hidden text-xs font-mono px-3 py-2 rounded-lg border transition-all
+                         border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700
+                         dark:border-slate-700 dark:text-slate-600 dark:hover:border-slate-600 dark:hover:text-slate-400">
+            Xoá lọc ×
+          </button>
+    </div>
+
+    {# ── Stats row ── #}
+    {% with total_orders=orders|length %}
+    {% with ns_pending=0 ns_shipped=0 ns_delivered=0 %}
+    {# Count using setvar pattern via forloop #}
+
+    {# Pre-count into template variables using assignment tags #}
+    {% comment %}Django doesn't have increment, so we use with/widthratio trick{% endcomment %}
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+      {# Card 1: Tổng đơn #}
+      <div class="card-industrial p-4 flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-brand-50 dark:bg-brand-950/40 border border-brand-200 dark:border-brand-800/40
+                    flex items-center justify-center flex-shrink-0">
+          <svg class="w-4.5 h-4.5 text-brand-600 dark:text-brand-400" style="width:18px;height:18px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+        </div>
+        <div>
+          <p class="font-display font-bold text-2xl text-slate-900 dark:text-white leading-none">{{ total_orders }}</p>
+          <p class="font-mono text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-500 mt-0.5">Tổng đơn</p>
+        </div>
+      </div>
+
+      {# Card 2: Chờ xử lý (pending) #}
+      <div class="card-industrial p-4 flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/40
+                    flex items-center justify-center flex-shrink-0">
+          <svg style="width:18px;height:18px" class="text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div>
+          {% with count=0 %}
+          {% for order in orders %}{% if order.status == 'pending' %}{% with count=count|add:1 %}{% endwith %}{% endif %}{% endfor %}
+          <p class="font-display font-bold text-2xl text-amber-600 dark:text-amber-400 leading-none" id="stat-pending">
+            {% for order in orders %}{% if order.status == 'pending' %}+{% endif %}{% endfor %}
+          </p>
+          {% endwith %}
+          <p class="font-mono text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-500 mt-0.5">Chờ xử lý</p>
+        </div>
+      </div>
+
+      {# Card 3: Đang giao (shipped) #}
+      <div class="card-industrial p-4 flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800/40
+                    flex items-center justify-center flex-shrink-0">
+          <svg style="width:18px;height:18px" class="text-sky-600 dark:text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+          </svg>
+        </div>
+        <div>
+          <p class="font-display font-bold text-2xl text-sky-600 dark:text-sky-400 leading-none" id="stat-shipped">
+            {% for order in orders %}{% if order.status == 'shipped' %}+{% endif %}{% endfor %}
+          </p>
+          <p class="font-mono text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-500 mt-0.5">Đang giao</p>
+        </div>
+      </div>
+
+      {# Card 4: Đã giao (delivered) #}
+      <div class="card-industrial p-4 flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/40
+                    flex items-center justify-center flex-shrink-0">
+          <svg style="width:18px;height:18px" class="text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="font-display font-bold text-2xl text-emerald-600 dark:text-emerald-400 leading-none" id="stat-delivered">
+            {% for order in orders %}{% if order.status == 'delivered' %}+{% endif %}{% endfor %}
+          </p>
+          <p class="font-mono text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-500 mt-0.5">Đã giao</p>
+        </div>
+      </div>
+
+    </div>
+    {% endwith %}
+    {% endwith %}
+
+    {# ── Orders table ── #}
+    <div class="mb-8">
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+
+        {# Table #}
+        <div class="overflow-x-auto">
+          <table id="orders-table" class="w-full border-collapse">
+            <thead>
+              <tr class="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700/60">
+                <th class="text-left px-4 py-3 text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-500 w-8"></th>
+                <th class="text-left px-4 py-3 text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-500">Mã đơn</th>
+                <th class="text-left px-4 py-3 text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-500">Khách hàng</th>
+                <th class="text-left px-4 py-3 text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-500">Loại</th>
+                <th class="text-left px-4 py-3 text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-500">Trạng thái</th>
+                <th class="text-right px-4 py-3 text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-500">Tổng tiền</th>
+                <th class="text-left px-4 py-3 text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-500">Ngày tạo</th>
+                <th class="text-center px-4 py-3 text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-500 w-12"></th>
+              </tr>
+            </thead>
+            <tbody id="orders-tbody">
+
+              {% if orders %}
+              {% for order in orders %}
+
+              {# ── Main row ── #}
+              <tr class="order-row border-b border-slate-100 dark:border-slate-800/60
+                         hover:bg-slate-50 dark:hover:bg-slate-800/30 cursor-pointer transition-colors duration-100"
+                  data-order-id="{{ order.pk }}"
+                  data-status="{{ order.status }}"
+                  data-type="{{ order.order_type }}"
+                  data-search="{{ order.order_number|lower }} {{ order.email|lower }} {{ order.company_name|lower }} {{ order.first_name|lower }} {{ order.last_name|lower }}">
+
+                {# Chevron #}
+                <td class="px-4 py-3.5">
+                  <svg class="chevron w-4 h-4 text-slate-400 dark:text-slate-600 transition-transform duration-200 flex-shrink-0"
+                       fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </td>
+
+                {# Mã đơn #}
+                <td class="px-4 py-3.5">
+                  <span class="font-mono text-sm font-semibold text-slate-800 dark:text-slate-200">
+                    {{ order.order_number }}
+                  </span>
+                  {% if order.po_number %}
+                  <p class="font-mono text-[10px] text-slate-400 dark:text-slate-600 mt-0.5">PO: {{ order.po_number }}</p>
+                  {% endif %}
+                </td>
+
+                {# Khách hàng #}
+                <td class="px-4 py-3.5">
+                  {% if order.customer %}
+                  <p class="text-sm font-medium text-slate-800 dark:text-slate-200">
+                    {{ order.first_name }} {{ order.last_name }}
+                  </p>
+                  {% if order.company_name %}
+                  <p class="text-[11px] text-slate-500 dark:text-slate-600 font-mono mt-0.5">{{ order.company_name }}</p>
+                  {% endif %}
+                  {% else %}
+                  <p class="text-sm italic text-slate-500 dark:text-slate-500">{{ order.email }}</p>
+                  <span class="font-mono text-[10px] px-1.5 py-0.5 rounded border
+                               bg-slate-50 text-slate-500 border-slate-200
+                               dark:bg-slate-800 dark:text-slate-500 dark:border-slate-700">
+                    Khách
+                  </span>
+                  {% endif %}
+                </td>
+
+                {# Loại #}
+                <td class="px-4 py-3.5">
+                  {% if order.order_type == 'purchase' %}
+                  <span class="tag tag-green">Đặt mua</span>
+                  {% else %}
+                  <span class="tag tag-blue">Báo giá</span>
+                  {% endif %}
+                </td>
+
+                {# Trạng thái #}
+                <td class="px-4 py-3.5">
+                  {% if order.status == 'pending' %}
+                  <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1
+                               text-[11px] font-mono border
+                               bg-amber-50 text-amber-700 border-amber-200
+                               dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/60">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400 animate-pulse flex-shrink-0"></span>
+                    Chờ xử lý
+                  </span>
+                  {% elif order.status == 'confirmed' %}
+                  <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1
+                               text-[11px] font-mono border
+                               bg-blue-50 text-blue-700 border-blue-200
+                               dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800/60">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500 dark:bg-blue-400 flex-shrink-0"></span>
+                    Đã xác nhận
+                  </span>
+                  {% elif order.status == 'processing' %}
+                  <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1
+                               text-[11px] font-mono border
+                               bg-violet-50 text-violet-700 border-violet-200
+                               dark:bg-violet-950/60 dark:text-violet-300 dark:border-violet-800/60">
+                    <span class="w-1.5 h-1.5 rounded-full bg-violet-500 dark:bg-violet-400 animate-pulse flex-shrink-0"></span>
+                    Đang xử lý
+                  </span>
+                  {% elif order.status == 'shipped' %}
+                  <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1
+                               text-[11px] font-mono border
+                               bg-sky-50 text-sky-700 border-sky-200
+                               dark:bg-sky-950/60 dark:text-sky-300 dark:border-sky-800/60">
+                    <span class="w-1.5 h-1.5 rounded-full bg-sky-500 dark:bg-sky-400 animate-pulse flex-shrink-0"></span>
+                    Đang giao
+                  </span>
+                  {% elif order.status == 'delivered' %}
+                  <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1
+                               text-[11px] font-mono border
+                               bg-emerald-50 text-emerald-700 border-emerald-200
+                               dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/60">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 flex-shrink-0"></span>
+                    Đã giao
+                  </span>
+                  {% elif order.status == 'cancelled' %}
+                  <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1
+                               text-[11px] font-mono border
+                               bg-red-50 text-red-700 border-red-200
+                               dark:bg-red-950/60 dark:text-red-300 dark:border-red-800/60">
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 dark:bg-red-400 flex-shrink-0"></span>
+                    Đã huỷ
+                  </span>
+                  {% elif order.status == 'refunded' %}
+                  <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1
+                               text-[11px] font-mono border
+                               bg-slate-100 text-slate-600 border-slate-200
+                               dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 flex-shrink-0"></span>
+                    Hoàn tiền
+                  </span>
+                  {% else %}
+                  <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1
+                               text-[11px] font-mono border
+                               bg-slate-100 text-slate-600 border-slate-200
+                               dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">
+                    {{ order.get_status_display }}
+                  </span>
+                  {% endif %}
+                </td>
+
+                {# Tổng tiền #}
+                <td class="px-4 py-3.5 text-right">
+                  <span class="font-mono font-bold text-sm text-slate-800 dark:text-slate-200">
+                    {{ order.total|vnd }}
+                  </span>
+                </td>
+
+                {# Ngày tạo #}
+                <td class="px-4 py-3.5">
+                  <span class="font-mono text-xs text-slate-500 dark:text-slate-500">
+                    {{ order.created_at|date:"d/m/Y H:i" }}
+                  </span>
+                </td>
+
+                {# Thao tác #}
+                <td class="px-4 py-3.5 text-center" onclick="event.stopPropagation()">
+                  <a href="{% url 'admin:orders_order_change' order.pk %}"
+                     target="_blank"
+                     title="Chỉnh sửa trong Admin"
+                     class="inline-flex items-center justify-center w-7 h-7 rounded-md border transition-all
+                            border-slate-200 text-slate-400 hover:border-brand-400 hover:text-brand-600
+                            dark:border-slate-700 dark:text-slate-600 dark:hover:border-brand-600 dark:hover:text-brand-400">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                    </svg>
+                  </a>
+                </td>
+              </tr>
+
+              {# ── Expandable detail row ── #}
+              <tr class="order-detail-row hidden"
+                  data-detail-for="{{ order.pk }}"
+                  style="border-bottom: 1px solid;">
+                <td colspan="8" class="p-0">
+                  <div class="bg-slate-50 dark:bg-slate-800/40 border-b border-slate-200 dark:border-slate-700/60 px-6 py-5">
+
+                    <div class="grid md:grid-cols-[1fr_280px] gap-6">
+
+                      {# Items table #}
+                      <div>
+                        <p class="font-mono text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-600 mb-3">
+                          Chi tiết sản phẩm
+                        </p>
+                        <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700/60">
+                          <table class="w-full text-xs border-collapse">
+                            <thead>
+                              <tr class="bg-white dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-700/60">
+                                <th class="text-left px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-600">Sản phẩm</th>
+                                <th class="text-left px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-600">SKU</th>
+                                <th class="text-right px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-600">SL</th>
+                                <th class="text-right px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-600">Đơn giá</th>
+                                <th class="text-right px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-600">Thành tiền</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {% for item in order.items.all %}
+                              <tr class="border-b border-slate-100 dark:border-slate-800/60 last:border-0
+                                         bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800/30">
+                                <td class="px-3 py-2.5 font-medium text-slate-800 dark:text-slate-200">{{ item.product_name }}</td>
+                                <td class="px-3 py-2.5 font-mono text-slate-500 dark:text-slate-500">{{ item.product_sku }}</td>
+                                <td class="px-3 py-2.5 text-right font-mono text-slate-700 dark:text-slate-300">{{ item.quantity }}</td>
+                                <td class="px-3 py-2.5 text-right font-mono text-slate-700 dark:text-slate-300">{{ item.unit_price|vnd }}</td>
+                                <td class="px-3 py-2.5 text-right font-mono font-semibold text-brand-600 dark:text-brand-400">
+                                  {% widthratio item.unit_price 1 1 as dummy %}
+                                  {{ item.unit_price|floatformat:0 }}₫ × {{ item.quantity }}
+                                </td>
+                              </tr>
+                              {% empty %}
+                              <tr>
+                                <td colspan="5" class="px-3 py-4 text-center text-slate-400 dark:text-slate-600 text-xs font-mono italic">
+                                  Không có sản phẩm
+                                </td>
+                              </tr>
+                              {% endfor %}
+                            </tbody>
+                            <tfoot>
+                              <tr class="bg-slate-50 dark:bg-slate-800/60 border-t border-slate-200 dark:border-slate-700/60">
+                                <td colspan="4" class="px-3 py-2.5 text-right font-mono text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-500">
+                                  Tổng cộng
+                                </td>
+                                <td class="px-3 py-2.5 text-right font-mono font-bold text-sm text-slate-900 dark:text-white">
+                                  {{ order.total|vnd }}
+                                </td>
+                              </tr>
+                            </tfoot>
+                          </table>
+                        </div>
+                      </div>
+
+                      {# Contact info #}
+                      <div class="space-y-4">
+                        <div>
+                          <p class="font-mono text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-600 mb-3">
+                            Thông tin liên hệ
+                          </p>
+                          <div class="rounded-xl border border-slate-200 dark:border-slate-700/60 overflow-hidden">
+                            <div class="divide-y divide-slate-100 dark:divide-slate-800/60">
+
+                              <div class="px-3 py-2.5 bg-white dark:bg-slate-900/40">
+                                <p class="font-mono text-[10px] uppercase text-slate-400 dark:text-slate-600 mb-0.5">Tên</p>
+                                <p class="text-sm text-slate-800 dark:text-slate-200">{{ order.first_name }} {{ order.last_name }}</p>
+                              </div>
+
+                              <div class="px-3 py-2.5 bg-white dark:bg-slate-900/40">
+                                <p class="font-mono text-[10px] uppercase text-slate-400 dark:text-slate-600 mb-0.5">Email</p>
+                                <p class="text-sm font-mono text-brand-600 dark:text-brand-400">{{ order.email }}</p>
+                              </div>
+
+                              {% if order.phone %}
+                              <div class="px-3 py-2.5 bg-white dark:bg-slate-900/40">
+                                <p class="font-mono text-[10px] uppercase text-slate-400 dark:text-slate-600 mb-0.5">Điện thoại</p>
+                                <p class="text-sm font-mono text-slate-700 dark:text-slate-300">{{ order.phone }}</p>
+                              </div>
+                              {% endif %}
+
+                              {% if order.company_name %}
+                              <div class="px-3 py-2.5 bg-white dark:bg-slate-900/40">
+                                <p class="font-mono text-[10px] uppercase text-slate-400 dark:text-slate-600 mb-0.5">Công ty</p>
+                                <p class="text-sm text-slate-700 dark:text-slate-300">{{ order.company_name }}</p>
+                              </div>
+                              {% endif %}
+
+                              {% if order.tracking_number %}
+                              <div class="px-3 py-2.5 bg-white dark:bg-slate-900/40">
+                                <p class="font-mono text-[10px] uppercase text-slate-400 dark:text-slate-600 mb-0.5">Tracking</p>
+                                <p class="text-sm font-mono text-emerald-600 dark:text-emerald-400">{{ order.tracking_number }}</p>
+                              </div>
+                              {% endif %}
+
+                              {% if order.shipped_at %}
+                              <div class="px-3 py-2.5 bg-white dark:bg-slate-900/40">
+                                <p class="font-mono text-[10px] uppercase text-slate-400 dark:text-slate-600 mb-0.5">Ngày giao</p>
+                                <p class="text-xs font-mono text-slate-600 dark:text-slate-400">{{ order.shipped_at|date:"d/m/Y H:i" }}</p>
+                              </div>
+                              {% endif %}
+
+                            </div>
+                          </div>
+                        </div>
+
+                        {% if order.shipping_address %}
+                        <div>
+                          <p class="font-mono text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-600 mb-2">
+                            Địa chỉ giao hàng
+                          </p>
+                          <div class="rounded-xl border border-slate-200 dark:border-slate-700/60 px-3 py-2.5
+                                      bg-white dark:bg-slate-900/40">
+                            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                              {% if order.shipping_address.address %}{{ order.shipping_address.address }}, {% endif %}
+                              {% if order.shipping_address.city %}{{ order.shipping_address.city }}, {% endif %}
+                              {% if order.shipping_address.country %}{{ order.shipping_address.country }}{% endif %}
+                            </p>
+                          </div>
+                        </div>
+                        {% endif %}
+
+                      </div>
+
+                    </div>
+
+                  </div>
+                </td>
+              </tr>
+
+              {% endfor %}
+
+              {% else %}
+              {# ── Empty state ── #}
+              <tr>
+                <td colspan="8" class="px-6 py-20 text-center">
+                  <div class="flex flex-col items-center justify-center">
+                    <div class="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700
+                                flex items-center justify-center mb-4">
+                      <svg class="w-7 h-7 text-slate-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                      </svg>
+                    </div>
+                    <p class="font-display font-bold uppercase text-slate-900 dark:text-white text-lg mb-1">Chưa có đơn hàng nào</p>
+                    <p class="text-slate-500 dark:text-slate-500 text-sm mb-5">Các đơn hàng sẽ xuất hiện ở đây sau khi được tạo.</p>
+                    <a href="/admin/orders/order/add/" class="btn-primary text-sm">
+                      Tạo đơn hàng trong Admin
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% endif %}
+
+              {# JS empty state row #}
+              <tr id="no-results-row" class="hidden">
+                <td colspan="8" class="px-6 py-10 text-center">
+                  <p class="font-mono text-sm text-slate-400 dark:text-slate-600">Không tìm thấy đơn hàng phù hợp</p>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── 1. Fix stat card displays (count + chars) ──────────────────
+  // Since Django template can't increment, we count the '+' chars we emitted
+  ['stat-pending', 'stat-shipped', 'stat-delivered'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const count = (el.textContent.match(/\+/g) || []).length;
+    el.textContent = count;
+  });
+
+  // ── 2. Row expand / collapse ───────────────────────────────────
+  document.querySelectorAll('.order-row').forEach(row => {
+    row.addEventListener('click', function () {
+      const orderId = this.dataset.orderId;
+      const detailRow = document.querySelector(`.order-detail-row[data-detail-for="${orderId}"]`);
+      const chevron = this.querySelector('.chevron');
+      if (!detailRow) return;
+
+      const isHidden = detailRow.classList.contains('hidden');
+      detailRow.classList.toggle('hidden', !isHidden);
+      if (chevron) {
+        chevron.style.transform = isHidden ? 'rotate(90deg)' : '';
+      }
+    });
+  });
+
+  // ── 3. Client-side filtering ───────────────────────────────────
+  const filterStatus = document.getElementById('filter-status');
+  const filterType   = document.getElementById('filter-type');
+  const filterSearch = document.getElementById('filter-search');
+  const resetBtn     = document.getElementById('filter-reset');
+  const noResults    = document.getElementById('no-results-row');
+
+  function applyFilters() {
+    const status = filterStatus.value;
+    const type   = filterType.value;
+    const search = filterSearch.value.trim().toLowerCase();
+
+    const hasFilter = status || type || search;
+    resetBtn.classList.toggle('hidden', !hasFilter);
+
+    let visibleCount = 0;
+
+    document.querySelectorAll('.order-row').forEach(row => {
+      const rowStatus = row.dataset.status;
+      const rowType   = row.dataset.type;
+      const rowSearch = row.dataset.search || '';
+
+      const matchStatus = !status || rowStatus === status;
+      const matchType   = !type   || rowType === type;
+      const matchSearch = !search || rowSearch.includes(search);
+
+      const visible = matchStatus && matchType && matchSearch;
+      row.classList.toggle('hidden', !visible);
+
+      // Also hide corresponding detail row when main row is hidden
+      const orderId = row.dataset.orderId;
+      const detailRow = document.querySelector(`.order-detail-row[data-detail-for="${orderId}"]`);
+      if (detailRow && !visible) detailRow.classList.add('hidden');
+
+      if (visible) visibleCount++;
+    });
+
+    noResults && noResults.classList.toggle('hidden', visibleCount > 0);
+  }
+
+  filterStatus?.addEventListener('change', applyFilters);
+  filterType?.addEventListener('change', applyFilters);
+
+  let searchDebounce;
+  filterSearch?.addEventListener('input', () => {
+    clearTimeout(searchDebounce);
+    searchDebounce = setTimeout(applyFilters, 200);
+  });
+
+  resetBtn?.addEventListener('click', () => {
+    filterStatus.value = '';
+    filterType.value   = '';
+    filterSearch.value = '';
+    applyFilters();
+  });
+
+})();
+</script>
+{% endblock %}

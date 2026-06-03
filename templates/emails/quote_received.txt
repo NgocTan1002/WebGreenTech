@@ -1,0 +1,55 @@
+{{ COMPANY_NAME }} — Xác nhận yêu cầu báo giá
+================================================
+
+Xin chào {{ quote.name }},
+
+Chúng tôi đã nhận được yêu cầu báo giá của bạn. Kỹ sư kỹ thuật đã được phân công
+xem xét và sẽ liên hệ sớm nhất.
+
+MÃ THAM CHIẾU: {{ quote.reference }}
+Vui lòng ghi nhớ mã này cho mọi liên hệ tiếp theo.
+
+
+THÔNG TIN YÊU CẦU
+-----------------
+Họ và tên    : {{ quote.name }}
+{% if quote.company %}Công ty      : {{ quote.company }}
+{% endif %}Email        : {{ quote.email }}
+{% if quote.phone %}Điện thoại   : {{ quote.phone }}
+{% endif %}{% if quote.solution %}Giải pháp    : {{ quote.solution.title }}
+{% endif %}{% if quote.application %}Ứng dụng     : {{ quote.application }}
+{% endif %}
+
+NỘI DUNG YÊU CẦU
+-----------------
+{% if quote.message %}{{ quote.message|truncatechars:500 }}{% else %}(Không có nội dung){% endif %}
+
+
+CAM KẾT XỬ LÝ
+--------------
+- Kỹ sư phản hồi trong vòng 4 giờ làm việc
+- Báo giá chi tiết trong vòng 24 giờ làm việc
+
+
+CÁC BƯỚC TIẾP THEO
+-------------------
+1. Kỹ sư chuyên môn xem xét thông số kỹ thuật và nhu cầu của bạn.
+2. Chúng tôi lựa chọn thiết bị phù hợp và xây dựng cấu hình hệ thống.
+3. Bạn nhận được báo giá đầy đủ (thiết bị, triển khai, bảo hành) trong 24 giờ.
+4. Kỹ sư trao đổi thêm nếu cần điều chỉnh trước khi xác nhận đơn hàng.
+
+
+LIÊN HỆ KHẨN CẤP
+-----------------
+Nếu cần hỗ trợ ngay, gọi trực tiếp: {{ COMPANY_PHONE }}
+Cung cấp mã tham chiếu {{ quote.reference }} để được ưu tiên xử lý.
+
+
+THÔNG TIN CÔNG TY
+-----------------
+{{ COMPANY_NAME }}
+{{ COMPANY_ADDRESS }}
+Email  : {{ COMPANY_EMAIL }}
+Hotline: {{ COMPANY_PHONE }}
+
+Đây là email giao dịch tự động — vui lòng không trả lời trực tiếp email này.

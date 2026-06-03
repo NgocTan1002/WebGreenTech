@@ -1,0 +1,552 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Yêu cầu báo giá — {{ COMPANY_NAME }}{% endblock %}
+{% block meta_description %}Gửi yêu cầu báo giá thiết bị IoT công nghiệp, cảm biến, gateway và giải pháp tự động hoá. Phản hồi trong vòng 24 giờ làm việc.{% endblock %}
+
+{% block content %}
+
+{# ══════════════════════════════════════════════════ HERO HEADER ══════════════════════════════════════════════════ #}
+<section class="relative bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 pt-24 pb-16 overflow-hidden">
+
+  <div class="absolute inset-0 grid-bg opacity-60"></div>
+  <div class="absolute inset-0 noise-overlay"></div>
+  <div class="absolute -top-24 right-1/4 w-[500px] h-[400px] rounded-full pointer-events-none"
+       style="background: radial-gradient(ellipse, rgba(6,184,224,.07) 0%, transparent 70%);"></div>
+
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    {# Breadcrumb #}
+    <nav class="flex items-center gap-2 text-xs font-mono text-slate-500 dark:text-slate-600 mb-10">
+      <a href="{% url 'core:home' %}" class="hover:text-slate-700 dark:hover:text-slate-400 transition-colors">Trang chủ</a>
+      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+      </svg>
+      <span class="text-slate-600 dark:text-slate-400">Yêu cầu báo giá</span>
+    </nav>
+
+    <div class="grid lg:grid-cols-2 gap-10 items-center">
+
+      {# Left: Hero copy #}
+      <div>
+        <div class="inline-flex items-center gap-2 border border-brand-200 dark:border-brand-700/40
+                    bg-brand-50 dark:bg-brand-950/40
+                    px-4 py-2 rounded-full mb-6 backdrop-blur-sm">
+          <svg class="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" fill="none" viewBox="0 0 24 24"
+               stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          <span class="font-mono text-[10px] uppercase tracking-[.2em] text-brand-600 dark:text-brand-400">
+            Phản hồi trong 24 giờ
+          </span>
+        </div>
+
+        {% comment %} <p class="section-label mb-4">— Báo giá dự án</p> {% endcomment %}
+        <h1 class="font-display font-bold uppercase text-slate-900 dark:text-white leading-[.92] tracking-tighter mb-5"
+            style="font-size: clamp(2.5rem,5.5vw,4.5rem);">
+          Yêu cầu<br>
+          <span class="text-brand-600 dark:text-brand-400">Báo giá</span>
+        </h1>
+        <p class="text-slate-500 dark:text-slate-400 text-base leading-relaxed max-w-lg mb-8">
+          Mô tả dự án và thiết bị cần thiết. Kỹ sư chuyên môn sẽ chuẩn bị
+          đề xuất kỹ thuật và báo giá chi tiết phù hợp với yêu cầu của bạn.
+        </p>
+
+        {# Trust signals #}
+        <div class="space-y-3">
+          <p class="font-mono text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-600">Cam kết của chúng tôi:</p>
+
+          <div class="flex items-center gap-3">
+            <span class="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/50
+                         flex items-center justify-center flex-shrink-0">
+              <svg class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24"
+                   stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+              </svg>
+            </span>
+            <p class="text-slate-600 dark:text-slate-400 text-sm">Kỹ sư phản hồi trong 4 giờ làm việc</p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <span class="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/50
+                         flex items-center justify-center flex-shrink-0">
+              <svg class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24"
+                   stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+              </svg>
+            </span>
+            <p class="text-slate-600 dark:text-slate-400 text-sm">Báo giá chi tiết trong 24 giờ làm việc</p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <span class="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/50
+                         flex items-center justify-center flex-shrink-0">
+              <svg class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24"
+                   stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+              </svg>
+            </span>
+            <p class="text-slate-600 dark:text-slate-400 text-sm">Tư vấn kỹ thuật miễn phí, không ràng buộc</p>
+          </div>
+        </div>
+      </div>
+
+      {# Right: Stats panel (desktop) #}
+      <div class="hidden lg:block">
+        <div class="rounded-2xl border border-slate-700/60 overflow-hidden backdrop-blur-sm
+                    dark:bg-[rgba(10,16,22,.85)] bg-white/90 border-slate-200 dark:border-slate-700/60">
+          <div class="grid grid-cols-2 gap-px bg-slate-200 dark:bg-slate-800">
+            <div class="bg-white dark:bg-slate-950 px-6 py-6 text-center">
+              <p class="font-display font-bold text-3xl text-slate-900 dark:text-white leading-none mb-1">500+</p>
+              <p class="font-mono text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-600">Dự án đã triển khai</p>
+            </div>
+            <div class="bg-white dark:bg-slate-950 px-6 py-6 text-center">
+              <p class="font-display font-bold text-3xl text-brand-600 dark:text-brand-400 leading-none mb-1">24h</p>
+              <p class="font-mono text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-600">Thời gian báo giá</p>
+            </div>
+            <div class="bg-white dark:bg-slate-950 px-6 py-6 text-center">
+              <p class="font-display font-bold text-3xl text-slate-900 dark:text-white leading-none mb-1">10+</p>
+              <p class="font-mono text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-600">Quốc gia</p>
+            </div>
+            <div class="bg-white dark:bg-slate-950 px-6 py-6 text-center">
+              <p class="font-display font-bold text-3xl text-slate-900 dark:text-white leading-none mb-1">100%</p>
+              <p class="font-mono text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-600">Miễn phí tư vấn</p>
+            </div>
+          </div>
+          <div class="px-6 py-4 flex items-center gap-2 bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800">
+            <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+            <p class="font-mono text-[10px] text-green-600 dark:text-green-400 uppercase tracking-wider">
+              Đang nhận yêu cầu báo giá
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+{# ══════════════════════════════════════════════════ MAIN CONTENT ══════════════════════════════════════════════════ #}
+<section class="py-14 bg-slate-50 dark:bg-slate-950 min-h-[60vh]">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_360px] gap-10 xl:gap-14">
+
+      {# ══ LEFT: Quote Request Form ══ #}
+      <div>
+        <div class="mb-8">
+          <h2 class="font-display font-bold uppercase text-slate-900 dark:text-white text-2xl tracking-tight mb-2">
+            Thông tin yêu cầu
+          </h2>
+          <p class="text-slate-500 dark:text-slate-500 text-sm">
+            Điền chi tiết về dự án và sản phẩm cần báo giá.
+          </p>
+        </div>
+
+        <form method="post" novalidate
+              class="rounded-2xl border p-6 sm:p-8
+                     border-slate-200 bg-white
+                     dark:border-slate-800 dark:bg-slate-900/60">
+          {% csrf_token %}
+
+          {# Non-field errors #}
+          {% if form.non_field_errors %}
+          <div class="mb-6 rounded-xl border border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/40 px-4 py-3">
+            {% for error in form.non_field_errors %}
+            <p class="text-red-600 dark:text-red-400 text-sm flex items-center gap-2">
+              <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+              </svg>
+              {{ error }}
+            </p>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          {# Input style utility #}
+          {% with input_cls="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-all border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 dark:border-slate-700 dark:bg-slate-800/60 dark:text-white dark:placeholder-slate-600 dark:focus:border-brand-600 dark:focus:ring-brand-700/20" %}
+
+          {# Section: Contact info #}
+          <p class="font-mono text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-600 mb-4 flex items-center gap-3">
+            <span>Thông tin liên hệ</span>
+            <span class="flex-1 h-px bg-slate-200 dark:bg-slate-800"></span>
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
+
+            {# Name #}
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                            text-slate-600 dark:text-slate-400">
+                Họ và tên <span class="text-red-500">*</span>
+              </label>
+              <input type="text" name="name"
+                     value="{{ form.name.value|default:'' }}"
+                     placeholder="Nguyễn Văn An"
+                     class="{{ input_cls }}{% if form.name.errors %} !border-red-400 dark:!border-red-700{% endif %}" />
+              {% if form.name.errors %}
+              <p class="text-red-500 dark:text-red-400 text-xs mt-1.5 flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01"/>
+                </svg>
+                {{ form.name.errors.0 }}
+              </p>
+              {% endif %}
+            </div>
+
+            {# Email #}
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                            text-slate-600 dark:text-slate-400">
+                Email <span class="text-red-500">*</span>
+              </label>
+              <input type="email" name="email"
+                     value="{{ form.email.value|default:'' }}"
+                     placeholder="email@congty.vn"
+                     class="{{ input_cls }}{% if form.email.errors %} !border-red-400 dark:!border-red-700{% endif %}" />
+              {% if form.email.errors %}
+              <p class="text-red-500 dark:text-red-400 text-xs mt-1.5 flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01"/>
+                </svg>
+                {{ form.email.errors.0 }}
+              </p>
+              {% endif %}
+            </div>
+
+            {# Phone #}
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                            text-slate-600 dark:text-slate-400">
+                Số điện thoại
+              </label>
+              <input type="text" name="phone"
+                     value="{{ form.phone.value|default:'' }}"
+                     placeholder="0901 234 567"
+                     class="{{ input_cls }}" />
+            </div>
+
+            {# Company #}
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                            text-slate-600 dark:text-slate-400">
+                Công ty
+              </label>
+              <input type="text" name="company"
+                     value="{{ form.company.value|default:'' }}"
+                     placeholder="Tên công ty / tổ chức"
+                     class="{{ input_cls }}" />
+            </div>
+
+          </div>
+
+          {# Section: Project details #}
+          <p class="font-mono text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-600 mb-4 flex items-center gap-3">
+            <span>Chi tiết dự án</span>
+            <span class="flex-1 h-px bg-slate-200 dark:bg-slate-800"></span>
+          </p>
+
+          <div class="space-y-5">
+
+            {# Solution (optional) #}
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                            text-slate-600 dark:text-slate-400">
+                Giải pháp quan tâm
+              </label>
+              <select name="solution"
+                      class="{{ input_cls }} appearance-none"
+                      style="background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 12px center;background-size:14px">
+                <option value="">— Chọn giải pháp (tuỳ chọn) —</option>
+                {% for value, label in form.solution.field.choices %}
+                {% if value %}
+                <option value="{{ value }}"
+                        {% if form.solution.value == value|stringformat:"s" %}selected{% endif %}>
+                  {{ label }}
+                </option>
+                {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+
+            {# Application #}
+            {% if form.application %}
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                            text-slate-600 dark:text-slate-400">
+                Ứng dụng / Ngành hàng
+              </label>
+              <input type="text" name="application"
+                     value="{{ form.application.value|default:'' }}"
+                     placeholder="VD: Nhà kính thông minh, Giám sát nhà máy, Nuôi trồng thuỷ sản..."
+                     class="{{ input_cls }}" />
+              <p class="text-slate-400 dark:text-slate-600 text-[11px] mt-1.5 font-mono">
+                Mô tả lĩnh vực ứng dụng cụ thể giúp chúng tôi đề xuất thiết bị phù hợp hơn.
+              </p>
+            </div>
+            {% endif %}
+
+            {# Message #}
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+                            text-slate-600 dark:text-slate-400">
+                Nội dung yêu cầu <span class="text-red-500">*</span>
+              </label>
+              <textarea name="message" rows="5"
+                        placeholder="Mô tả chi tiết về dự án, quy mô hệ thống, số lượng thiết bị cần thiết và các thông số kỹ thuật cụ thể (nếu có)..."
+                        class="{{ input_cls }} resize-none{% if form.message.errors %} !border-red-400 dark:!border-red-700{% endif %}">{{ form.message.value|default:'' }}</textarea>
+              {% if form.message.errors %}
+              <p class="text-red-500 dark:text-red-400 text-xs mt-1.5 flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01"/>
+                </svg>
+                {{ form.message.errors.0 }}
+              </p>
+              {% endif %}
+            </div>
+
+          </div>
+
+          {% endwith %}
+
+          {# Submit row #}
+          <div class="mt-7 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <p class="text-slate-400 dark:text-slate-600 text-xs font-mono leading-relaxed">
+              Kỹ sư phản hồi trong 4 giờ làm việc.<br>
+              Báo giá chi tiết trong 24 giờ.
+            </p>
+            <button type="submit"
+                    class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-500
+                           text-white font-bold text-sm px-8 py-3.5 rounded-xl
+                           transition-all duration-200 shadow-lg shadow-brand-950/30
+                           flex-shrink-0 w-full sm:w-auto justify-center">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+              </svg>
+              Gửi yêu cầu báo giá
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+
+      {# ══ RIGHT: Sidebar ══ #}
+      <aside class="space-y-5">
+
+        {# Process steps #}
+        <div class="rounded-2xl border p-6
+                    border-slate-200 bg-white
+                    dark:border-slate-800 dark:bg-slate-900/60">
+          <p class="font-mono text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-500 mb-5">
+            Quy trình xử lý
+          </p>
+          <div class="space-y-4">
+
+            <div class="flex gap-3">
+              <div class="flex flex-col items-center">
+                <span class="w-6 h-6 rounded-full bg-brand-600 flex items-center justify-center
+                             font-mono text-[10px] font-bold text-white flex-shrink-0">1</span>
+                <div class="w-px flex-1 bg-slate-200 dark:bg-slate-800 mt-1 mb-1 min-h-[20px]"></div>
+              </div>
+              <div class="pb-4">
+                <p class="text-sm font-semibold text-slate-800 dark:text-slate-200">Tiếp nhận yêu cầu</p>
+                <p class="text-xs text-slate-500 dark:text-slate-500 mt-0.5 leading-relaxed">
+                  Kỹ sư chuyên môn được phân công ngay sau khi nhận form.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex gap-3">
+              <div class="flex flex-col items-center">
+                <span class="w-6 h-6 rounded-full bg-brand-600 flex items-center justify-center
+                             font-mono text-[10px] font-bold text-white flex-shrink-0">2</span>
+                <div class="w-px flex-1 bg-slate-200 dark:bg-slate-800 mt-1 mb-1 min-h-[20px]"></div>
+              </div>
+              <div class="pb-4">
+                <p class="text-sm font-semibold text-slate-800 dark:text-slate-200">Phân tích yêu cầu</p>
+                <p class="text-xs text-slate-500 dark:text-slate-500 mt-0.5 leading-relaxed">
+                  Đội kỹ thuật xem xét thông số và đề xuất cấu hình thiết bị phù hợp.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex gap-3">
+              <div class="flex flex-col items-center">
+                <span class="w-6 h-6 rounded-full bg-brand-600 flex items-center justify-center
+                             font-mono text-[10px] font-bold text-white flex-shrink-0">3</span>
+                <div class="w-px flex-1 bg-slate-200 dark:bg-slate-800 mt-1 mb-1 min-h-[20px]"></div>
+              </div>
+              <div class="pb-4">
+                <p class="text-sm font-semibold text-slate-800 dark:text-slate-200">Gửi báo giá chi tiết</p>
+                <p class="text-xs text-slate-500 dark:text-slate-500 mt-0.5 leading-relaxed">
+                  Báo giá đầy đủ: thiết bị, triển khai, bảo hành trong 24 giờ làm việc.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex gap-3">
+              <div class="flex flex-col items-center">
+                <span class="w-6 h-6 rounded-full border-2 border-brand-600/40
+                             flex items-center justify-center
+                             font-mono text-[10px] font-bold text-brand-600 dark:text-brand-400 flex-shrink-0">4</span>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-slate-800 dark:text-slate-200">Tư vấn & xác nhận</p>
+                <p class="text-xs text-slate-500 dark:text-slate-500 mt-0.5 leading-relaxed">
+                  Điều chỉnh theo phản hồi của bạn trước khi xác nhận đơn hàng.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {# Contact card #}
+        <div class="rounded-2xl border p-5
+                    border-slate-200 bg-white
+                    dark:border-slate-800 dark:bg-slate-900/40">
+          <p class="font-mono text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-500 mb-4">
+            Liên hệ trực tiếp
+          </p>
+          <a href="tel:{{ COMPANY_PHONE }}"
+             class="flex items-center gap-3 group mb-3">
+            <div class="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-700
+                        bg-slate-50 dark:bg-slate-800
+                        group-hover:border-brand-300 dark:group-hover:border-brand-700
+                        flex items-center justify-center transition-colors">
+              <svg class="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" fill="none"
+                   viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+              </svg>
+            </div>
+            <div>
+              <p class="text-[10px] font-mono text-slate-400 dark:text-slate-600">Gọi ngay</p>
+              <p class="text-sm font-semibold text-slate-800 dark:text-slate-200
+                        group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+                {{ COMPANY_PHONE }}
+              </p>
+            </div>
+          </a>
+          <a href="mailto:{{ COMPANY_EMAIL }}"
+             class="flex items-center gap-3 group">
+            <div class="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-700
+                        bg-slate-50 dark:bg-slate-800
+                        group-hover:border-brand-300 dark:group-hover:border-brand-700
+                        flex items-center justify-center transition-colors">
+              <svg class="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" fill="none"
+                   viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+            </div>
+            <div>
+              <p class="text-[10px] font-mono text-slate-400 dark:text-slate-600">Email</p>
+              <p class="text-sm font-semibold text-slate-800 dark:text-slate-200
+                        group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+                {{ COMPANY_EMAIL }}
+              </p>
+            </div>
+          </a>
+        </div>
+
+        {# Demo CTA card #}
+        <div class="rounded-2xl overflow-hidden border border-brand-200/60 dark:border-brand-800/40
+                    bg-gradient-to-br from-brand-50 to-brand-100/60
+                    dark:from-brand-950/60 dark:to-brand-900/30">
+          <div class="p-6">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center">
+                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.361a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+                </svg>
+              </div>
+              <p class="font-mono text-[10px] uppercase tracking-widest text-brand-600 dark:text-brand-400">
+                Demo miễn phí
+              </p>
+            </div>
+            <h3 class="font-display font-bold uppercase text-slate-900 dark:text-white text-lg mb-2">
+              Muốn xem hệ thống thực tế?
+            </h3>
+            <p class="text-slate-600 dark:text-slate-400 text-xs leading-relaxed mb-5">
+              Đặt lịch demo 30 phút để xem hệ thống IoT vận hành thực tế
+              và nhận tư vấn kỹ thuật chuyên sâu.
+            </p>
+            {% url 'contacts:demo_request' as url_demo %}
+            <a href="{{ url_demo|default:'#' }}"
+               class="flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-500
+                      text-white font-bold text-sm py-3 rounded-xl transition-all duration-200
+                      shadow-lg shadow-brand-900/30">
+              Đặt lịch demo ngay
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        {# Trust signals card #}
+        <div class="rounded-2xl border p-5
+                    border-slate-200 bg-white
+                    dark:border-slate-800 dark:bg-slate-900/40">
+          <p class="font-mono text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-600 mb-4">
+            Tại sao chọn chúng tôi
+          </p>
+          <div class="space-y-3">
+            <div class="flex items-center gap-3">
+              <div class="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950/60
+                          border border-emerald-200 dark:border-emerald-800/50
+                          flex items-center justify-center flex-shrink-0">
+                <svg class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none"
+                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+              </div>
+              <p class="text-xs text-slate-600 dark:text-slate-400">Kỹ sư thực chiến với 500+ dự án</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950/60
+                          border border-emerald-200 dark:border-emerald-800/50
+                          flex items-center justify-center flex-shrink-0">
+                <svg class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none"
+                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+              </div>
+              <p class="text-xs text-slate-600 dark:text-slate-400">Báo giá chi tiết, không phí ẩn</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950/60
+                          border border-emerald-200 dark:border-emerald-800/50
+                          flex items-center justify-center flex-shrink-0">
+                <svg class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none"
+                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+              </div>
+              <p class="text-xs text-slate-600 dark:text-slate-400">Hỗ trợ kỹ thuật 24/7 sau triển khai</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950/60
+                          border border-emerald-200 dark:border-emerald-800/50
+                          flex items-center justify-center flex-shrink-0">
+                <svg class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none"
+                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+              </div>
+              <p class="text-xs text-slate-600 dark:text-slate-400">Bảo hành chính hãng tất cả thiết bị</p>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

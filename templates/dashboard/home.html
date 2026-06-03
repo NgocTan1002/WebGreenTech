@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Dashboard — {{ COMPANY_NAME }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-white dark:bg-slate-950 pt-24 pb-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    {# ── Page header ── #}
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <p class="section-label mb-2">— Quản trị nội bộ</p>
+        <h1 class="font-display font-bold uppercase text-slate-900 dark:text-white
+                   text-3xl tracking-tight">
+          Tổng quan vận hành
+        </h1>
+      </div>
+      <a href="/admin/" class="btn-ghost text-sm">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        Django Admin
+      </a>
+    </div>
+
+    {# ── Dashboard nav tabs ── #}
+    <nav class="flex gap-1 mb-8 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
+      {% url 'dashboard:home'      as url_dash_home %}
+      {% url 'dashboard:products'  as url_dash_products %}
+      {% url 'dashboard:orders'    as url_dash_orders %}
+      {% url 'dashboard:quotes'    as url_dash_quotes %}
+      {% url 'dashboard:contacts'  as url_dash_contacts %}
+      {% url 'dashboard:analytics' as url_dash_analytics %}
+
+      <a href="{{ url_dash_home }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                border-brand-500 text-brand-600 dark:text-brand-400">
+        Tổng quan
+      </a>
+      <a href="{{ url_dash_products }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                border-transparent text-slate-500 hover:text-slate-700
+                dark:text-slate-500 dark:hover:text-slate-300">
+        Sản phẩm
+      </a>
+      <a href="{{ url_dash_orders }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                border-transparent text-slate-500 hover:text-slate-700
+                dark:text-slate-500 dark:hover:text-slate-300">
+        Đơn hàng
+      </a>
+      <a href="{{ url_dash_quotes }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                border-transparent text-slate-500 hover:text-slate-700
+                dark:text-slate-500 dark:hover:text-slate-300">
+        Báo giá
+      </a>
+      <a href="{{ url_dash_contacts }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                border-transparent text-slate-500 hover:text-slate-700
+                dark:text-slate-500 dark:hover:text-slate-300">
+        Liên hệ
+      </a>
+      <a href="{{ url_dash_analytics }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                border-transparent text-slate-500 hover:text-slate-700
+                dark:text-slate-500 dark:hover:text-slate-300">
+        Analytics
+      </a>
+    </nav>
+
+    {# ── KPI Cards ── #}
+    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-10">
+
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border
+                  border-slate-200 dark:border-slate-800 p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+          </div>
+          <p class="text-slate-400 dark:text-slate-500 text-[10px] font-mono uppercase tracking-wider">
+            Tổng đơn
+          </p>
+        </div>
+        <p class="font-display text-3xl font-bold text-slate-900 dark:text-white leading-none">
+          {{ total_orders|intcomma }}
+        </p>
+      </div>
+
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border
+                  border-slate-200 dark:border-slate-800 p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 rounded-lg bg-brand-50 dark:bg-brand-950/60 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+            </svg>
+          </div>
+          <p class="text-slate-400 dark:text-slate-500 text-[10px] font-mono uppercase tracking-wider">
+            Tuần này
+          </p>
+        </div>
+        <p class="font-display text-3xl font-bold text-brand-600 dark:text-brand-400 leading-none">
+          {{ orders_this_week|intcomma }}
+        </p>
+      </div>
+
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border
+                  border-slate-200 dark:border-slate-800 p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 rounded-lg bg-amber-50 dark:bg-amber-950/60 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+          </div>
+          <p class="text-slate-400 dark:text-slate-500 text-[10px] font-mono uppercase tracking-wider">
+            Chờ báo giá
+          </p>
+        </div>
+        <p class="font-display text-3xl font-bold text-amber-600 dark:text-amber-400 leading-none">
+          {{ pending_quotes|intcomma }}
+        </p>
+      </div>
+
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border
+                  border-slate-200 dark:border-slate-800 p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <p class="text-slate-400 dark:text-slate-500 text-[10px] font-mono uppercase tracking-wider">
+            Liên hệ mới
+          </p>
+        </div>
+        <p class="font-display text-3xl font-bold text-slate-900 dark:text-white leading-none">
+          {{ new_contacts|intcomma }}
+        </p>
+      </div>
+
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border
+                  border-slate-200 dark:border-slate-800 p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            </svg>
+          </div>
+          <p class="text-slate-400 dark:text-slate-500 text-[10px] font-mono uppercase tracking-wider">
+            Sản phẩm live
+          </p>
+        </div>
+        <p class="font-display text-3xl font-bold text-emerald-600 dark:text-emerald-400 leading-none">
+          {{ total_products|intcomma }}
+        </p>
+      </div>
+
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border
+                  border-{% if low_stock_products > 0 %}red-200 dark:border-red-900/50{% else %}slate-200 dark:border-slate-800{% endif %}
+                  p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 rounded-lg bg-red-50 dark:bg-red-950/60 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-red-500 dark:text-red-400" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            </svg>
+          </div>
+          <p class="text-slate-400 dark:text-slate-500 text-[10px] font-mono uppercase tracking-wider">
+            Sắp hết hàng
+          </p>
+        </div>
+        <p class="font-display text-3xl font-bold leading-none
+                  {% if low_stock_products > 0 %}text-red-500 dark:text-red-400{% else %}text-slate-900 dark:text-white{% endif %}">
+          {{ low_stock_products|intcomma }}
+        </p>
+      </div>
+
+    </div>
+
+    {# ── Tables ── #}
+    <div class="grid lg:grid-cols-2 gap-6">
+
+      {# Recent Orders #}
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border
+                  border-slate-200 dark:border-slate-800 overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4
+                    border-b border-slate-100 dark:border-slate-800">
+          <h2 class="font-semibold text-slate-900 dark:text-white text-sm">Đơn hàng gần đây</h2>
+          <a href="{% url 'dashboard:orders' %}"
+             class="text-brand-600 dark:text-brand-400 text-xs font-mono hover:underline">
+            Xem tất cả →
+          </a>
+        </div>
+        <div class="divide-y divide-slate-50 dark:divide-slate-800">
+          {% for order in recent_orders %}
+          <div class="flex items-center justify-between px-6 py-3
+                      hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+            <div>
+              <p class="font-mono text-sm font-semibold text-slate-800 dark:text-slate-200">
+                {{ order.order_number }}
+              </p>
+              <p class="text-slate-400 dark:text-slate-600 text-xs mt-0.5">
+                {{ order.email }} · {{ order.created_at|date:"d/m H:i" }}
+              </p>
+            </div>
+            <span class="inline-flex px-2.5 py-1 rounded-lg text-[11px] font-semibold
+              {% if order.status == 'pending' %}bg-yellow-100 text-yellow-700 dark:bg-yellow-950/60 dark:text-yellow-400
+              {% elif order.status == 'confirmed' %}bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400
+              {% elif order.status == 'shipped' %}bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-400
+              {% elif order.status == 'delivered' %}bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400
+              {% else %}bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400{% endif %}">
+              {{ order.get_status_display }}
+            </span>
+          </div>
+          {% empty %}
+          <div class="px-6 py-10 text-center">
+            <p class="text-slate-400 dark:text-slate-600 text-sm">Chưa có đơn hàng nào.</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {# Recent Quotes #}
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border
+                  border-slate-200 dark:border-slate-800 overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4
+                    border-b border-slate-100 dark:border-slate-800">
+          <h2 class="font-semibold text-slate-900 dark:text-white text-sm">Yêu cầu báo giá gần đây</h2>
+          <a href="{% url 'dashboard:quotes' %}"
+             class="text-brand-600 dark:text-brand-400 text-xs font-mono hover:underline">
+            Xem tất cả →
+          </a>
+        </div>
+        <div class="divide-y divide-slate-50 dark:divide-slate-800">
+          {% for quote in recent_quotes %}
+          <div class="flex items-center justify-between px-6 py-3
+                      hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+            <div>
+              <p class="font-mono text-sm font-semibold text-slate-800 dark:text-slate-200">
+                {{ quote.reference }}
+              </p>
+              <p class="text-slate-400 dark:text-slate-600 text-xs mt-0.5">
+                {{ quote.company|default:quote.name }} · {{ quote.created_at|date:"d/m H:i" }}
+              </p>
+            </div>
+            <span class="inline-flex px-2.5 py-1 rounded-lg text-[11px] font-semibold
+              {% if quote.status == 'new' %}bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-400
+              {% elif quote.status == 'in_review' %}bg-yellow-100 text-yellow-700 dark:bg-yellow-950/60 dark:text-yellow-400
+              {% elif quote.status == 'quoted' %}bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400
+              {% else %}bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400{% endif %}">
+              {{ quote.get_status_display }}
+            </span>
+          </div>
+          {% empty %}
+          <div class="px-6 py-10 text-center">
+            <p class="text-slate-400 dark:text-slate-600 text-sm">Chưa có yêu cầu báo giá nào.</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

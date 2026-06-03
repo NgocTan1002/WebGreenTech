@@ -1,0 +1,68 @@
+{{ COMPANY_NAME }} — Xác nhận đơn hàng
+========================================
+
+Xin chào {{ order.first_name }} {{ order.last_name }}{% if order.company_name %} — {{ order.company_name }}{% endif %},
+
+Chúng tôi đã nhận được đơn hàng của bạn và sẽ xử lý trong thời gian sớm nhất.
+Đội kỹ thuật sẽ liên hệ xác nhận trong vòng 24 giờ làm việc.
+
+----------------------------------------
+MÃ ĐƠN HÀNG: {{ order.order_number }}
+LOẠI ĐƠN:    {% if order.order_type == 'quote' %}Yêu cầu báo giá{% else %}Đơn mua hàng{% endif %}
+TRẠNG THÁI:  Chờ xác nhận
+----------------------------------------
+
+CHI TIẾT ĐƠN HÀNG
+------------------
+{% for item in items %}
+  {{ item.product_name }}
+  SKU: {{ item.product_sku }}
+  Số lượng: {{ item.quantity }}  |  Đơn giá: {{ item.unit_price|floatformat:0 }} ₫  |  Thành tiền: {{ item.line_total|floatformat:0 }} ₫
+{% endfor %}
+
+TỔNG CỘNG: {{ order.total|floatformat:0 }} ₫
+* Giá chưa bao gồm phí vận chuyển và VAT. Sẽ được xác nhận sau khi liên hệ.
+
+{% if order.shipping_address %}
+ĐỊA CHỈ GIAO HÀNG
+------------------
+{{ order.first_name }} {{ order.last_name }}{% if order.company_name %} — {{ order.company_name }}{% endif %}
+{% if order.shipping_address.address_line1 %}{{ order.shipping_address.address_line1 }}{% endif %}
+{% if order.shipping_address.address_line2 %}{{ order.shipping_address.address_line2 }}{% endif %}
+{% if order.shipping_address.city %}{{ order.shipping_address.city }}{% if order.shipping_address.state %}, {{ order.shipping_address.state }}{% endif %}{% endif %}
+{% if order.shipping_address.country %}{{ order.shipping_address.country }}{% endif %}
+
+{% endif %}
+{% if order.customer_notes %}
+GHI CHÚ ĐƠN HÀNG
+-----------------
+{{ order.customer_notes }}
+
+{% endif %}
+BƯỚC TIẾP THEO
+--------------
+1. XÁC NHẬN ĐƠN HÀNG
+   Kỹ sư của chúng tôi sẽ liên hệ qua email hoặc điện thoại trong vòng 24 giờ
+   làm việc để xác nhận đơn.
+
+2. XÁC NHẬN GIÁ & ĐIỀU KHOẢN
+   Chúng tôi sẽ gửi báo giá chính thức và thống nhất điều khoản thanh toán,
+   thời gian giao hàng.
+
+3. XỬ LÝ & GIAO HÀNG
+   Sau khi xác nhận, đơn hàng được xử lý và giao đến địa chỉ của bạn kèm
+   tài liệu kỹ thuật đầy đủ.
+
+Xem chi tiết đơn hàng trực tuyến:
+{{ SITE_URL }}/orders/confirmation/{{ order.order_number }}/
+
+----------------------------------------
+LIÊN HỆ HỖ TRỢ
+Email:    {{ COMPANY_EMAIL }}
+Hotline:  {{ COMPANY_PHONE }}
+Website:  {{ SITE_URL }}
+{% if COMPANY_ADDRESS %}Địa chỉ: {{ COMPANY_ADDRESS }}{% endif %}
+
+----------------------------------------
+{{ COMPANY_NAME }}
+Email này được gửi tự động sau khi đơn hàng được tiếp nhận.

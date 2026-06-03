@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block title %}Yêu cầu báo giá đã được gửi — {{ COMPANY_NAME }}{% endblock %}
+{% block meta_description %}Yêu cầu báo giá của bạn đã được tiếp nhận. Kỹ sư sẽ phản hồi trong 4 giờ làm việc — {{ COMPANY_NAME }}{% endblock %}
+
+{% block content %}
+
+{# ══════════════════════════════════════════════════════════════════ HERO SUCCESS ══════════════════════════════════════════════════════════════════ #}
+<section class="relative min-h-[60vh] flex items-center justify-center overflow-hidden
+               bg-slate-950 dark:bg-slate-950 pt-24 pb-16">
+
+  {# Background overlays #}
+  <div class="absolute inset-0 grid-bg"></div>
+  <div class="absolute inset-0 noise-overlay"></div>
+  <div class="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-transparent to-slate-950/80"></div>
+
+  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+
+    {# Animated success icon #}
+    <div class="relative inline-flex items-center justify-center mb-8">
+      {# Ping ring #}
+      <span class="absolute w-20 h-20 rounded-2xl bg-emerald-500/20 animate-ping"></span>
+      {# Icon container #}
+      <div class="relative w-20 h-20 rounded-2xl bg-emerald-500 flex items-center justify-center
+                  shadow-lg shadow-emerald-500/30">
+        <svg class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+    </div>
+
+    {# H1 #}
+    <h1 class="font-display font-bold uppercase text-white text-3xl sm:text-4xl lg:text-5xl
+               tracking-tight mb-5 animate-fade-up">
+      Yêu cầu báo giá đã được gửi!
+    </h1>
+
+    {# Subtitle #}
+    <p class="max-w-lg mx-auto text-slate-400 text-sm sm:text-base leading-relaxed mb-6 animate-fade-up">
+      Chúng tôi đã tiếp nhận yêu cầu của bạn. Kỹ sư chuyên môn sẽ phản hồi trong
+      <span class="text-brand-400 font-semibold">4 giờ làm việc</span> và gửi báo giá chi tiết trong
+      <span class="text-brand-400 font-semibold">24 giờ</span>.
+    </p>
+
+    {# Email confirmation note #}
+    <div class="inline-flex items-center gap-2 font-mono text-xs tracking-wide
+                border border-slate-700 rounded-full px-4 py-2 mb-10
+                text-slate-400 bg-slate-900/60 backdrop-blur-sm">
+      <svg class="w-3.5 h-3.5 text-brand-400 flex-shrink-0" fill="none" viewBox="0 0 24 24"
+           stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+      </svg>
+      Kiểm tra email của bạn để nhận xác nhận
+    </div>
+
+    {# CTA buttons #}
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+      <a href="{% url 'solutions:list' %}" class="btn-primary">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+        </svg>
+        Xem giải pháp IoT
+      </a>
+      <a href="{% url 'core:home' %}" class="btn-ghost dark:border-slate-700 dark:text-slate-400 dark:hover:border-brand-500/60 dark:hover:text-brand-300">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+        Về trang chủ
+      </a>
+    </div>
+
+  </div>
+</section>
+
+
+{# ══════════════════════════════════════════════════════════════════ PROCESS STEPS ══════════════════════════════════════════════════════════════════ #}
+<section class="bg-slate-50 dark:bg-[#080d12] border-t border-slate-200 dark:border-slate-800 py-14">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    {# Section label + heading #}
+    <div class="text-center mb-10">
+      <p class="section-label justify-center mb-3">Bước tiếp theo</p>
+      <h2 class="font-display font-bold uppercase text-slate-900 dark:text-white text-2xl tracking-tight">
+        Quy trình xử lý yêu cầu
+      </h2>
+    </div>
+
+    {# Steps grid #}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+      {# Step 1 #}
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800
+                  p-6 relative group hover:border-brand-400/60 dark:hover:border-brand-500/40
+                  transition-all duration-300">
+        <div class="flex items-start gap-4">
+          <div class="w-8 h-8 rounded-full bg-brand-600 text-white font-mono text-sm
+                      flex items-center justify-center flex-shrink-0">1</div>
+          <div>
+            <h3 class="font-semibold text-slate-800 dark:text-slate-200 text-sm mb-1.5">
+              Xác nhận tiếp nhận
+            </h3>
+            <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+              Kỹ sư chuyên môn được phân công xem xét yêu cầu của bạn ngay lập tức.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {# Step 2 #}
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800
+                  p-6 relative group hover:border-brand-400/60 dark:hover:border-brand-500/40
+                  transition-all duration-300">
+        <div class="flex items-start gap-4">
+          <div class="w-8 h-8 rounded-full bg-brand-600 text-white font-mono text-sm
+                      flex items-center justify-center flex-shrink-0">2</div>
+          <div>
+            <h3 class="font-semibold text-slate-800 dark:text-slate-200 text-sm mb-1.5">
+              Phân tích & Đề xuất
+            </h3>
+            <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+              Chúng tôi lựa chọn thiết bị phù hợp và xây dựng cấu hình hệ thống tối ưu.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {# Step 3 #}
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800
+                  p-6 relative group hover:border-brand-400/60 dark:hover:border-brand-500/40
+                  transition-all duration-300">
+        <div class="flex items-start gap-4">
+          <div class="w-8 h-8 rounded-full bg-brand-600 text-white font-mono text-sm
+                      flex items-center justify-center flex-shrink-0">3</div>
+          <div>
+            <h3 class="font-semibold text-slate-800 dark:text-slate-200 text-sm mb-1.5">
+              Gửi báo giá chi tiết
+            </h3>
+            <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+              Báo giá đầy đủ gồm thiết bị, triển khai và bảo hành trong 24 giờ làm việc.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {# Step 4 #}
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800
+                  p-6 relative group hover:border-brand-400/60 dark:hover:border-brand-500/40
+                  transition-all duration-300">
+        <div class="flex items-start gap-4">
+          <div class="w-8 h-8 rounded-full bg-brand-600 text-white font-mono text-sm
+                      flex items-center justify-center flex-shrink-0">4</div>
+          <div>
+            <h3 class="font-semibold text-slate-800 dark:text-slate-200 text-sm mb-1.5">
+              Tư vấn & Xác nhận
+            </h3>
+            <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+              Kỹ sư trao đổi thêm nếu cần, sau đó xác nhận đơn hàng hoặc lên lịch demo.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+{# ══════════════════════════════════════════════════════════════════ CONTACT + SECONDARY CTAs ══════════════════════════════════════════════════════════════════ #}
+<section class="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+
+      {# Left: contact info #}
+      <div>
+        <h3 class="font-display text-xl font-bold text-slate-900 dark:text-white mb-3">
+          Cần hỗ trợ ngay?
+        </h3>
+        <div class="space-y-2">
+          {% if COMPANY_PHONE %}
+          <a href="tel:{{ COMPANY_PHONE }}"
+             class="flex items-center gap-2.5 text-slate-500 hover:text-brand-600
+                    dark:hover:text-brand-400 text-sm transition-colors group">
+            <span class="w-7 h-7 rounded-md border border-slate-200 dark:border-slate-800
+                         group-hover:border-brand-300 dark:group-hover:border-brand-700/50
+                         flex items-center justify-center flex-shrink-0 transition-colors">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+              </svg>
+            </span>
+            {{ COMPANY_PHONE }}
+          </a>
+          {% endif %}
+          {% if COMPANY_EMAIL %}
+          <a href="mailto:{{ COMPANY_EMAIL }}"
+             class="flex items-center gap-2.5 text-slate-500 hover:text-brand-600
+                    dark:hover:text-brand-400 text-sm transition-colors group">
+            <span class="w-7 h-7 rounded-md border border-slate-200 dark:border-slate-800
+                         group-hover:border-brand-300 dark:group-hover:border-brand-700/50
+                         flex items-center justify-center flex-shrink-0 transition-colors">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+            </span>
+            {{ COMPANY_EMAIL }}
+          </a>
+          {% endif %}
+        </div>
+      </div>
+
+      {# Right: secondary CTAs #}
+      <div class="flex flex-col sm:flex-row gap-3 flex-shrink-0">
+        <a href="{% url 'contacts:demo_request' %}" class="btn-primary text-xs py-2.5 px-5">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.361a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+          </svg>
+          Đặt lịch demo miễn phí
+        </a>
+        <a href="{% url 'orders:quote_request' %}" class="btn-ghost text-xs py-2.5 px-5">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          Gửi yêu cầu báo giá khác
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}

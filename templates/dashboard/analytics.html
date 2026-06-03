@@ -1,0 +1,666 @@
+{% extends "base.html" %}
+{% load static %}
+{% load currency %}
+{% block title %}Analytics — Dashboard{% endblock %}
+
+{% block content %}
+
+<style>
+@keyframes bar-grow {
+  from { width: 0 !important; }
+  to   { width: var(--bar-w); }
+}
+.bar-animated {
+  animation: bar-grow 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+</style>
+
+<div class="min-h-screen bg-white dark:bg-slate-950 pt-24 pb-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    {# ── Page header ── #}
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <p class="section-label mb-2">— Quản trị nội bộ</p>
+        <h1 class="font-display font-bold uppercase text-slate-900 dark:text-white
+                   text-3xl tracking-tight">
+          Analytics
+        </h1>
+      </div>
+      <span class="font-mono text-xs px-3 py-1.5 rounded-lg
+                   bg-slate-100 text-slate-600 border border-slate-200
+                   dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">
+        {{ period_start|date:"d/m/Y" }} – {{ period_end|date:"d/m/Y" }}
+      </span>
+    </div>
+
+    {# ── Dashboard nav tabs ── #}
+    <nav class="flex gap-1 mb-8 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
+      {% url 'dashboard:home'      as url_dash_home %}
+      {% url 'dashboard:products'  as url_dash_products %}
+      {% url 'dashboard:orders'    as url_dash_orders %}
+      {% url 'dashboard:quotes'    as url_dash_quotes %}
+      {% url 'dashboard:contacts'  as url_dash_contacts %}
+      {% url 'dashboard:analytics' as url_dash_analytics %}
+
+      <a href="{{ url_dash_home }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                {% if request.path == url_dash_home %}border-brand-500 text-brand-600 dark:text-brand-400
+                {% else %}border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-300{% endif %}">
+        Tổng quan
+      </a>
+      <a href="{{ url_dash_products }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                {% if request.path == url_dash_products %}border-brand-500 text-brand-600 dark:text-brand-400
+                {% else %}border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-300{% endif %}">
+        Sản phẩm
+      </a>
+      <a href="{{ url_dash_orders }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                {% if request.path == url_dash_orders %}border-brand-500 text-brand-600 dark:text-brand-400
+                {% else %}border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-300{% endif %}">
+        Đơn hàng
+      </a>
+      <a href="{{ url_dash_quotes }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                {% if request.path == url_dash_quotes %}border-brand-500 text-brand-600 dark:text-brand-400
+                {% else %}border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-300{% endif %}">
+        Báo giá
+      </a>
+      <a href="{{ url_dash_contacts }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                {% if request.path == url_dash_contacts %}border-brand-500 text-brand-600 dark:text-brand-400
+                {% else %}border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-300{% endif %}">
+        Liên hệ
+      </a>
+      <a href="{{ url_dash_analytics }}"
+         class="flex-shrink-0 px-4 py-3 text-sm font-semibold border-b-2 transition-all
+                {% if request.path == url_dash_analytics %}border-brand-500 text-brand-600 dark:text-brand-400
+                {% else %}border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-300{% endif %}">
+        Analytics
+      </a>
+    </nav>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+      {# Card 1: Revenue #}
+      <div class="relative overflow-hidden bg-white dark:bg-slate-900 rounded-2xl border
+                  border-slate-200 dark:border-slate-800 p-6">
+        <div class="absolute inset-0 grid-bg opacity-50 pointer-events-none"></div>
+        <div class="absolute inset-0 noise-overlay pointer-events-none"></div>
+        <div class="relative">
+          <div class="flex items-start justify-between mb-4">
+            <p class="section-label">Doanh thu / 30 ngày</p>
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0
+                        bg-brand-50 dark:bg-brand-950/40 border border-brand-100 dark:border-brand-900/50">
+              <svg class="w-5 h-5 text-brand-600 dark:text-brand-400"
+                   fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3
+                         2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11
+                         0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+          </div>
+          {% if revenue_30d %}
+          <p class="font-display font-bold text-4xl text-slate-900 dark:text-white
+                     leading-none mb-2">
+            {{ revenue_30d|vnd }}
+          </p>
+          {% else %}
+          <p class="font-display font-bold text-3xl text-slate-400 dark:text-slate-600
+                     leading-none mb-2">
+            Chưa có doanh thu
+          </p>
+          {% endif %}
+          <p class="font-mono text-[11px] text-slate-400 dark:text-slate-600">
+            {{ period_start|date:"d/m" }} – {{ period_end|date:"d/m/Y" }}
+          </p>
+        </div>
+      </div>
+
+      {# Card 2: Total Orders #}
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border
+                  border-slate-200 dark:border-slate-800 p-6">
+        <div class="flex items-start justify-between mb-4">
+          <p class="section-label">Tổng đơn hàng</p>
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0
+                      bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+            <svg class="w-5 h-5 text-slate-500 dark:text-slate-400"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293
+                       2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100
+                       4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+          </div>
+        </div>
+        {% if orders_by_status %}
+        {# Total #}
+        <p class="font-display font-bold text-4xl text-slate-900 dark:text-white
+                   leading-none mb-3" id="kpi-total-orders">
+          {% for item in orders_by_status %}{% if forloop.first %}{{ item.count }}{% endif %}{% endfor %}
+          {# Note: real total computed by JS below #}
+        </p>
+        {# Mini breakdown #}
+        <div class="space-y-1.5">
+          {% for item in orders_by_status %}
+          {% if item.status == 'pending' or item.status == 'delivered' or item.status == 'cancelled' %}
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full flex-shrink-0
+                {% if item.status == 'pending' %}bg-amber-400
+                {% elif item.status == 'delivered' %}bg-emerald-500
+                {% else %}bg-red-400{% endif %}"></span>
+              <span class="text-xs text-slate-500 dark:text-slate-500">
+                {% if item.status == 'pending' %}Chờ xử lý
+                {% elif item.status == 'delivered' %}Đã giao
+                {% else %}Đã huỷ{% endif %}
+              </span>
+            </div>
+            <span class="font-mono text-xs font-bold text-slate-600 dark:text-slate-400">
+              {{ item.count }}
+            </span>
+          </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="font-display font-bold text-4xl text-slate-400 dark:text-slate-600
+                   leading-none mb-2">—</p>
+        <p class="text-xs text-slate-400 dark:text-slate-600 font-mono">Chưa có dữ liệu</p>
+        {% endif %}
+      </div>
+
+      {# Card 3: Quote Funnel Summary #}
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border
+                  border-slate-200 dark:border-slate-800 p-6">
+        <div class="flex items-start justify-between mb-4">
+          <p class="section-label">Báo giá / 30 ngày</p>
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0
+                      bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+            <svg class="w-5 h-5 text-slate-500 dark:text-slate-400"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0
+                       002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0
+                       012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2
+                       2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2
+                       0 01-2-2z"/>
+            </svg>
+          </div>
+        </div>
+        {% if quote_funnel %}
+        {# Find accepted count and compute display #}
+        {% with accepted_count=0 total_count=0 %}
+        <p class="font-display font-bold text-4xl text-slate-900 dark:text-white
+                   leading-none mb-1" id="kpi-total-quotes">
+          {% for item in quote_funnel %}{% if forloop.first %}{{ item.count }}{% endif %}{% endfor %}
+        </p>
+        <div class="flex items-center gap-2 mt-2">
+          <span class="font-mono text-xs text-slate-400 dark:text-slate-600">
+            tỷ lệ chuyển đổi:
+          </span>
+          <span class="font-mono text-sm font-bold text-brand-600 dark:text-brand-400"
+                id="kpi-conversion-rate">—</span>
+        </div>
+        {% endwith %}
+        {% else %}
+        <p class="font-display font-bold text-4xl text-slate-400 dark:text-slate-600
+                   leading-none mb-2">—</p>
+        <p class="text-xs text-slate-400 dark:text-slate-600 font-mono">Chưa có dữ liệu</p>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+
+      {# LEFT: Orders by Status — Horizontal bar chart #}
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border
+                  border-slate-200 dark:border-slate-800 overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4
+                    border-b border-slate-100 dark:border-slate-800">
+          <h2 class="font-display font-bold uppercase text-slate-900 dark:text-white text-lg tracking-tight">
+            Đơn hàng theo trạng thái
+          </h2>
+          <span class="font-mono text-[10px] text-slate-400 dark:text-slate-600 uppercase tracking-wider">
+            Tất cả thời gian
+          </span>
+        </div>
+
+        <div class="p-5">
+          {% if orders_by_status %}
+          {# Find max count for bar sizing #}
+          {% with max_count=1 %}
+          {# Build max via forloop — take first as seed, JS will handle actual bars #}
+          <div class="space-y-3" id="orders-bars">
+            {% for item in orders_by_status %}
+            {% widthratio item.count 1 1 as raw_count %}
+            <div class="flex items-center gap-3"
+                 data-count="{{ item.count }}"
+                 data-status="{{ item.status }}">
+              {# Label #}
+              <span class="w-28 flex-shrink-0 text-xs font-medium text-slate-600 dark:text-slate-400
+                           text-right">
+                {% if item.status == 'pending' %}Chờ xử lý
+                {% elif item.status == 'confirmed' %}Đã xác nhận
+                {% elif item.status == 'processing' %}Đang xử lý
+                {% elif item.status == 'shipped' %}Đã giao vận
+                {% elif item.status == 'delivered' %}Đã giao hàng
+                {% elif item.status == 'cancelled' %}Đã huỷ
+                {% elif item.status == 'refunded' %}Hoàn tiền
+                {% else %}{{ item.status }}{% endif %}
+              </span>
+              {# Bar track #}
+              <div class="flex-1 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div class="h-full rounded-full bar-animated
+                            {% if item.status == 'pending' %}bg-amber-400
+                            {% elif item.status == 'confirmed' %}bg-blue-400
+                            {% elif item.status == 'processing' %}bg-violet-400
+                            {% elif item.status == 'shipped' %}bg-sky-400
+                            {% elif item.status == 'delivered' %}bg-emerald-500
+                            {% elif item.status == 'cancelled' %}bg-red-400
+                            {% else %}bg-slate-400{% endif %}"
+                     style="--bar-w: 0%; width: 0%"
+                     data-value="{{ item.count }}">
+                </div>
+              </div>
+              {# Count #}
+              <span class="w-8 flex-shrink-0 font-mono text-xs font-bold
+                           text-slate-700 dark:text-slate-300 text-right">
+                {{ item.count }}
+              </span>
+            </div>
+            {% endfor %}
+          </div>
+          {% endwith %}
+
+          {% else %}
+          <div class="flex flex-col items-center justify-center py-10 text-center">
+            <svg class="w-8 h-8 text-slate-300 dark:text-slate-700 mb-2"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2z"/>
+            </svg>
+            <p class="text-sm text-slate-400 dark:text-slate-600">Chưa có dữ liệu đơn hàng</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      {# RIGHT: Quote Funnel #}
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border
+                  border-slate-200 dark:border-slate-800 overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4
+                    border-b border-slate-100 dark:border-slate-800">
+          <h2 class="font-display font-bold uppercase text-slate-900 dark:text-white text-lg tracking-tight">
+            Funnel báo giá
+          </h2>
+          <span class="font-mono text-[10px] text-slate-400 dark:text-slate-600 uppercase tracking-wider">
+            30 ngày
+          </span>
+        </div>
+
+        <div class="p-5">
+          {% if quote_funnel %}
+          {# Build lookup dict via iteration — render all 5 stages #}
+          {# We render stages in order, matching against quote_funnel items #}
+          <div class="space-y-1.5">
+
+            {# Render each funnel stage manually with data from quote_funnel #}
+            {% for item in quote_funnel %}
+            {# Funnel tapering: stage index via forloop.counter0 * 12px padding each side #}
+            <div class="rounded-md h-11 flex items-center justify-between px-4
+                        transition-all duration-500
+                        {% if item.status == 'new' %}bg-brand-500 text-white
+                        {% elif item.status == 'in_review' %}bg-blue-500 text-white
+                        {% elif item.status == 'quoted' %}bg-violet-500 text-white
+                        {% elif item.status == 'accepted' %}bg-emerald-500 text-white
+                        {% elif item.status == 'declined' %}bg-slate-400 text-white
+                        {% else %}bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400{% endif %}"
+                 style="margin-left: calc({{ forloop.counter0 }} * 12px);
+                        margin-right: calc({{ forloop.counter0 }} * 12px);">
+              <span class="font-mono text-xs font-semibold">
+                {% if item.status == 'new' %}Mới nhận
+                {% elif item.status == 'in_review' %}Đang xem xét
+                {% elif item.status == 'quoted' %}Đã báo giá
+                {% elif item.status == 'accepted' %}Đã chấp nhận
+                {% elif item.status == 'declined' %}Từ chối
+                {% else %}{{ item.status }}{% endif %}
+              </span>
+              <span class="font-display font-bold text-lg leading-none">{{ item.count }}</span>
+            </div>
+            {% endfor %}
+
+          </div>
+
+          {# Funnel legend #}
+          <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800
+                      flex flex-wrap gap-x-4 gap-y-2">
+            {% for item in quote_funnel %}
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-sm flex-shrink-0
+                {% if item.status == 'new' %}bg-brand-500
+                {% elif item.status == 'in_review' %}bg-blue-500
+                {% elif item.status == 'quoted' %}bg-violet-500
+                {% elif item.status == 'accepted' %}bg-emerald-500
+                {% elif item.status == 'declined' %}bg-slate-400
+                {% else %}bg-slate-300{% endif %}"></span>
+              <span class="text-[11px] font-mono text-slate-500 dark:text-slate-500">
+                {% if item.status == 'new' %}Mới
+                {% elif item.status == 'in_review' %}Xem xét
+                {% elif item.status == 'quoted' %}Báo giá
+                {% elif item.status == 'accepted' %}Chấp nhận
+                {% elif item.status == 'declined' %}Từ chối
+                {% else %}{{ item.status }}{% endif %}
+                <span class="font-bold text-slate-700 dark:text-slate-300 ml-0.5">
+                  {{ item.count }}
+                </span>
+              </span>
+            </div>
+            {% endfor %}
+          </div>
+
+          {% else %}
+          <div class="flex flex-col items-center justify-center py-10 text-center">
+            <svg class="w-8 h-8 text-slate-300 dark:text-slate-700 mb-2"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0
+                       01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <p class="text-sm text-slate-400 dark:text-slate-600">Chưa có dữ liệu báo giá</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border
+                border-slate-200 dark:border-slate-800 overflow-hidden mb-6">
+
+      <div class="flex items-center justify-between px-6 py-4
+                  border-b border-slate-100 dark:border-slate-800">
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-brand-500" fill="none" viewBox="0 0 24 24"
+               stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542
+                     7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+          </svg>
+          <h2 class="font-display font-bold uppercase text-slate-900 dark:text-white
+                     text-lg tracking-tight">
+            Top sản phẩm theo lượt xem
+          </h2>
+        </div>
+        <span class="font-mono text-[10px] text-slate-400 dark:text-slate-600 uppercase tracking-wider">
+          Top {{ top_products|length }}
+        </span>
+      </div>
+
+      {% if top_products %}
+      {% with max_view=top_products.0.view_count %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-slate-50 dark:bg-slate-800/60">
+              <th class="px-4 py-3 text-left text-[10px] font-mono uppercase tracking-wider
+                         text-slate-500 dark:text-slate-500 w-8">#</th>
+              <th class="px-4 py-3 text-left text-[10px] font-mono uppercase tracking-wider
+                         text-slate-500 dark:text-slate-500">Sản phẩm</th>
+              <th class="px-4 py-3 text-left text-[10px] font-mono uppercase tracking-wider
+                         text-slate-500 dark:text-slate-500">SKU</th>
+              <th class="px-4 py-3 text-left text-[10px] font-mono uppercase tracking-wider
+                         text-slate-500 dark:text-slate-500">Kho</th>
+              <th class="px-4 py-3 text-right text-[10px] font-mono uppercase tracking-wider
+                         text-slate-500 dark:text-slate-500">Lượt xem</th>
+              <th class="px-4 py-3 text-left text-[10px] font-mono uppercase tracking-wider
+                         text-slate-500 dark:text-slate-500 w-32">Tỷ lệ</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+            {% for product in top_products %}
+            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors group">
+              <td class="px-4 py-3 font-mono text-xs text-slate-400 dark:text-slate-600">
+                {{ forloop.counter }}
+              </td>
+              <td class="px-4 py-3">
+                <a href="{% url 'products:detail' product.slug %}"
+                   class="font-medium text-slate-800 dark:text-slate-200
+                          group-hover:text-brand-600 dark:group-hover:text-brand-400
+                          transition-colors line-clamp-1">
+                  {{ product.name }}
+                </a>
+              </td>
+              <td class="px-4 py-3">
+                <span class="font-mono text-xs text-slate-500 dark:text-slate-500
+                             bg-slate-50 dark:bg-slate-800 px-2 py-0.5 rounded">
+                  {{ product.sku }}
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md
+                  {% if product.stock_status == 'in_stock' %}
+                    text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/40
+                  {% elif product.stock_status == 'low_stock' %}
+                    text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/40
+                  {% else %}
+                    text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-950/40
+                  {% endif %}">
+                  {% if product.stock_status == 'in_stock' %}Còn hàng
+                  {% elif product.stock_status == 'low_stock' %}Sắp hết
+                  {% else %}Hết hàng{% endif %}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-right font-mono font-bold text-sm
+                         text-slate-800 dark:text-slate-200">
+                {{ product.view_count }}
+              </td>
+              <td class="px-4 py-3">
+                <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                  {% widthratio product.view_count max_view 100 as bar_pct %}
+                  <div class="h-full bg-brand-500 rounded-full bar-animated"
+                       style="--bar-w: {{ bar_pct }}%; width: {{ bar_pct }}%"></div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endwith %}
+
+      {% else %}
+      <div class="flex flex-col items-center justify-center py-16 text-center">
+        <svg class="w-10 h-10 text-slate-300 dark:text-slate-700 mb-3"
+             fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+        </svg>
+        <p class="text-slate-400 dark:text-slate-600 text-sm">Chưa có dữ liệu sản phẩm</p>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border
+                border-slate-200 dark:border-slate-800 overflow-hidden">
+
+      <div class="flex items-center justify-between px-6 py-4
+                  border-b border-slate-100 dark:border-slate-800">
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-brand-500" fill="none" viewBox="0 0 24 24"
+               stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h7l2 2h5a2 2 0 012 2v10a2 2 0 01-2 2z"/>
+          </svg>
+          <h2 class="font-display font-bold uppercase text-slate-900 dark:text-white
+                     text-lg tracking-tight">
+            Top bài viết theo lượt xem
+          </h2>
+        </div>
+        <span class="font-mono text-[10px] text-slate-400 dark:text-slate-600 uppercase tracking-wider">
+          Top {{ top_posts|length }}
+        </span>
+      </div>
+
+      {% if top_posts %}
+      {% with max_post_views=top_posts.0.view_count %}
+      <div class="divide-y divide-slate-100 dark:divide-slate-800 px-6">
+        {% for post in top_posts %}
+        <div class="flex items-center gap-4 py-3.5 group">
+          {# Rank #}
+          <span class="font-display font-bold text-2xl leading-none w-8 flex-shrink-0
+                       text-slate-200 dark:text-slate-700">
+            {{ forloop.counter }}
+          </span>
+          {# Post type badge #}
+          <span class="flex-shrink-0
+            {% if post.post_type == 'article' %}tag tag-blue
+            {% elif post.post_type == 'news' %}tag tag-amber
+            {% elif post.post_type == 'guide' %}tag tag-green
+            {% elif post.post_type == 'case_study' %}tag tag-red
+            {% else %}tag tag-blue{% endif %}">
+            {% if post.post_type == 'article' %}Bài viết
+            {% elif post.post_type == 'news' %}Tin tức
+            {% elif post.post_type == 'guide' %}Hướng dẫn
+            {% elif post.post_type == 'case_study' %}Case Study
+            {% else %}{{ post.post_type }}{% endif %}
+          </span>
+          {# Title #}
+          <a href="{% url 'blog:detail' post.slug %}"
+             class="flex-1 min-w-0 font-medium text-sm text-slate-700 dark:text-slate-300
+                    hover:text-brand-600 dark:hover:text-brand-400 transition-colors
+                    truncate">
+            {{ post.title }}
+          </a>
+          {# View count + mini bar #}
+          <div class="flex items-center gap-3 flex-shrink-0">
+            <div class="w-20 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden
+                        hidden sm:block">
+              {% widthratio post.view_count max_post_views 100 as post_bar_pct %}
+              <div class="h-full bg-brand-500 rounded-full bar-animated"
+                   style="--bar-w: {{ post_bar_pct }}%; width: {{ post_bar_pct }}%"></div>
+            </div>
+            <span class="font-mono text-sm font-bold text-slate-600 dark:text-slate-400 w-12 text-right">
+              {{ post.view_count }}
+            </span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endwith %}
+
+      {% else %}
+      <div class="flex flex-col items-center justify-center py-16 text-center">
+        <svg class="w-10 h-10 text-slate-300 dark:text-slate-700 mb-3"
+             fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h7l2 2h5a2 2 0 012 2v10a2 2 0 01-2 2z"/>
+        </svg>
+        <p class="text-slate-400 dark:text-slate-600 text-sm">Chưa có dữ liệu bài viết</p>
+      </div>
+      {% endif %}
+
+    </div>
+
+  </div>
+</div>
+
+{# ── JS: compute totals and animate bars ── #}
+<script>
+(function () {
+  'use strict';
+
+  // ── Compute orders total from DOM ──────────────────────────────────────
+  const orderRows = document.querySelectorAll('#orders-bars [data-count]');
+  let ordersTotal = 0;
+  let ordersMax   = 0;
+  orderRows.forEach(row => {
+    const v = parseInt(row.dataset.count, 10) || 0;
+    ordersTotal += v;
+    if (v > ordersMax) ordersMax = v;
+  });
+  const kpiOrders = document.getElementById('kpi-total-orders');
+  if (kpiOrders) kpiOrders.textContent = ordersTotal;
+
+  // ── Animate horizontal order bars with correct % ────────────────────────
+  if (ordersMax > 0) {
+    orderRows.forEach(row => {
+      const v   = parseInt(row.dataset.count, 10) || 0;
+      const pct = Math.round((v / ordersMax) * 100);
+      const bar = row.querySelector('.bar-animated');
+      if (bar) {
+        bar.style.setProperty('--bar-w', pct + '%');
+        bar.style.width = pct + '%';
+      }
+    });
+  }
+
+  // ── Compute quote funnel totals ─────────────────────────────────────────
+  const funnelItems = document.querySelectorAll('[data-status]');
+  let quotesTotal    = 0;
+  let quotesAccepted = 0;
+  // quote_funnel items rendered in funnel section have no data-count
+  // We re-read from the legend spans or directly compute via inline text
+  // Instead, collect via a hidden data element approach:
+  // The funnel rows have data-status — but they're in the orders section too.
+  // Filter to only funnel statuses:
+  const funnelStatuses = new Set(['new', 'in_review', 'quoted', 'accepted', 'declined']);
+  const funnelRows = document.querySelectorAll('.rounded-md[style*="margin-left"]');
+  // Actually, let's use data attributes from the legend
+  // The legend items contain count as text — parse them
+  document.querySelectorAll('#kpi-total-quotes')?.forEach(() => {}); // already set placeholder
+
+  // Simpler: read from the funnel stage rows directly
+  // Each funnel row has a font-display span with the count
+  funnelRows.forEach(row => {
+    const countEl = row.querySelector('.font-display');
+    if (!countEl) return;
+    const v = parseInt(countEl.textContent.trim(), 10) || 0;
+    quotesTotal += v;
+    const statusText = row.querySelector('.font-mono')?.textContent?.trim() || '';
+    if (statusText === 'Đã chấp nhận') quotesAccepted = v;
+  });
+
+  const kpiQuotes = document.getElementById('kpi-total-quotes');
+  if (kpiQuotes && quotesTotal > 0) kpiQuotes.textContent = quotesTotal;
+
+  const kpiRate = document.getElementById('kpi-conversion-rate');
+  if (kpiRate) {
+    if (quotesTotal > 0) {
+      const rate = Math.round((quotesAccepted / quotesTotal) * 100);
+      kpiRate.textContent = rate + '%';
+    } else {
+      kpiRate.textContent = '—';
+    }
+  }
+
+  // ── Trigger bar animation via IntersectionObserver ─────────────────────
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        // Re-trigger animation by removing and re-adding class
+        const bars = entry.target.querySelectorAll('.bar-animated');
+        bars.forEach(bar => {
+          bar.classList.remove('bar-animated');
+          void bar.offsetWidth; // reflow
+          bar.classList.add('bar-animated');
+        });
+        io.unobserve(entry.target);
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('table, #orders-bars, .divide-y').forEach(el => io.observe(el));
+  }
+
+})();
+</script>
+
+{% endblock %}

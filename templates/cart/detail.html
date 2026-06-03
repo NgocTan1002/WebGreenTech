@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% load static %}
+{% load currency %}
+
+{% block title %}Giỏ hàng — {{ COMPANY_NAME }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50 dark:bg-[#080d12] pt-24 pb-16">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    {# Breadcrumb #}
+    <nav class="flex items-center gap-2 text-xs font-mono text-slate-400 dark:text-slate-600 mb-8">
+      <a href="{% url 'core:home' %}" class="hover:text-slate-600 dark:hover:text-slate-400 transition-colors">Trang chủ</a>
+      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+      </svg>
+      <span class="text-slate-600 dark:text-slate-300">Giỏ hàng</span>
+    </nav>
+
+    <h1 class="font-display font-bold uppercase text-2xl sm:text-3xl text-slate-900 dark:text-white mb-8 tracking-tight">
+      Giỏ hàng của bạn
+    </h1>
+
+    {% if cart_items %}
+    <div class="grid lg:grid-cols-3 gap-8">
+
+      {# ── Cart Items ── #}
+      <div class="lg:col-span-2 space-y-4">
+        {% for item in cart_items %}
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 flex gap-4 items-start transition-all hover:border-slate-300 dark:hover:border-slate-700">
+
+          {# Product image #}
+          <div class="w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center">
+            {% if item.thumbnail %}
+            <img src="{{ item.thumbnail }}" alt="{{ item.product_name }}" class="w-full h-full object-contain p-2" loading="lazy" />
+            {% else %}
+            <svg class="w-8 h-8 text-slate-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01"/>
+            </svg>
+            {% endif %}
+          </div>
+
+          {# Product info #}
+          <div class="flex-1 min-w-0">
+            <p class="font-mono text-[10px] text-slate-400 dark:text-slate-600 mb-0.5">{{ item.product_sku }}</p>
+            <a href="{% url 'products:detail' item.product_slug %}"
+               class="font-semibold text-sm text-slate-800 dark:text-slate-100 hover:text-brand-600 dark:hover:text-brand-400 transition-colors line-clamp-2 block mb-2">
+              {{ item.product_name }}
+            </a>
+
+            {# Stock status #}
+            <span class="inline-flex items-center gap-1 text-[11px] font-mono
+              {% if item.stock_status == 'in_stock' %}text-emerald-600 dark:text-emerald-400
+              {% elif item.stock_status == 'low_stock' %}text-amber-600 dark:text-amber-400
+              {% else %}text-red-600 dark:text-red-400{% endif %}">
+              <span class="w-1.5 h-1.5 rounded-full flex-shrink-0
+                {% if item.stock_status == 'in_stock' %}bg-emerald-500 dark:bg-emerald-400
+                {% elif item.stock_status == 'low_stock' %}bg-amber-500 dark:bg-amber-400
+                {% else %}bg-red-500 dark:bg-red-400{% endif %}"></span>
+              {% if item.stock_status == 'in_stock' %}Còn hàng
+              {% elif item.stock_status == 'low_stock' %}Sắp hết
+              {% else %}Hết hàng{% endif %}
+            </span>
+          </div>
+
+          {# Price + actions #}
+          <div class="flex flex-col items-end gap-3 flex-shrink-0">
+            <div class="text-right">
+              <p class="text-xs text-slate-400 dark:text-slate-600 font-mono">{{ item.unit_price|vnd }} × {{ item.quantity }}</p>
+              <p class="font-bold text-base text-slate-900 dark:text-white mt-0.5">{{ item.line_total|vnd }}</p>
+            </div>
+
+            {# Quantity update #}
+            <form action="{% url 'cart:update' item.item_id %}" method="post"
+                  class="flex items-center border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden bg-white dark:bg-slate-800">
+              {% csrf_token %}
+              <button type="submit" name="quantity" value="{{ item.quantity|add:'-1' }}"
+                      class="px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 font-bold text-base leading-none transition-colors">−</button>
+              <span class="px-3 py-2 text-slate-800 dark:text-slate-200 font-semibold text-sm w-10 text-center select-none">{{ item.quantity }}</span>
+              <button type="submit" name="quantity" value="{{ item.quantity|add:'1' }}"
+                      class="px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 font-bold text-base leading-none transition-colors">+</button>
+            </form>
+
+            {# Remove #}
+            <form action="{% url 'cart:remove' item.item_id %}" method="post">
+              {% csrf_token %}
+              <button type="submit"
+                      class="flex items-center gap-1 text-slate-400 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 text-xs font-mono transition-colors">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                Xoá
+              </button>
+            </form>
+          </div>
+
+        </div>
+        {% endfor %}
+
+        {# Bottom actions #}
+        <div class="flex items-center justify-between pt-2">
+          <a href="{% url 'products:list' %}"
+             class="inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Tiếp tục mua sắm
+          </a>
+          <form action="{% url 'cart:clear' %}" method="post">
+            {% csrf_token %}
+            <button type="submit"
+                    class="text-sm font-mono text-slate-400 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 transition-colors">
+              Xoá tất cả
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {# ── Order Summary ── #}
+      <div class="lg:col-span-1">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 lg:sticky lg:top-24">
+
+          <h2 class="font-display font-bold uppercase text-slate-900 dark:text-white text-xl tracking-tight mb-6">
+            Tóm tắt đơn hàng
+          </h2>
+
+          <div class="space-y-3 mb-5">
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-slate-500 dark:text-slate-400">Tạm tính ({{ total_items }} sản phẩm)</span>
+              <span class="font-semibold text-slate-800 dark:text-slate-200">{{ subtotal|vnd }}</span>
+            </div>
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-slate-500 dark:text-slate-400">Phí vận chuyển</span>
+              <span class="text-slate-400 dark:text-slate-600 italic text-xs">Tính khi thanh toán</span>
+            </div>
+          </div>
+
+          <div class="border-t border-slate-100 dark:border-slate-800 pt-4 mb-6">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-900 dark:text-white">Tổng cộng</span>
+              <span class="font-display font-bold text-xl text-brand-600 dark:text-brand-400">{{ subtotal|vnd }}</span>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <a href="{% url 'orders:checkout' %}"
+               class="flex items-center justify-center gap-2 w-full bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm py-3.5 px-5 rounded-xl transition-all duration-200 shadow-lg shadow-brand-200/40 dark:shadow-brand-950/50">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              Tiến hành thanh toán
+            </a>
+            <a href="{% url 'orders:quote_request' %}"
+               class="flex items-center justify-center gap-2 w-full border border-slate-200 dark:border-slate-700 hover:border-brand-400 dark:hover:border-brand-600 text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 font-semibold text-sm py-3 px-5 rounded-xl transition-all duration-200">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+              Yêu cầu báo giá
+            </a>
+          </div>
+
+          <div class="flex items-center justify-center gap-2 mt-5 pt-5 border-t border-slate-100 dark:border-slate-800">
+            <svg class="w-3.5 h-3.5 text-slate-300 dark:text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+            <p class="text-[11px] font-mono text-slate-400 dark:text-slate-600">Thanh toán an toàn · SSL mã hoá</p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    {% else %}
+
+    {# ── Empty cart state ── #}
+    <div class="flex flex-col items-center justify-center py-28 text-center">
+      <div class="w-20 h-20 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center mb-6 shadow-sm">
+        <svg class="w-9 h-9 text-slate-300 dark:text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+      </div>
+      <h2 class="font-display font-bold uppercase text-slate-800 dark:text-white text-2xl tracking-tight mb-2">
+        Giỏ hàng trống
+      </h2>
+      <p class="text-slate-500 dark:text-slate-400 text-sm max-w-sm leading-relaxed mb-8">
+        Bạn chưa thêm sản phẩm nào vào giỏ. Khám phá danh mục thiết bị IoT công nghiệp của chúng tôi.
+      </p>
+      <div class="flex gap-3">
+        <a href="{% url 'products:list' %}"
+           class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm px-6 py-3 rounded-xl transition-all duration-200 shadow-lg shadow-brand-200/40 dark:shadow-brand-950/50">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          </svg>
+          Xem sản phẩm
+        </a>
+        <a href="{% url 'solutions:list' %}"
+           class="inline-flex items-center gap-2 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-semibold text-sm px-6 py-3 rounded-xl transition-all duration-200">
+          Xem giải pháp
+        </a>
+      </div>
+    </div>
+
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

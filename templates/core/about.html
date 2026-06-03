@@ -1,0 +1,682 @@
+{% extends "base.html" %}
+{% load static %}
+{% load currency %}
+
+{% block title %}Về chúng tôi — {{ COMPANY_NAME }}{% endblock %}
+{% block meta_description %}{{ COMPANY_NAME }} cung cấp thiết bị IoT công nghiệp, cảm biến, gateway và giải pháp tự động hoá thông minh cho nông nghiệp, nhà máy và quản lý năng lượng tại Việt Nam và Đông Nam Á.{% endblock %}
+
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "{{ COMPANY_NAME }}",
+  "url": "{{ SITE_URL }}",
+  "telephone": "{{ COMPANY_PHONE }}",
+  "email": "{{ COMPANY_EMAIL }}",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "{{ COMPANY_ADDRESS }}"
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+{# ══════════════════════════════════════════════════ HERO ══════════════════════════════════════════════════ #}
+<section class="relative bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 pt-24 pb-16 overflow-hidden">
+
+  <div class="absolute inset-0 grid-bg opacity-60"></div>
+  <div class="absolute inset-0 noise-overlay"></div>
+
+  <div class="absolute -top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full pointer-events-none"
+       style="background: radial-gradient(ellipse, rgba(6,184,224,.08) 0%, transparent 65%);"></div>
+
+  <div class="absolute top-0 right-16 w-px h-full hidden lg:block opacity-10"
+       style="background: linear-gradient(to bottom, transparent, rgba(6,184,224,1) 40%, rgba(6,184,224,1) 60%, transparent);"></div>
+
+  <div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+
+    {# Breadcrumb #}
+    <nav class="flex items-center gap-2 text-xs font-mono text-slate-500 dark:text-slate-600 mb-12">
+      <a href="{% url 'core:home' %}" class="hover:text-slate-700 dark:hover:text-slate-400 transition-colors">Trang chủ</a>
+      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+      </svg>
+      <span class="text-slate-600 dark:text-slate-400">Về chúng tôi</span>
+    </nav>
+
+    <div class="grid lg:grid-cols-[1fr_380px] gap-16 items-end">
+
+      {# Copy #}
+      <div>
+        <div class="inline-flex items-center gap-3 border border-brand-200 dark:border-brand-700/40
+                    bg-brand-50 dark:bg-brand-950/40 px-4 py-2 rounded-full mb-8">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-400"></span>
+          </span>
+          <span class="font-mono text-[10px] uppercase tracking-[.2em] text-brand-600 dark:text-brand-400">
+            Est. 2018 &nbsp;/&nbsp; Việt Nam &nbsp;/&nbsp; Industrial IoT
+          </span>
+        </div>
+
+        <h1 class="font-display font-bold uppercase text-slate-900 dark:text-white leading-[.92] tracking-tighter mb-6"
+            style="font-size: clamp(3rem,7vw,5.5rem);">
+          Kết nối<br>
+          thế giới<br>
+          <span class="text-brand-600 dark:text-brand-400">công nghiệp.</span>
+        </h1>
+
+        <p class="text-slate-600 dark:text-slate-400 text-lg leading-relaxed max-w-xl">
+          Chúng tôi thiết kế và cung cấp hệ sinh thái IoT đầu cuối — từ cảm biến hiện trường
+          đến dashboard phân tích — giúp doanh nghiệp Việt Nam và Đông Nam Á bước vào
+          kỷ nguyên Công nghiệp 4.0.
+        </p>
+      </div>
+
+      {# Stats panel #}
+      <div class="rounded-2xl border border-slate-200 dark:border-slate-700/60 overflow-hidden
+                  bg-white dark:bg-[rgba(10,16,22,.85)] shadow-sm dark:shadow-none">
+        <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
+          <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+          <span class="font-mono text-[10px] uppercase tracking-[.2em] text-green-600 dark:text-green-400">Live metrics</span>
+        </div>
+        <div class="grid grid-cols-2 gap-px bg-slate-200 dark:bg-slate-800">
+          <div class="bg-white dark:bg-slate-950 px-6 py-6">
+            <p class="font-display font-bold text-3xl text-slate-900 dark:text-white leading-none mb-1">500+</p>
+            <p class="font-mono text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-600">Dự án triển khai</p>
+          </div>
+          <div class="bg-white dark:bg-slate-950 px-6 py-6">
+            <p class="font-display font-bold text-3xl text-brand-600 dark:text-brand-400 leading-none mb-1">VN</p>
+            <p class="font-mono text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-600">Triển khai toàn quốc</p>
+          </div>
+          <div class="bg-white dark:bg-slate-950 px-6 py-6">
+            <p class="font-display font-bold text-3xl text-slate-900 dark:text-white leading-none mb-1">
+              {{ stats.products_count|default:"500" }}+
+            </p>
+
+            <p class="font-mono text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-600">
+              Sản phẩm
+            </p>
+          </div>
+          <div class="bg-white dark:bg-slate-950 px-6 py-6">
+            <p class="font-display font-bold text-3xl text-slate-900 dark:text-white leading-none mb-1">24/7</p>
+            <p class="font-mono text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-600">Hỗ trợ kỹ thuật</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+{# ══════════════════════════════════════════════════ USP STRIP ══════════════════════════════════════════════════ #}
+<section class="border-y border-slate-200 dark:border-slate-800/60 bg-slate-50 dark:bg-[rgba(10,16,22,.6)]">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-2 lg:grid-cols-4">
+
+      <div class="flex items-center gap-3.5 px-6 py-6 border-r border-slate-200 dark:border-slate-800/60 group">
+        <div class="w-9 h-9 rounded-lg border border-brand-200 dark:border-brand-700/40
+                    bg-brand-50 dark:bg-transparent
+                    flex items-center justify-center flex-shrink-0
+                    group-hover:border-brand-400 dark:group-hover:border-brand-500/60
+                    group-hover:bg-brand-100 dark:group-hover:bg-brand-950/40 transition-all">
+          <svg class="w-4 h-4 text-brand-600 dark:text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-slate-800 dark:text-white font-semibold text-sm">Chuẩn IP67</p>
+          <p class="text-slate-500 dark:text-slate-600 text-xs mt-0.5">Môi trường khắc nghiệt</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3.5 px-6 py-6 border-r border-slate-200 dark:border-slate-800/60 group">
+        <div class="w-9 h-9 rounded-lg border border-brand-200 dark:border-brand-700/40
+                    bg-brand-50 dark:bg-transparent
+                    flex items-center justify-center flex-shrink-0
+                    group-hover:border-brand-400 dark:group-hover:border-brand-500/60
+                    group-hover:bg-brand-100 dark:group-hover:bg-brand-950/40 transition-all">
+          <svg class="w-4 h-4 text-brand-600 dark:text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-slate-800 dark:text-white font-semibold text-sm">Tích hợp nhanh</p>
+          <p class="text-slate-500 dark:text-slate-600 text-xs mt-0.5">Modbus · MQTT · REST API</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3.5 px-6 py-6 border-r border-slate-200 dark:border-slate-800/60 group">
+        <div class="w-9 h-9 rounded-lg border border-brand-200 dark:border-brand-700/40
+                    bg-brand-50 dark:bg-transparent
+                    flex items-center justify-center flex-shrink-0
+                    group-hover:border-brand-400 dark:group-hover:border-brand-500/60
+                    group-hover:bg-brand-100 dark:group-hover:bg-brand-950/40 transition-all">
+          <svg class="w-4 h-4 text-brand-600 dark:text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-slate-800 dark:text-white font-semibold text-sm">End-to-end</p>
+          <p class="text-slate-500 dark:text-slate-600 text-xs mt-0.5">Sensor → Cloud → Dashboard</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3.5 px-6 py-6 group">
+        <div class="w-9 h-9 rounded-lg border border-brand-200 dark:border-brand-700/40
+                    bg-brand-50 dark:bg-transparent
+                    flex items-center justify-center flex-shrink-0
+                    group-hover:border-brand-400 dark:group-hover:border-brand-500/60
+                    group-hover:bg-brand-100 dark:group-hover:bg-brand-950/40 transition-all">
+          <svg class="w-4 h-4 text-brand-600 dark:text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-slate-800 dark:text-white font-semibold text-sm">Mở rộng tự do</p>
+          <p class="text-slate-500 dark:text-slate-600 text-xs mt-0.5">1 → 10.000 node</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+{# ══════════════════════════════════════════════════ MISSION ══════════════════════════════════════════════════ #}
+<section class="py-24 bg-white dark:bg-slate-950">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid lg:grid-cols-[280px_1fr] gap-14" data-reveal>
+
+      <div class="flex-shrink-0">
+        <p class="section-label mb-4">Sứ mệnh</p>
+        <h2 class="font-display font-bold uppercase text-slate-900 dark:text-white text-3xl leading-tight">
+          Chúng tôi<br>là ai?
+        </h2>
+        <div class="mt-6 w-12 h-0.5 bg-brand-600"></div>
+      </div>
+
+      <div class="space-y-5 leading-relaxed">
+        <p class="text-lg text-slate-700 dark:text-slate-300">
+          <span class="text-brand-600 dark:text-brand-400 font-semibold">{{ COMPANY_NAME }}</span> là nhà cung cấp
+          thiết bị IoT công nghiệp và giải pháp tự động hoá thông minh chuyên sâu cho thị trường
+          Việt Nam và Đông Nam Á.
+        </p>
+        <p class="text-slate-600 dark:text-slate-400">
+          Chúng tôi cung cấp hệ sinh thái đầy đủ từ cảm biến hiện trường (nhiệt độ, độ ẩm, pH, lưu lượng,
+          áp suất…), gateway IoT, datalogger đến phần mềm giám sát và cảnh báo realtime — tất cả được
+          lựa chọn và tích hợp để tương thích hoàn toàn trong một nền tảng thống nhất.
+        </p>
+        <p class="text-slate-600 dark:text-slate-400">
+          Đội ngũ kỹ sư của chúng tôi có kinh nghiệm thực chiến triển khai trong các môi trường khắc nghiệt
+          nhất: nhà kính nông nghiệp độ ẩm cao, nhà máy chế biến bụi bặm đến trạm quan trắc ngoài trời.
+          Chúng tôi không chỉ bán sản phẩm — chúng tôi đồng hành từ khảo sát đến vận hành.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+{# ══════════════════════════════════════════════════ WHAT WE DO ══════════════════════════════════════════════════ #}
+<section class="py-16 bg-slate-50 dark:bg-slate-900 border-y border-slate-200 dark:border-slate-800">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="text-center mb-14" data-reveal>
+      <p class="section-label justify-center mb-4">Lĩnh vực hoạt động</p>
+      <h2 class="font-display font-bold uppercase text-slate-900 dark:text-white text-4xl leading-tight">
+        Chúng tôi làm gì?
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+      <div class="card-industrial p-6 group" data-reveal>
+        <div class="w-10 h-10 rounded-xl border border-brand-200 dark:border-brand-700/40
+                    bg-brand-50 dark:bg-brand-950/40
+                    flex items-center justify-center mb-5
+                    group-hover:border-brand-400 dark:group-hover:border-brand-500/60 transition-all">
+          <svg class="w-5 h-5 text-brand-600 dark:text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
+          </svg>
+        </div>
+        <h3 class="font-display font-bold uppercase text-slate-900 dark:text-white text-lg mb-2">Cảm biến & Đo lường</h3>
+        <p class="text-slate-600 dark:text-slate-500 text-sm leading-relaxed">
+          Cung cấp và tích hợp cảm biến công nghiệp đa thông số: nhiệt độ, độ ẩm, pH, DO,
+          lưu lượng, áp suất, khí gas — kết nối RS485/4-20mA.
+        </p>
+      </div>
+
+      <div class="card-industrial p-6 group" data-reveal>
+        <div class="w-10 h-10 rounded-xl border border-brand-200 dark:border-brand-700/40
+                    bg-brand-50 dark:bg-brand-950/40
+                    flex items-center justify-center mb-5
+                    group-hover:border-brand-400 dark:group-hover:border-brand-500/60 transition-all">
+          <svg class="w-5 h-5 text-brand-600 dark:text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.14 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/>
+          </svg>
+        </div>
+        <h3 class="font-display font-bold uppercase text-slate-900 dark:text-white text-lg mb-2">Gateway & Kết nối</h3>
+        <p class="text-slate-600 dark:text-slate-500 text-sm leading-relaxed">
+          Gateway IoT công nghiệp hỗ trợ 4G LTE, LoRaWAN, Ethernet. Chuyển đổi giao thức
+          Modbus RTU/TCP, MQTT, REST API về nền tảng cloud thống nhất.
+        </p>
+      </div>
+
+      <div class="card-industrial p-6 group" data-reveal>
+        <div class="w-10 h-10 rounded-xl border border-brand-200 dark:border-brand-700/40
+                    bg-brand-50 dark:bg-brand-950/40
+                    flex items-center justify-center mb-5
+                    group-hover:border-brand-400 dark:group-hover:border-brand-500/60 transition-all">
+          <svg class="w-5 h-5 text-brand-600 dark:text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/>
+          </svg>
+        </div>
+        <h3 class="font-display font-bold uppercase text-slate-900 dark:text-white text-lg mb-2">Datalogger & PLC</h3>
+        <p class="text-slate-600 dark:text-slate-500 text-sm leading-relaxed">
+          Bộ thu thập dữ liệu đa kênh, PLC mini và HMI công nghiệp cho các ứng dụng
+          tự động hoá và ghi nhật ký vận hành tại hiện trường.
+        </p>
+      </div>
+
+      <div class="card-industrial p-6 group" data-reveal>
+        <div class="w-10 h-10 rounded-xl border border-brand-200 dark:border-brand-700/40
+                    bg-brand-50 dark:bg-brand-950/40
+                    flex items-center justify-center mb-5
+                    group-hover:border-brand-400 dark:group-hover:border-brand-500/60 transition-all">
+          <svg class="w-5 h-5 text-brand-600 dark:text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
+          </svg>
+        </div>
+        <h3 class="font-display font-bold uppercase text-slate-900 dark:text-white text-lg mb-2">Nền tảng Cloud & Dashboard</h3>
+        <p class="text-slate-600 dark:text-slate-500 text-sm leading-relaxed">
+          Nền tảng giám sát realtime với dashboard trực quan, cảnh báo đa kênh (SMS, email,
+          Zalo) và API mở để tích hợp với hệ thống ERP, SCADA hiện có.
+        </p>
+      </div>
+
+      <div class="card-industrial p-6 group" data-reveal>
+        <div class="w-10 h-10 rounded-xl border border-brand-200 dark:border-brand-700/40
+                    bg-brand-50 dark:bg-brand-950/40
+                    flex items-center justify-center mb-5
+                    group-hover:border-brand-400 dark:group-hover:border-brand-500/60 transition-all">
+          <svg class="w-5 h-5 text-brand-600 dark:text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+          </svg>
+        </div>
+        <h3 class="font-display font-bold uppercase text-slate-900 dark:text-white text-lg mb-2">Tích hợp & Triển khai</h3>
+        <p class="text-slate-600 dark:text-slate-500 text-sm leading-relaxed">
+          Dịch vụ tư vấn, khảo sát, lắp đặt và commissioning. Đội kỹ sư có mặt tại hiện trường
+          và hỗ trợ từ xa để đảm bảo hệ thống vận hành ổn định.
+        </p>
+      </div>
+
+      <div class="card-industrial p-6 group" data-reveal>
+        <div class="w-10 h-10 rounded-xl border border-brand-200 dark:border-brand-700/40
+                    bg-brand-50 dark:bg-brand-950/40
+                    flex items-center justify-center mb-5
+                    group-hover:border-brand-400 dark:group-hover:border-brand-500/60 transition-all">
+          <svg class="w-5 h-5 text-brand-600 dark:text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+          </svg>
+        </div>
+        <h3 class="font-display font-bold uppercase text-slate-900 dark:text-white text-lg mb-2">Đào tạo & Bảo trì</h3>
+        <p class="text-slate-600 dark:text-slate-500 text-sm leading-relaxed">
+          Đào tạo vận hành cho đội ngũ khách hàng. Hợp đồng bảo trì định kỳ và hỗ trợ kỹ thuật
+          24/7 với cam kết SLA rõ ràng.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+{# ══════════════════════════════════════════════════ WHY US ══════════════════════════════════════════════════ #}
+<section class="py-24 bg-white dark:bg-slate-950">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="grid lg:grid-cols-2 gap-16 items-center">
+
+      {# Left — checklist panel #}
+      <div class="relative" data-reveal>
+        <div class="absolute inset-8 rounded-2xl opacity-10 dark:opacity-20 blur-3xl"
+             style="background: radial-gradient(ellipse, rgba(6,184,224,.5) 0%, transparent 70%);"></div>
+
+        <div class="relative border border-slate-200 dark:border-slate-700/60 rounded-2xl overflow-hidden
+                    bg-white dark:bg-[rgba(10,16,22,.85)] shadow-sm dark:shadow-none">
+
+          <div class="flex items-center gap-2 px-4 py-3 border-b border-slate-100 dark:border-slate-800
+                      bg-slate-50 dark:bg-[rgba(5,10,15,.6)]">
+            <span class="w-2.5 h-2.5 rounded-full bg-red-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-yellow-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-green-500/80"></span>
+            <span class="font-mono text-[10px] text-slate-500 dark:text-slate-600 ml-2">why-choose-us.reasons</span>
+          </div>
+
+          <div class="p-5 space-y-3">
+
+            <div class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800
+                        bg-slate-50 dark:bg-slate-900/40
+                        hover:border-brand-200 dark:hover:border-brand-700/40 transition-colors">
+              <span class="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950/60
+                           border border-emerald-300 dark:border-emerald-800/50
+                           flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+              </span>
+              <div>
+                <p class="text-slate-800 dark:text-white font-semibold text-sm">Kỹ sư thực chiến</p>
+                <p class="text-slate-500 dark:text-slate-500 text-xs mt-0.5">Đội ngũ có kinh nghiệm triển khai trực tiếp tại hiện trường, không chỉ tư vấn lý thuyết.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800
+                        bg-slate-50 dark:bg-slate-900/40
+                        hover:border-brand-200 dark:hover:border-brand-700/40 transition-colors">
+              <span class="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950/60
+                           border border-emerald-300 dark:border-emerald-800/50
+                           flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+              </span>
+              <div>
+                <p class="text-slate-800 dark:text-white font-semibold text-sm">Hệ sinh thái tương thích</p>
+                <p class="text-slate-500 dark:text-slate-500 text-xs mt-0.5">Toàn bộ sản phẩm được kiểm tra tương thích với nhau. Một nền tảng, không phải nhiều vendor khác nhau.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800
+                        bg-slate-50 dark:bg-slate-900/40
+                        hover:border-brand-200 dark:hover:border-brand-700/40 transition-colors">
+              <span class="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950/60
+                           border border-emerald-300 dark:border-emerald-800/50
+                           flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+              </span>
+              <div>
+                <p class="text-slate-800 dark:text-white font-semibold text-sm">Hỗ trợ nhanh có cam kết SLA</p>
+                <p class="text-slate-500 dark:text-slate-500 text-xs mt-0.5">Phản hồi trong vòng 2 giờ làm việc. Kỹ sư hỗ trợ từ xa và tại chỗ khi cần.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800
+                        bg-slate-50 dark:bg-slate-900/40
+                        hover:border-brand-200 dark:hover:border-brand-700/40 transition-colors">
+              <span class="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950/60
+                           border border-emerald-300 dark:border-emerald-800/50
+                           flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+              </span>
+              <div>
+                <p class="text-slate-800 dark:text-white font-semibold text-sm">Giá cạnh tranh, minh bạch</p>
+                <p class="text-slate-500 dark:text-slate-500 text-xs mt-0.5">Không phí ẩn. Báo giá chi tiết theo từng hạng mục, linh hoạt theo quy mô dự án.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800
+                        bg-slate-50 dark:bg-slate-900/40
+                        hover:border-brand-200 dark:hover:border-brand-700/40 transition-colors">
+              <span class="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950/60
+                           border border-emerald-300 dark:border-emerald-800/50
+                           flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+              </span>
+              <div>
+                <p class="text-slate-800 dark:text-white font-semibold text-sm">Bảo hành chính hãng</p>
+                <p class="text-slate-500 dark:text-slate-500 text-xs mt-0.5">Tất cả sản phẩm đều có bảo hành chính hãng và hỗ trợ linh kiện thay thế.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      {# Right — copy #}
+      <div data-reveal>
+        <p class="section-label mb-4">Tại sao chọn chúng tôi</p>
+        <h2 class="font-display font-bold uppercase text-slate-900 dark:text-white leading-tight mb-6"
+            style="font-size: clamp(2rem,4vw,3rem);">
+          Không chỉ là<br>
+          nhà cung cấp
+        </h2>
+        <div class="space-y-4 text-sm leading-relaxed">
+          <p class="text-slate-600 dark:text-slate-400">
+            Thị trường IoT công nghiệp có rất nhiều vendor — nhưng phần lớn chỉ bán phần cứng
+            và để khách hàng tự xoay xở với tích hợp. Chúng tôi làm khác.
+          </p>
+          <p class="text-slate-600 dark:text-slate-400">
+            Chúng tôi đồng hành từ giai đoạn khảo sát, thiết kế hệ thống, lựa chọn thiết bị,
+            lắp đặt, lập trình, đào tạo vận hành đến bảo trì dài hạn. Mỗi dự án được xử lý
+            bởi kỹ sư chuyên môn với kinh nghiệm thực tế — không outsource.
+          </p>
+          <p class="text-slate-600 dark:text-slate-400">
+            Kết quả: khách hàng của chúng tôi không phải lo về tích hợp, không bị phụ thuộc
+            vào một vendor duy nhất và luôn có người hỗ trợ khi hệ thống gặp sự cố.
+          </p>
+        </div>
+
+        <div class="mt-8 grid grid-cols-2 gap-4">
+          <div class="bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 text-center">
+            <p class="font-display font-bold text-3xl text-brand-600 dark:text-brand-400 mb-1">99.5%</p>
+            <p class="font-mono text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-600">Uptime hệ thống</p>
+          </div>
+          <div class="bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 text-center">
+            <p class="font-display font-bold text-3xl text-slate-900 dark:text-white mb-1">&lt;2h</p>
+            <p class="font-mono text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-600">Thời gian phản hồi</p>
+          </div>
+        </div>
+
+        <div class="mt-8 flex gap-3">
+          {% url 'contacts:demo_request' as url_demo %}
+          <a href="{{ url_demo|default:'#' }}" class="btn-primary text-sm">
+            Đặt lịch tư vấn
+          </a>
+          {% url 'contacts:contact' as url_contact %}
+          <a href="{{ url_contact|default:'#' }}" class="btn-ghost text-sm">
+            Liên hệ ngay
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+{# ══════════════════════════════════════════════════ INDUSTRIES ══════════════════════════════════════════════════ #}
+<section class="py-16 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="text-center mb-12" data-reveal>
+      <p class="section-label justify-center mb-4">Ngành phục vụ</p>
+      <h2 class="font-display font-bold uppercase text-slate-900 dark:text-white text-3xl">
+        Chúng tôi phục vụ ai?
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+
+      {% if features %}
+      {% for name, icon_path in features %}
+      <div>{{ name }}</div>
+      {% endfor %}
+      {% endif %}
+
+      <div class="card-industrial flex flex-col items-center gap-3 p-5 text-center group" data-reveal>
+        <div class="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700
+                    bg-white dark:bg-transparent
+                    flex items-center justify-center
+                    group-hover:border-brand-300 dark:group-hover:border-brand-600/50
+                    group-hover:bg-brand-50 dark:group-hover:bg-brand-950/30 transition-all">
+          <svg class="w-5 h-5 text-slate-500 dark:text-slate-400 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+          </svg>
+        </div>
+        <p class="text-slate-600 dark:text-slate-400 text-xs font-semibold group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">Nông nghiệp</p>
+      </div>
+
+      <div class="card-industrial flex flex-col items-center gap-3 p-5 text-center group" data-reveal>
+        <div class="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700
+                    bg-white dark:bg-transparent
+                    flex items-center justify-center
+                    group-hover:border-brand-300 dark:group-hover:border-brand-600/50
+                    group-hover:bg-brand-50 dark:group-hover:bg-brand-950/30 transition-all">
+          <svg class="w-5 h-5 text-slate-500 dark:text-slate-400 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+          </svg>
+        </div>
+        <p class="text-slate-600 dark:text-slate-400 text-xs font-semibold group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">Sản xuất</p>
+      </div>
+
+      <div class="card-industrial flex flex-col items-center gap-3 p-5 text-center group" data-reveal>
+        <div class="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700
+                    bg-white dark:bg-transparent
+                    flex items-center justify-center
+                    group-hover:border-brand-300 dark:group-hover:border-brand-600/50
+                    group-hover:bg-brand-50 dark:group-hover:bg-brand-950/30 transition-all">
+          <svg class="w-5 h-5 text-slate-500 dark:text-slate-400 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+        <p class="text-slate-600 dark:text-slate-400 text-xs font-semibold group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">Năng lượng</p>
+      </div>
+
+      <div class="card-industrial flex flex-col items-center gap-3 p-5 text-center group" data-reveal>
+        <div class="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700
+                    bg-white dark:bg-transparent
+                    flex items-center justify-center
+                    group-hover:border-brand-300 dark:group-hover:border-brand-600/50
+                    group-hover:bg-brand-50 dark:group-hover:bg-brand-950/30 transition-all">
+          <svg class="w-5 h-5 text-slate-500 dark:text-slate-400 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>
+          </svg>
+        </div>
+        <p class="text-slate-600 dark:text-slate-400 text-xs font-semibold group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">Môi trường</p>
+      </div>
+
+      <div class="card-industrial flex flex-col items-center gap-3 p-5 text-center group" data-reveal>
+        <div class="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700
+                    bg-white dark:bg-transparent
+                    flex items-center justify-center
+                    group-hover:border-brand-300 dark:group-hover:border-brand-600/50
+                    group-hover:bg-brand-50 dark:group-hover:bg-brand-950/30 transition-all">
+          <svg class="w-5 h-5 text-slate-500 dark:text-slate-400 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+          </svg>
+        </div>
+        <p class="text-slate-600 dark:text-slate-400 text-xs font-semibold group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">Hạ tầng</p>
+      </div>
+
+      <div class="card-industrial flex flex-col items-center gap-3 p-5 text-center group" data-reveal>
+        <div class="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700
+                    bg-white dark:bg-transparent
+                    flex items-center justify-center
+                    group-hover:border-brand-300 dark:group-hover:border-brand-600/50
+                    group-hover:bg-brand-50 dark:group-hover:bg-brand-950/30 transition-all">
+          <svg class="w-5 h-5 text-slate-500 dark:text-slate-400 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          </svg>
+        </div>
+        <p class="text-slate-600 dark:text-slate-400 text-xs font-semibold group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">Hậu cần & Kho</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+{# ══════════════════════════════════════════════════ CTA ══════════════════════════════════════════════════ #}
+<section class="relative py-24 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 overflow-hidden">
+
+  <div class="absolute inset-0 grid-bg opacity-40"></div>
+  <div class="absolute inset-0 noise-overlay"></div>
+  <div class="absolute inset-0 pointer-events-none"
+       style="background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(6,184,224,.05) 0%, transparent 70%);"></div>
+  <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-300/50 dark:via-brand-600/30 to-transparent"></div>
+
+  <div class="relative max-w-3xl mx-auto px-4 text-center" data-reveal>
+    <p class="section-label justify-center mb-5">Hợp tác cùng chúng tôi</p>
+    <h2 class="font-display font-bold uppercase text-slate-900 dark:text-white leading-[.95] tracking-tighter mb-6"
+        style="font-size: clamp(2.5rem,6vw,4.5rem);">
+      Sẵn sàng bắt đầu<br>
+      <span class="text-brand-600 dark:text-brand-400">dự án IoT?</span>
+    </h2>
+    <p class="text-slate-600 dark:text-slate-500 text-lg mb-10 max-w-xl mx-auto leading-relaxed">
+      Chia sẻ với chúng tôi về ngành nghề và thách thức của bạn.
+      Đội kỹ sư sẽ đề xuất giải pháp phù hợp trong vòng 24 giờ làm việc.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="{{ url_demo|default:'#' }}" class="btn-primary justify-center text-sm px-8 py-3.5">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.361a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+        </svg>
+        Đặt lịch demo miễn phí
+      </a>
+      <a href="{{ url_contact|default:'#' }}" class="btn-ghost justify-center text-sm px-8 py-3.5">
+        Gửi yêu cầu tư vấn
+      </a>
+    </div>
+
+    <div class="flex items-center justify-center gap-6 mt-12 pt-10 border-t border-slate-200 dark:border-slate-800/60">
+      <div class="flex items-center gap-2 text-slate-500 dark:text-slate-700 text-xs font-mono">
+        <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+        Hỗ trợ 24/7
+      </div>
+      <div class="w-px h-4 bg-slate-200 dark:bg-slate-800"></div>
+      <div class="flex items-center gap-2 text-slate-500 dark:text-slate-700 text-xs font-mono">
+        <svg class="w-3.5 h-3.5 text-brand-500 dark:text-brand-600" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        Bảo hành chính hãng
+      </div>
+      <div class="w-px h-4 bg-slate-200 dark:bg-slate-800"></div>
+      <div class="flex items-center gap-2 text-slate-500 dark:text-slate-700 text-xs font-mono">
+        <svg class="w-3.5 h-3.5 text-brand-500 dark:text-brand-600" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        Phản hồi &lt; 2h
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
