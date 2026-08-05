@@ -355,7 +355,7 @@
               {% endif %}
               {% if point.description %}
                 <p class="text-slate-500 dark:text-slate-500 text-sm leading-relaxed">{{ point.description }}</p>
-              {% else %}
+              {% elif not point.title %}
                 {# point là string đơn giản #}
                 <p class="text-slate-700 dark:text-slate-400 text-sm leading-relaxed">{{ point }}</p>
               {% endif %}
