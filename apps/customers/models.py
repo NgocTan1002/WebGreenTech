@@ -64,8 +64,8 @@ class Customer(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
     REQUIRED_FIELDS = ['first_name', 'last_name']
 
     class Meta:
-        verbose_name = 'Customer'
-        verbose_name_plural = 'Customers'
+        verbose_name = 'Khách hàng'
+        verbose_name_plural = 'Khách hàng'
 
     def __str__(self):
         return f'{self.get_full_name()} ({self.email})'
@@ -98,8 +98,8 @@ class CustomerAddress(TimeStampedModel):
     is_default_billing = models.BooleanField(default=False)
 
     class Meta:
-        verbose_name = 'Customer Address'
-        verbose_name_plural = 'Customer Addresses'
+        verbose_name = 'Địa chỉ khách hàng'
+        verbose_name_plural = 'Địa chỉ khách hàng'
 
     def __str__(self):
         return f'{self.customer.email} — {self.label}'

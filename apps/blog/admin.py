@@ -31,9 +31,9 @@ class PostAdmin(admin.ModelAdmin):
  
     fieldsets = [
         (None, {'fields': ['title', 'slug', 'post_type', 'category', 'author']}),
-        ('Media', {'fields': ['thumbnail']}),
-        ('Content', {'fields': ['short_description', 'content', 'read_time', 'tags'], 'classes': ['wide']}),
-        ('Relations', {'fields': ['related_products', 'related_solutions']}),
+        ('Hình ảnh', {'fields': ['thumbnail']}),
+        ('Nội dung', {'fields': ['short_description', 'content', 'read_time', 'tags'], 'classes': ['wide']}),
+        ('Liên kết', {'fields': ['related_products', 'related_solutions']}),
         ('SEO', {'fields': ['meta_title', 'meta_description'], 'classes': ['collapse']}),
-        ('Publishing', {'fields': ['status', 'published_at', 'is_featured', 'sort_order']}),
+        ('Xuất bản', {'fields': ['status', 'published_at', 'is_featured', 'sort_order']}),
     ]

@@ -8,11 +8,11 @@ class ContactInquiry(TimeStampedModel):
     INQUIRY_SUPPORT = "support"
     INQUIRY_PARTNERSHIP = "partnership"
     INQUIRY_TYPE_CHOICES = [
-        (INQUIRY_GENERAL, "General Inquiry"),
-        (INQUIRY_TECHNICAL, "Technical Support"),
-        (INQUIRY_SALES, "Sales / Pricing"),
-        (INQUIRY_SUPPORT, "After-Sales Support"),
-        (INQUIRY_PARTNERSHIP, "Partnership"),
+        (INQUIRY_GENERAL, "Tư vấn chung"),
+        (INQUIRY_TECHNICAL, "Hỗ trợ kỹ thuật"),
+        (INQUIRY_SALES, "Kinh doanh / Báo giá"),
+        (INQUIRY_SUPPORT, "Hỗ trợ sau bán hàng"),
+        (INQUIRY_PARTNERSHIP, "Hợp tác"),
     ]
 
     STATUS_NEW = "new"
@@ -20,10 +20,10 @@ class ContactInquiry(TimeStampedModel):
     STATUS_REPLIED = "replied"
     STATUS_CLOSED = "closed"
     STATUS_CHOICES = [
-        (STATUS_NEW, "New"),
-        (STATUS_READ, "Read"),
-        (STATUS_REPLIED, "Replied"),
-        (STATUS_CLOSED, "Closed"),
+        (STATUS_NEW, "Mới"),
+        (STATUS_READ, "Đã đọc"),
+        (STATUS_REPLIED, "Đã trả lời"),
+        (STATUS_CLOSED, "Đã đóng"),
     ]
 
     name = models.CharField(max_length=200)
@@ -42,8 +42,8 @@ class ContactInquiry(TimeStampedModel):
 
     class Meta:
         ordering = ['-created_at']
-        verbose_name = 'Contact Inquiry'
-        verbose_name_plural = 'Contact Inquiries'
+        verbose_name = 'Yêu cầu liên hệ'
+        verbose_name_plural = 'Yêu cầu liên hệ'
 
     def __str__(self):
         return f'{self.name} - {self.subject}'
@@ -54,10 +54,10 @@ class DemoRequest(TimeStampedModel):
     STATUS_COMPLETED = 'completed'
     STATUS_CANCELLED = 'cancelled'
     STATUS_CHOICES = [
-        (STATUS_NEW,       'New'),
-        (STATUS_SCHEDULED, 'Scheduled'),
-        (STATUS_COMPLETED, 'Completed'),
-        (STATUS_CANCELLED, 'Cancelled'),
+        (STATUS_NEW,       'Mới'),
+        (STATUS_SCHEDULED, 'Đã lên lịch'),
+        (STATUS_COMPLETED, 'Hoàn thành'),
+        (STATUS_CANCELLED, 'Đã hủy'),
     ]
     name = models.CharField(max_length=200)
     email = models.EmailField(db_index=True)
@@ -77,6 +77,8 @@ class DemoRequest(TimeStampedModel):
 
     class Meta:
         ordering = ['-created_at']
+        verbose_name = 'Yêu cầu đăng ký demo'
+        verbose_name_plural = 'Yêu cầu đăng ký demo'
     
     def __str__(self):
         return f'Demo: {self.name} ({self.company})'

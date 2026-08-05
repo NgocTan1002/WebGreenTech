@@ -17,8 +17,8 @@ class SolutionCategory(TimeStampedModel, SlugModel, SortableModel):
 
     class Meta:
         ordering = ['sort_order', 'name']
-        verbose_name = 'Solution Category'
-        verbose_name_plural = 'Solution Categories'
+        verbose_name = 'Danh mục giải pháp'
+        verbose_name_plural = 'Danh mục giải pháp'
 
     def __str__(self):
         return self.name
@@ -101,6 +101,8 @@ class Solution(TimeStampedModel, SEOModel, SlugModel, PublishableModel, Sortable
 
     class Meta:
         ordering = ['sort_order', '-created_at']
+        verbose_name = 'Giải pháp'
+        verbose_name_plural = 'Giải pháp'
         indexes = [
             models.Index(fields=['status', 'is_featured']),
             models.Index(fields=['solution_category', 'status']),
@@ -195,6 +197,8 @@ class SolutionProduct(SortableModel):
     class Meta:
         unique_together = ('solution', 'product')
         ordering = ['sort_order']
+        verbose_name = 'Sản phẩm trong giải pháp'
+        verbose_name_plural = 'Sản phẩm trong giải pháp'
 
     def __str__(self):
         return f'{self.solution.title} → {self.product.name}'
@@ -212,7 +216,8 @@ class ArchitectureBlock(TimeStampedModel, SortableModel):
 
     class Meta:
         ordering = ['sort_order']
-        verbose_name = 'Architecture Block'
+        verbose_name = 'Khối kiến trúc'
+        verbose_name_plural = 'Khối kiến trúc'
 
     def __str__(self):
         return f'{self.solution.title} — {self.title}'
@@ -229,7 +234,8 @@ class WorkflowStep(TimeStampedModel, SortableModel):
 
     class Meta:
         ordering = ['step_number']
-        verbose_name = 'Workflow Step'
+        verbose_name = 'Bước quy trình'
+        verbose_name_plural = 'Bước quy trình'
 
     def __str__(self):
         return f'Bước {self.step_number}: {self.title}'
@@ -255,8 +261,8 @@ class CustomerCase(TimeStampedModel, SlugModel, PublishableModel, SortableModel)
 
     class Meta:
         ordering = ['-published_at']
-        verbose_name = 'Customer Case'
-        verbose_name_plural = 'Customer Cases'
+        verbose_name = 'Dự án khách hàng'
+        verbose_name_plural = 'Dự án khách hàng'
 
     def __str__(self):
         return f'{self.company_name} — {self.solution.title}'

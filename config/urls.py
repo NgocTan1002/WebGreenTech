@@ -10,6 +10,10 @@ from apps.core.sitemaps import (
     CategorySitemap,
     BlogSitemap,
 )
+
+admin.site.site_header = "Quản trị GreenTech"
+admin.site.site_title = "Quản trị GreenTech"
+admin.site.index_title = "Quản lý nội dung website"
  
 sitemaps = {
     'static':     StaticViewSitemap,

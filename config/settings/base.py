@@ -30,7 +30,7 @@ INSTALLED_APPS = [
     "apps.customers",
 
     "mptt",
-    "taggit",
+    "apps.core.taggit_config.VietnameseTaggitAppConfig",
     "imagekit",
     "ckeditor",
 

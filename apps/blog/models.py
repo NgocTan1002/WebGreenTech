@@ -12,8 +12,8 @@ class BlogCategory(TimeStampedModel, SlugModel, SortableModel):
 
     class Meta:
         ordering = ['sort_order', 'name']
-        verbose_name = 'Blog Category'
-        verbose_name_plural = 'Blog Categories'
+        verbose_name = 'Danh mục bài viết'
+        verbose_name_plural = 'Danh mục bài viết'
 
     def __str__(self):
         return self.name
@@ -74,6 +74,8 @@ class Post(TimeStampedModel, SEOModel, SlugModel, PublishableModel, SortableMode
 
     class Meta:
         ordering = ['-published_at', '-created_at']
+        verbose_name = 'Bài viết'
+        verbose_name_plural = 'Bài viết'
         indexes = [
             models.Index(fields=['status', 'post_type']),
             models.Index(fields=['status', 'category']),

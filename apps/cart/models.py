@@ -20,6 +20,8 @@ class Cart(TimeStampedModel):
     notes = models.TextField(blank=True)
 
     class Meta:
+        verbose_name = 'Giỏ hàng'
+        verbose_name_plural = 'Giỏ hàng'
         indexes = [
             models.Index(fields=['session_key', 'is_active']),
             models.Index(fields=['customer', 'is_active']),
@@ -58,6 +60,8 @@ class CartItem(TimeStampedModel):
 
     class Meta:
         unique_together = ('cart', 'product')
+        verbose_name = 'Sản phẩm trong giỏ hàng'
+        verbose_name_plural = 'Sản phẩm trong giỏ hàng'
 
     def __str__(self):
         return f'{self.quantity} x {self.product.name}'
