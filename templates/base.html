@@ -275,9 +275,9 @@
         {# ── Logo ── #}
         <a href="{% url 'core:home' %}" class="flex items-center flex-shrink-0 group">
           <img
-            src="{% static 'img/company-logo-header.png' %}"
+            src="{% static 'img/company-logo-header.svg' %}"
             alt="{{ COMPANY_NAME|default:'Logo công ty' }}"
-            class="h-12 lg:h-14 w-auto object-contain"
+            class="w-[220px] sm:w-[250px] xl:w-[280px] h-auto object-contain"
           >
         </a>
 
@@ -1017,9 +1017,9 @@
         <div class="lg:col-span-3">
           <a href="{% url 'core:home' %}" class="inline-flex items-center mb-6">
             <img
-              src="{% static 'img/company-logo-footer.png' %}"
+              src="{% static 'img/company-logo-footer.svg' %}"
               alt="{{ COMPANY_NAME|default:'Logo công ty' }}"
-              class="h-45 sm:h-60 w-auto max-w-full object-contain"
+              class="w-full max-w-[360px] h-auto object-contain"
               loading="lazy"
             >
           </a>
