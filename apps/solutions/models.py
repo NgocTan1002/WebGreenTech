@@ -46,6 +46,25 @@ class Solution(TimeStampedModel, SEOModel, SlugModel, PublishableModel, Sortable
     short_description = models.TextField(max_length=500)
     overview          = models.TextField(help_text='Nội dung HTML đầy đủ (dùng CKEditor)')
 
+    # ─── Triển khai thực tế ───
+    deployment_site = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name='Đơn vị / địa điểm triển khai',
+        help_text='Ví dụ: Nhà máy ABC',
+    )
+    deployment_location = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name='Địa chỉ triển khai',
+        help_text='Ví dụ: KCN Quế Võ, Bắc Ninh',
+    )
+    deployed_at = models.DateField(
+        blank=True,
+        null=True,
+        verbose_name='Thời gian triển khai',
+    )
+
     # ─── Pain Points & Benefits (JSON đơn giản) ───────────────────────────────
     pain_points = models.JSONField(
         default=list, blank=True,

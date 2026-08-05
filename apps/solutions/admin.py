@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django import forms
+from django.core.cache import cache
 from django.utils.html import format_html
 from ckeditor.widgets import CKEditorWidget
 from .models import Solution, SolutionCategory, SolutionProduct, ArchitectureBlock, WorkflowStep, CustomerCase
@@ -183,6 +184,11 @@ class SolutionAdmin(admin.ModelAdmin):
             'classes': ['wide']
         }),
 
+        ('Triển khai thực tế', {
+            'fields': ['deployment_site', 'deployment_location', 'deployed_at'],
+            'description': 'Không bắt buộc. Chỉ hiển thị trên trang khi có ít nhất một thông tin.',
+        }),
+
         ('Vấn đề khách hàng', {
             'fields': ['pain_points'],
             'classes': ['collapse']
@@ -215,6 +221,21 @@ class SolutionAdmin(admin.ModelAdmin):
             return format_html('<img src="{}" width="60" height="40" style="object-fit:cover;border-radius:4px;" />', obj.thumbnail.url)
         return '-'
     thumbnail_preview.short_description = ''
+
+    def save_model(self, request, obj, form, change):
+        old_slug = None
+        if change and obj.pk:
+            old_slug = Solution.objects.filter(pk=obj.pk).values_list('slug', flat=True).first()
+
+        super().save_model(request, obj, form, change)
+
+        cache.delete(f'solution_detail_{obj.slug}')
+        if old_slug and old_slug != obj.slug:
+            cache.delete(f'solution_detail_{old_slug}')
+
+    def delete_model(self, request, obj):
+        cache.delete(f'solution_detail_{obj.slug}')
+        super().delete_model(request, obj)
 
 @admin.register(SolutionCategory)
 class SolutionCategoryAdmin(admin.ModelAdmin):

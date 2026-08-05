@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+from datetime import date
 from pathlib import Path
 from decimal import Decimal
 
@@ -240,6 +241,9 @@ class CoreDbFunctionTests(TransactionTestCase, SqlFunctionsLoaderMixin):
             thumbnail=dummy_image("solution.png"),
             short_description="Solution short description",
             overview="<p>Overview</p>",
+            deployment_site="GreenTech Factory",
+            deployment_location="Que Vo Industrial Park, Bac Ninh",
+            deployed_at=date(2025, 6, 1),
             pain_points=["Remote monitoring difficulty"],
             benefits=["Save water"],
             workflow_title="Workflow",
@@ -339,6 +343,9 @@ class CoreDbFunctionTests(TransactionTestCase, SqlFunctionsLoaderMixin):
         detail = core_db.get_solution_detail(self.solution.slug)
         self.assertIsNotNone(detail)
         self.assertEqual(detail["slug"], self.solution.slug)
+        self.assertEqual(detail["deployment_site"], "GreenTech Factory")
+        self.assertEqual(detail["deployment_location"], "Que Vo Industrial Park, Bac Ninh")
+        self.assertEqual(detail["deployed_at"], date(2025, 6, 1))
 
         sol_products = core_db.get_solution_products(self.solution.id, featured_only=False)
         self.assertTrue(any(p["product_sku"] == self.product.sku for p in sol_products))

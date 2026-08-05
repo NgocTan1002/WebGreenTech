@@ -4,7 +4,7 @@
 
 CREATE OR REPLACE FUNCTION public.fn_get_solution_detail(
 	p_slug text)
-    RETURNS TABLE(id bigint, title character varying, slug character varying, subtitle character varying, short_description text, overview text, pain_points jsonb, benefits jsonb, workflow_title character varying, workflow_description text, cta_title character varying, cta_primary_text character varying, cta_primary_url character varying, cta_secondary_text character varying, cta_secondary_url character varying, hero_image character varying, hero_video_url character varying, thumbnail character varying, category_name character varying, view_count integer) 
+    RETURNS TABLE(id bigint, title character varying, slug character varying, subtitle character varying, short_description text, overview text, deployment_site character varying, deployment_location character varying, deployed_at date, pain_points jsonb, benefits jsonb, workflow_title character varying, workflow_description text, cta_title character varying, cta_primary_text character varying, cta_primary_url character varying, cta_secondary_text character varying, cta_secondary_url character varying, hero_image character varying, hero_video_url character varying, thumbnail character varying, category_name character varying, view_count integer)
     LANGUAGE 'sql'
     COST 100
     STABLE PARALLEL UNSAFE
@@ -14,6 +14,7 @@ AS $BODY$
     SELECT
         s.id, s.title, s.slug, s.subtitle,
         s.short_description, s.overview,
+        s.deployment_site, s.deployment_location, s.deployed_at,
         s.pain_points, s.benefits,
         s.workflow_title, s.workflow_description,
         s.cta_title, s.cta_primary_text, s.cta_primary_url,
