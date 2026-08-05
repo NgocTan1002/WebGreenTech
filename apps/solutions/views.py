@@ -47,8 +47,6 @@ class SolutionListView(TemplateView):
             "has_previous":   page > 1,
         })
         return context
- 
- 
 class SolutionDetailView(TemplateView):
     template_name = "solutions/detail.html"
  
@@ -92,7 +90,16 @@ class SolutionDetailView(TemplateView):
         all_products      = get_solution_products(solution["id"], featured_only=False)
         featured_products = [p for p in all_products if p.get("is_featured")]
         
-        from apps.solutions.models import ArchitectureBlock, WorkflowStep
+        from apps.solutions.models import (
+            ArchitectureBlock,
+            SolutionDeploymentImage,
+            WorkflowStep,
+        )
+        deployment_images = list(
+            SolutionDeploymentImage.objects.filter(
+                solution_id=solution["id"]
+            ).order_by("-is_primary", "sort_order", "id")
+        )
         architecture_blocks = ArchitectureBlock.objects.filter(
             solution_id=solution["id"]
         ).order_by("sort_order")
@@ -105,9 +112,9 @@ class SolutionDetailView(TemplateView):
             "solution":          solution,
             "all_products":      all_products,
             "featured_products": featured_products,
+            "deployment_images": deployment_images,
+            "deployment_image_count": len(deployment_images),
             "architecture_blocks": architecture_blocks,
             "workflow_steps":      workflow_steps,
         })
         return context
- 
- 

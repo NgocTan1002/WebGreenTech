@@ -1,5 +1,7 @@
 from django.db import models
 from django.urls import reverse
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFill, ResizeToFit
 from apps.core.models import (
     TimeStampedModel, SEOModel, SlugModel, PublishableModel, SortableModel,
 )
@@ -120,6 +122,62 @@ class Solution(TimeStampedModel, SEOModel, SlugModel, PublishableModel, Sortable
     def get_all_products(self):
         """Trả về toàn bộ sản phẩm published của solution."""
         return self.products.filter(status='published').order_by('solutionproduct__sort_order')
+
+
+class SolutionDeploymentImage(TimeStampedModel, SortableModel):
+    """Thư viện ảnh triển khai thực tế của một giải pháp."""
+    solution = models.ForeignKey(
+        Solution,
+        on_delete=models.CASCADE,
+        related_name='deployment_images',
+        verbose_name='Giải pháp',
+    )
+    image = models.ImageField(
+        upload_to='solutions/deployments/',
+        verbose_name='Ảnh triển khai',
+    )
+    image_webp = ImageSpecField(
+        source='image',
+        processors=[ResizeToFit(1600, 1200)],
+        format='WEBP',
+        options={'quality': 88},
+    )
+    thumbnail_webp = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(480, 320)],
+        format='WEBP',
+        options={'quality': 82},
+    )
+    caption = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name='Chú thích',
+    )
+    alt_text = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name='Mô tả ảnh (SEO)',
+    )
+    is_primary = models.BooleanField(
+        default=False,
+        verbose_name='Ảnh chính',
+    )
+
+    class Meta:
+        ordering = ['-is_primary', 'sort_order', 'id']
+        verbose_name = 'Ảnh triển khai giải pháp'
+        verbose_name_plural = 'Ảnh triển khai giải pháp'
+
+    def __str__(self):
+        return self.caption or f'{self.solution.title} — Ảnh {self.sort_order}'
+
+    def save(self, *args, **kwargs):
+        if self.is_primary:
+            SolutionDeploymentImage.objects.filter(
+                solution=self.solution,
+                is_primary=True,
+            ).exclude(pk=self.pk).update(is_primary=False)
+        super().save(*args, **kwargs)
 
 
 class SolutionProduct(SortableModel):

@@ -23,6 +23,7 @@ from apps.products.models import (
 from apps.solutions.models import (
     SolutionCategory,
     Solution,
+    SolutionDeploymentImage,
     SolutionProduct,
 )
 from apps.cart.models import Cart
@@ -346,6 +347,29 @@ class CoreDbFunctionTests(TransactionTestCase, SqlFunctionsLoaderMixin):
         self.assertEqual(detail["deployment_site"], "GreenTech Factory")
         self.assertEqual(detail["deployment_location"], "Que Vo Industrial Park, Bac Ninh")
         self.assertEqual(detail["deployed_at"], date(2025, 6, 1))
+
+        first_photo = SolutionDeploymentImage.objects.create(
+            solution=self.solution,
+            image=dummy_image("deployment-1.png"),
+            caption="Control cabinet installed on site",
+            alt_text="Installed control cabinet",
+            is_primary=True,
+            sort_order=1,
+        )
+        second_photo = SolutionDeploymentImage.objects.create(
+            solution=self.solution,
+            image=dummy_image("deployment-2.png"),
+            caption="System commissioning",
+            is_primary=True,
+            sort_order=2,
+        )
+        first_photo.refresh_from_db()
+        self.assertFalse(first_photo.is_primary)
+        self.assertTrue(second_photo.is_primary)
+
+        response = self.client.get(self.solution.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "System commissioning")
 
         sol_products = core_db.get_solution_products(self.solution.id, featured_only=False)
         self.assertTrue(any(p["product_sku"] == self.product.sku for p in sol_products))

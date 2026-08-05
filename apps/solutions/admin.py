@@ -3,7 +3,15 @@ from django import forms
 from django.core.cache import cache
 from django.utils.html import format_html
 from ckeditor.widgets import CKEditorWidget
-from .models import Solution, SolutionCategory, SolutionProduct, ArchitectureBlock, WorkflowStep, CustomerCase
+from .models import (
+    ArchitectureBlock,
+    CustomerCase,
+    Solution,
+    SolutionCategory,
+    SolutionDeploymentImage,
+    SolutionProduct,
+    WorkflowStep,
+)
 
 
 class SolutionAdminForm(forms.ModelForm):
@@ -136,6 +144,14 @@ class SolutionProductInline(admin.TabularInline):
     autocomplete_fields = ['product']
     fields = ['product', 'is_featured', 'role_description', 'sort_order']
 
+
+class SolutionDeploymentImageInline(admin.TabularInline):
+    model = SolutionDeploymentImage
+    extra = 1
+    fields = ['image', 'caption', 'alt_text', 'is_primary', 'sort_order']
+    verbose_name = "Ảnh triển khai"
+    verbose_name_plural = "Thư viện ảnh triển khai thực tế"
+
 class ArchitectureBlockInline(admin.StackedInline):
     model = ArchitectureBlock
     extra = 1
@@ -168,7 +184,12 @@ class SolutionAdmin(admin.ModelAdmin):
     list_select_related = ['solution_category']
     save_on_top = True
 
-    inlines = [SolutionProductInline, ArchitectureBlockInline, WorkflowStepInline]
+    inlines = [
+        SolutionDeploymentImageInline,
+        SolutionProductInline,
+        ArchitectureBlockInline,
+        WorkflowStepInline,
+    ]
 
     fieldsets = [
         ('Thông tin cơ bản', {
