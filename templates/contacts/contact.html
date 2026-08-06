@@ -48,9 +48,9 @@
       {# ══ LEFT: Contact Form ══ #}
       <div>
         <div class="mb-8">
-          <h2 class="font-display font-bold uppercase text-slate-900 dark:text-white text-2xl tracking-tight mb-2">
+          <h1 class="font-display font-bold text-slate-900 dark:text-white text-3xl tracking-tight mb-2">
             Gửi tin nhắn
-          </h2>
+          </h1>
           <p class="text-slate-500 dark:text-slate-500 text-sm">
             Điền vào form bên dưới — chúng tôi sẽ phản hồi trong vòng 2 giờ làm việc.
           </p>
@@ -80,13 +80,14 @@
 
             {# Name #}
             <div class="sm:col-span-1">
-              <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+              <label for="contact-name" class="block text-sm font-semibold mb-1.5
                             text-slate-600 dark:text-slate-400">
                 Họ và tên <span class="text-red-500">*</span>
               </label>
-              <input type="text" name="name" value="{{ form.name.value|default:'' }}"
+              <input id="contact-name" type="text" name="name" value="{{ form.name.value|default:'' }}"
+                     autocomplete="name" required
                      placeholder="Nguyễn Văn An"
-                     class="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-all
+                     class="w-full text-base px-4 py-3 rounded-lg border outline-none transition-all
                             border-slate-200 bg-white text-slate-900 placeholder-slate-400
                             focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10
                             dark:border-slate-700 dark:bg-slate-800/60 dark:text-white dark:placeholder-slate-600
@@ -102,13 +103,14 @@
 
             {# Email #}
             <div class="sm:col-span-1">
-              <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+              <label for="contact-email" class="block text-sm font-semibold mb-1.5
                             text-slate-600 dark:text-slate-400">
                 Email <span class="text-red-500">*</span>
               </label>
-              <input type="email" name="email" value="{{ form.email.value|default:'' }}"
+              <input id="contact-email" type="email" name="email" value="{{ form.email.value|default:'' }}"
+                     autocomplete="email" required
                      placeholder="email@congty.vn"
-                     class="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-all
+                     class="w-full text-base px-4 py-3 rounded-lg border outline-none transition-all
                             border-slate-200 bg-white text-slate-900 placeholder-slate-400
                             focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10
                             dark:border-slate-700 dark:bg-slate-800/60 dark:text-white dark:placeholder-slate-600
@@ -124,13 +126,14 @@
 
             {# Phone #}
             <div class="sm:col-span-1">
-              <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+              <label for="contact-phone" class="block text-sm font-semibold mb-1.5
                             text-slate-600 dark:text-slate-400">
                 Số điện thoại
               </label>
-              <input type="text" name="phone" value="{{ form.phone.value|default:'' }}"
+              <input id="contact-phone" type="tel" name="phone" value="{{ form.phone.value|default:'' }}"
+                     autocomplete="tel" inputmode="tel"
                      placeholder="0901 234 567"
-                     class="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-all
+                     class="w-full text-base px-4 py-3 rounded-lg border outline-none transition-all
                             border-slate-200 bg-white text-slate-900 placeholder-slate-400
                             focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10
                             dark:border-slate-700 dark:bg-slate-800/60 dark:text-white dark:placeholder-slate-600
@@ -139,13 +142,14 @@
 
             {# Company #}
             <div class="sm:col-span-1">
-              <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+              <label for="contact-company" class="block text-sm font-semibold mb-1.5
                             text-slate-600 dark:text-slate-400">
                 Công ty
               </label>
-              <input type="text" name="company" value="{{ form.company.value|default:'' }}"
+              <input id="contact-company" type="text" name="company" value="{{ form.company.value|default:'' }}"
+                     autocomplete="organization"
                      placeholder="Tên công ty của bạn"
-                     class="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-all
+                     class="w-full text-base px-4 py-3 rounded-lg border outline-none transition-all
                             border-slate-200 bg-white text-slate-900 placeholder-slate-400
                             focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10
                             dark:border-slate-700 dark:bg-slate-800/60 dark:text-white dark:placeholder-slate-600
@@ -154,12 +158,12 @@
 
             {# Inquiry type #}
             <div class="sm:col-span-1">
-              <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+              <label for="contact-type" class="block text-sm font-semibold mb-1.5
                             text-slate-600 dark:text-slate-400">
                 Loại liên hệ
               </label>
-              <select name="inquiry_type"
-                      class="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-all appearance-none
+              <select id="contact-type" name="inquiry_type"
+                      class="w-full text-base px-4 py-3 rounded-lg border outline-none transition-all appearance-none
                              border-slate-200 bg-white text-slate-900
                              focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10
                              dark:border-slate-700 dark:bg-slate-800/60 dark:text-white
@@ -173,13 +177,14 @@
 
             {# Country #}
             <div class="sm:col-span-1">
-              <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+              <label for="contact-country" class="block text-sm font-semibold mb-1.5
                             text-slate-600 dark:text-slate-400">
                 Quốc gia
               </label>
-              <input type="text" name="country" value="{{ form.country.value|default:'Việt Nam' }}"
+              <input id="contact-country" type="text" name="country" value="{{ form.country.value|default:'Việt Nam' }}"
+                     autocomplete="country-name"
                      placeholder="Việt Nam"
-                     class="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-all
+                     class="w-full text-base px-4 py-3 rounded-lg border outline-none transition-all
                             border-slate-200 bg-white text-slate-900 placeholder-slate-400
                             focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10
                             dark:border-slate-700 dark:bg-slate-800/60 dark:text-white dark:placeholder-slate-600
@@ -188,13 +193,14 @@
 
             {# Subject #}
             <div class="sm:col-span-2">
-              <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+              <label for="contact-subject" class="block text-sm font-semibold mb-1.5
                             text-slate-600 dark:text-slate-400">
                 Tiêu đề <span class="text-red-500">*</span>
               </label>
-              <input type="text" name="subject" value="{{ form.subject.value|default:'' }}"
+              <input id="contact-subject" type="text" name="subject" value="{{ form.subject.value|default:'' }}"
+                     required
                      placeholder="Tóm tắt nội dung liên hệ của bạn"
-                     class="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-all
+                     class="w-full text-base px-4 py-3 rounded-lg border outline-none transition-all
                             border-slate-200 bg-white text-slate-900 placeholder-slate-400
                             focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10
                             dark:border-slate-700 dark:bg-slate-800/60 dark:text-white dark:placeholder-slate-600
@@ -207,13 +213,13 @@
 
             {# Message #}
             <div class="sm:col-span-2">
-              <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5
+              <label for="contact-message" class="block text-sm font-semibold mb-1.5
                             text-slate-600 dark:text-slate-400">
                 Nội dung <span class="text-red-500">*</span>
               </label>
-              <textarea name="message" rows="5"
+              <textarea id="contact-message" name="message" rows="5" required
                         placeholder="Mô tả chi tiết về dự án, nhu cầu kỹ thuật hoặc câu hỏi của bạn..."
-                        class="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-all resize-none
+                        class="w-full text-base px-4 py-3 rounded-lg border outline-none transition-all resize-none
                                border-slate-200 bg-white text-slate-900 placeholder-slate-400
                                focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10
                                dark:border-slate-700 dark:bg-slate-800/60 dark:text-white dark:placeholder-slate-600

@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   {# ── Theme init: chạy trước khi render để tránh flash ── #}
   <script>
@@ -26,9 +26,9 @@
       theme: {
         extend: {
           fontFamily: {
-            display: ['"Space Grotesk"', 'sans-serif'],
-            sans:    ['"Space Grotesk"', 'sans-serif'],
-            mono:    ['"Space Grotesk"', 'sans-serif'],
+            display: ['"Be Vietnam Pro"', 'sans-serif'],
+            sans:    ['"Source Sans 3"', 'sans-serif'],
+            mono:    ['"Source Sans 3"', 'sans-serif'],
           },
           colors: {
             brand: {
@@ -70,7 +70,7 @@
     @layer base {
       body {
         @apply font-sans antialiased transition-colors duration-300;
-        @apply text-slate-800 bg-white dark:text-slate-300 dark:bg-[#080d12];
+        @apply text-base leading-relaxed text-slate-800 bg-white dark:text-slate-300 dark:bg-[#080d12];
       }
 
       ::selection {
@@ -88,7 +88,7 @@
 
       /* ── Buttons ─────────────────────────────────────────────── */
       .btn-primary {
-        @apply inline-flex items-center gap-2 font-bold text-sm tracking-wide
+        @apply inline-flex min-h-11 items-center justify-center gap-2 font-bold text-[15px]
               px-6 py-3 rounded-lg transition-all duration-200
               shadow-sm hover:shadow-md
               /* dark */
@@ -98,7 +98,7 @@
       }
 
       .btn-ghost {
-        @apply inline-flex items-center gap-2 font-semibold text-sm
+        @apply inline-flex min-h-11 items-center justify-center gap-2 font-semibold text-[15px]
               px-6 py-3 rounded-lg bg-transparent transition-all duration-200
               /* light */
               border border-slate-300 text-slate-600
@@ -158,8 +158,8 @@
 
       /* ── Tags ────────────────────────────────────────────────── */
       .tag {
-        @apply inline-flex items-center gap-1.5 text-[10px] font-mono font-medium
-              uppercase tracking-wider px-2.5 py-1 rounded border;
+        @apply inline-flex items-center gap-1.5 text-xs font-sans font-semibold
+              tracking-normal px-2.5 py-1 rounded-md border;
       }
 
       .tag-blue {
@@ -247,6 +247,62 @@
         background-clip: text;
         color: transparent;
       }
+
+      /* Readability floor for legacy templates. Tailwind arbitrary-size
+         utilities below 12px are retained in markup but never rendered tiny. */
+      .text-\[9px\],
+      .text-\[10px\],
+      .text-\[11px\] {
+        font-size: 0.75rem !important;
+        line-height: 1.45 !important;
+      }
+
+      .font-mono.uppercase,
+      .uppercase.font-mono {
+        letter-spacing: 0.06em !important;
+      }
+
+      .tracking-widest { letter-spacing: 0.06em !important; }
+      .tracking-wider { letter-spacing: 0.04em !important; }
+      .tracking-\[\.15em\],
+      .tracking-\[\.18em\],
+      .tracking-\[\.2em\],
+      .tracking-\[\.22em\],
+      .tracking-\[\.25em\] { letter-spacing: 0.06em !important; }
+
+      .font-display.uppercase {
+        text-transform: none !important;
+        letter-spacing: -0.025em !important;
+      }
+
+      .gtc-section-kicker {
+        @apply inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-300;
+      }
+
+      .gtc-section-kicker::before {
+        content: '';
+        @apply h-px w-8 bg-brand-600 dark:bg-brand-400;
+      }
+
+      .gtc-section-title {
+        @apply font-display font-bold tracking-tight text-slate-900 dark:text-white;
+        font-size: clamp(1.875rem, 4vw, 2.75rem);
+        line-height: 1.15;
+      }
+
+      .gtc-card {
+        @apply border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900;
+        border-radius: 0.75rem;
+      }
+    }
+
+    :focus-visible {
+      outline: 3px solid rgba(23, 82, 164, 0.35);
+      outline-offset: 3px;
+    }
+
+    @media (max-width: 639px) {
+      body { padding-bottom: 4rem; }
     }
   </style>
 
@@ -262,14 +318,16 @@
   <header id="site-header"
           class="fixed top-0 inset-x-0 z-50 transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="relative flex items-center justify-between h-[76px] lg:h-[84px] gap-4">
+      <div class="relative flex items-center justify-between h-[76px] lg:h-[84px] gap-2 sm:gap-4">
 
         {# ── Logo ── #}
         <a href="{% url 'core:home' %}" class="flex items-center flex-shrink-0 group">
           <img
-            src="{% static 'img/company-logo-header.svg' %}"
+            src="{% static 'img/company-logo-header.svg' %}?v=20260806"
             alt="{{ COMPANY_NAME|default:'Logo công ty' }}"
-            class="w-[220px] sm:w-[250px] xl:w-[280px] h-auto object-contain"
+            width="280"
+            height="30"
+            class="block w-[140px] min-[360px]:w-[178px] sm:w-[225px] xl:w-[280px] h-auto object-contain"
           >
         </a>
 
@@ -315,7 +373,7 @@
           {# Search #}
           <button id="search-toggle"
                   type="button"
-                  class="w-8 h-8 flex items-center justify-center rounded-md transition-all duration-150
+                  class="w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-150
                          text-slate-500 hover:text-brand-600 hover:bg-brand-50
                          dark:text-slate-500 dark:hover:text-brand-400 dark:hover:bg-slate-800/60"
                   aria-label="Tìm kiếm">
@@ -327,7 +385,7 @@
 
           {# Cart #}
           <a href="{% url 'cart:detail' %}"
-             class="relative w-8 h-8 flex items-center justify-center rounded-md transition-all duration-150
+             class="relative w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-150
                     text-slate-500 hover:text-brand-600 hover:bg-brand-50
                     dark:text-slate-500 dark:hover:text-brand-400 dark:hover:bg-slate-800/60"
              aria-label="Giỏ hàng">
@@ -468,7 +526,7 @@
 
           {# Mobile avatar #}
           <a href="{% url 'customers:dashboard' %}"
-             class="sm:hidden w-8 h-8 rounded-full
+             class="hidden w-10 h-10 rounded-full
                     bg-brand-100 border border-brand-200
                     dark:bg-brand-700/60 dark:border-brand-600/40
                     flex items-center justify-center text-[11px] font-bold
@@ -479,7 +537,7 @@
           {% else %}
           {# Guest icon #}
           <a href="{% url 'customers:login' %}"
-             class="w-8 h-8 flex items-center justify-center rounded-md transition-all duration-150
+             class="hidden sm:flex w-10 h-10 items-center justify-center rounded-lg transition-all duration-150
                     text-slate-500 hover:text-brand-600 hover:bg-brand-50
                     dark:text-slate-500 dark:hover:text-brand-400 dark:hover:bg-slate-800/60"
              aria-label="Tài khoản">
@@ -501,8 +559,8 @@
 
           {# Mobile hamburger #}
           <button id="mobile-menu-btn" type="button"
-                  class="lg:hidden w-8 h-8 flex flex-col items-center justify-center gap-1.5
-                         rounded-md hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors ml-1"
+                  class="lg:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5
+                         rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors"
                   aria-label="Menu">
             <span class="menu-bar w-5 h-0.5 bg-slate-500 dark:bg-slate-400 transition-all duration-300 origin-center"></span>
             <span class="menu-bar w-5 h-0.5 bg-slate-500 dark:bg-slate-400 transition-all duration-300"></span>
@@ -682,8 +740,9 @@
   {% block show_sidebars %}   
   <div class="flex-1 flex min-w-0">
  
-        {# Side bar trái #}
-    <aside class="hidden xl:flex fixed left-4 top-1/2 -translate-y-1/2 z-40
+    {% comment %}
+        {# Legacy floating partner rail retained temporarily for reference. #}
+    <aside class="hidden fixed left-4 top-1/2 -translate-y-1/2 z-40
                   flex-col items-center gap-2">
     
       <div class="sr-only">Đối tác</div>
@@ -739,16 +798,18 @@
     
       </div>
     </aside>
- 
- 
+    {% endcomment %}
+
+
     {# ══ Nội dung chính ══ #}
     <main class="flex-1 min-w-0">
       {% block content %}{% endblock %}
     </main>
  
-    {# Sticky contact buttons #}
-    <aside class="fixed right-4 bottom-6 sm:right-5 sm:bottom-8 z-50
-                  flex flex-col items-end gap-2">
+    {% comment %}
+    {# Legacy multi-button contact widget replaced by contact_launcher.html. #}
+    <aside class="hidden fixed right-4 bottom-4 sm:right-5 sm:bottom-8 z-50
+                  flex-col items-end gap-2">
  
       {# Accessible label only #}
       <div class="sr-only">
@@ -765,12 +826,13 @@
           <a href="https://zalo.me/{{ COMPANY_PHONE|default:'0123456789' }}"
              target="_blank" rel="noopener"
              title="Chat Zalo"
-              class="w-11 h-11 flex items-center justify-center rounded-full
+              class="h-12 px-4 sm:w-11 sm:px-0 flex items-center justify-center gap-2 rounded-full
                      shadow-md transition-all duration-200
                      bg-[#0068FF] hover:bg-[#0052CC]
                      shadow-blue-500/30 hover:shadow-blue-500/50
                      hover:-translate-y-0.5">
-            <span class="font-bold text-white text-sm tracking-tight">Zalo</span>
+            <span class="sm:hidden font-semibold text-white text-sm">Liên hệ</span>
+            <span class="hidden sm:inline font-bold text-white text-sm tracking-tight">Zalo</span>
           </a>
  
           {# Tooltip Zalo với QR placeholder #}
@@ -890,7 +952,7 @@
         </div>
         {# ── Điện thoại ── #}
         {% if COMPANY_PHONE %}
-        <div class="group relative">
+        <div class="group relative hidden sm:block">
           <a href="tel:{{ COMPANY_PHONE }}"
              title="Gọi: {{ COMPANY_PHONE }}"
               class="w-11 h-11 flex items-center justify-center rounded-full
@@ -976,6 +1038,9 @@
         </div>
  
     </aside>
+    {% endcomment %}
+
+    {% include "partials/contact_launcher.html" %}
  
   </div>
   {% endblock show_sidebars %}
@@ -991,11 +1056,13 @@
 
         {# ── Cột 1: Logo + Bản đồ ── #}
         <div class="lg:col-span-3">
-          <a href="{% url 'core:home' %}" class="inline-flex items-center mb-6">
+          <a href="{% url 'core:home' %}" class="block w-full max-w-[340px] mb-6">
             <img
-              src="{% static 'img/company-logo-footer.svg' %}"
+              src="{% static 'img/company-logo-footer.svg' %}?v=20260806"
               alt="{{ COMPANY_NAME|default:'Logo công ty' }}"
-              class="w-full max-w-[360px] h-auto object-contain"
+              width="340"
+              height="182"
+              class="block w-full h-auto object-contain"
               loading="lazy"
             >
           </a>
