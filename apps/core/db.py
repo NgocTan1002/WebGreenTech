@@ -114,7 +114,7 @@ def get_category_ancestors(category_id: int) -> list[dict]:
 # CART
 
 def get_cart_detail(cart_id: str) -> list[dict]:
-    return _call("fn_get_cart_detail", [cart_id])
+    return _call("fn_get_cart_detail_v2", [cart_id])
 
 
 def get_cart_summary(cart_id: str) -> dict:
@@ -130,7 +130,7 @@ def upsert_cart_item(
     quantity: int,
     unit_price,
 ) -> dict:
-    return _call_one("fn_upsert_cart_item", [
+    return _call_one("fn_upsert_cart_item_v2", [
         cart_id, product_id, quantity, unit_price,
     ])
 
@@ -150,7 +150,7 @@ def create_order_from_cart(
     notes: str = "",
 ) -> dict | None:
     import json
-    return _call_one("fn_create_order_from_cart", [
+    return _call_one("fn_create_order_from_cart_v2", [
         cart_id, order_type, customer_id,
         email, first_name, last_name,
         company_name, phone,

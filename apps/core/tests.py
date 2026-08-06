@@ -102,9 +102,10 @@ class CoreDbFunctionTests(TransactionTestCase, SqlFunctionsLoaderMixin):
         "fn_get_solution_detail.sql",
         "fn_increment_solution_views.sql",
         "fn_increment_post_views.sql",
-        "fn_get_cart_detail.sql",
+        "fn_get_cart_detail_v2.sql",
         "fn_get_cart_summary.sql",
-        "fn_upsert_cart_item.sql",
+        "fn_upsert_cart_item_v2.sql",
+        "fn_create_order_from_cart_v2.sql",
     ]
 
     # ------------------------------------------------------------------ #

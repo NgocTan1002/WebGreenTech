@@ -154,11 +154,9 @@ def migrate_order_prices(apps, schema_editor):
         SET pricing_type = 'quote', unit_price = NULL
         WHERE product_id IS NULL AND unit_price = 0;
     """)
-    schema_editor.execute(FORWARD_CREATE_ORDER_SQL)
 
 
 def reverse_order_prices(apps, schema_editor):
-    schema_editor.execute(REVERSE_CREATE_ORDER_SQL)
     schema_editor.execute(
         "UPDATE orders_orderitem SET unit_price = 0 WHERE unit_price IS NULL;"
     )

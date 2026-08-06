@@ -193,15 +193,9 @@ def migrate_cart_prices(apps, schema_editor):
         FROM products_product AS p
         WHERE p.id = ci.product_id;
     """)
-    schema_editor.execute("DROP FUNCTION IF EXISTS public.fn_get_cart_detail(uuid);")
-    schema_editor.execute(FORWARD_CART_DETAIL_SQL)
-    schema_editor.execute(FORWARD_UPSERT_SQL)
 
 
 def reverse_cart_prices(apps, schema_editor):
-    schema_editor.execute("DROP FUNCTION IF EXISTS public.fn_get_cart_detail(uuid);")
-    schema_editor.execute(REVERSE_CART_DETAIL_SQL)
-    schema_editor.execute(REVERSE_UPSERT_SQL)
     schema_editor.execute(
         "UPDATE cart_cartitem SET unit_price = 0 WHERE unit_price IS NULL;"
     )
