@@ -29,8 +29,21 @@ class CartAdmin(admin.ModelAdmin):
 
     # Không có actions, không có fieldsets phức tạp — chỉ để xem
     def subtotal_display(self, obj):
-        return f'{int(obj.subtotal):,} ₫'
+        subtotal = obj.subtotal
+        if obj.has_pending_quote:
+            if subtotal:
+                return f'{int(subtotal):,} ₫ + Chờ báo giá'
+            return 'Chờ báo giá'
+        return f'{int(subtotal):,} ₫'
     subtotal_display.short_description = 'Tạm tính'
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .select_related('customer')
+            .prefetch_related('items')
+        )
 
     def has_add_permission(self, request):
         return False  # cart chỉ được tạo qua code, không tạo thủ công

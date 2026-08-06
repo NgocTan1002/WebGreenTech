@@ -36,7 +36,16 @@ class Cart(TimeStampedModel):
 
     @property
     def subtotal(self):
-        return sum(item.line_total for item in self.items.all())
+        subtotal = Decimal('0')
+        for item in self.items.all():
+            line_total = item.line_total
+            if line_total is not None:
+                subtotal += line_total
+        return subtotal
+
+    @property
+    def has_pending_quote(self):
+        return any(item.price_pending for item in self.items.all())
 
     def merge_with(self, other_cart):
         """Gộp giỏ hàng session vào giỏ hàng tài khoản khi đăng nhập."""
