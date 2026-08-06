@@ -161,6 +161,7 @@ class CoreDbFunctionTests(TransactionTestCase, SqlFunctionsLoaderMixin):
             slug="iot-sensor-x",
             sku="SKU-IOT-X",
             part_number="PN-IOT-X",
+            thumbnail=dummy_image("product-thumbnail.png"),
             category=self.child_category,
             brand=self.brand,
             status="published",
@@ -413,3 +414,10 @@ class CoreDbFunctionTests(TransactionTestCase, SqlFunctionsLoaderMixin):
         detail = core_db.get_cart_detail(str(self.cart.id))
         self.assertEqual(len(detail), 1)
         self.assertEqual(int(detail[0]["quantity"]), 3)
+
+        session = self.client.session
+        session["cart_session_key"] = self.cart.session_key
+        session.save()
+        response = self.client.get("/cart/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, f'/media/{self.product.thumbnail.name}')
