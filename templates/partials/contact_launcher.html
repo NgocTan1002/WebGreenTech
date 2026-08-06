@@ -22,14 +22,14 @@
 </nav>
 
 <details class="group hidden sm:block fixed bottom-8 right-5 z-50">
-  <summary class="flex min-h-12 cursor-pointer list-none items-center gap-2 rounded-lg bg-brand-600 px-5 text-[15px] font-bold text-white shadow-lg shadow-brand-900/20 transition-colors hover:bg-brand-700 [&::-webkit-details-marker]:hidden">
+  <summary class="relative flex h-12 w-12 cursor-pointer list-none items-center justify-center rounded-full bg-brand-600 p-0 text-white shadow-lg shadow-brand-900/20 transition-all hover:-translate-y-0.5 hover:bg-brand-700 hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-200 [&::-webkit-details-marker]:hidden"
+           aria-label="Liên hệ">
     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
       <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 12a9 9 0 01-9 9 9.8 9.8 0 01-4-.8L3 21l.8-4A9 9 0 1121 12z"/>
     </svg>
-    Liên hệ
-    <svg class="h-4 w-4 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
-    </svg>
+    <span class="pointer-events-none absolute right-full mr-3 whitespace-nowrap rounded-md bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 group-open:hidden">
+      Liên hệ
+    </span>
   </summary>
 
   <div class="absolute bottom-14 right-0 w-72 overflow-hidden rounded-xl border border-slate-200 bg-white p-2 shadow-2xl shadow-slate-900/15">
@@ -41,10 +41,24 @@
       </span>
       <span><strong class="block text-sm">Gọi tư vấn</strong><span class="text-sm text-slate-500">{{ COMPANY_PHONE }}</span></span>
     </a>
+    {% comment %}
+    Tạm ẩn Zalo. Giữ lại đoạn mã để có thể bật lại khi cần.
     <a href="https://zalo.me/{{ COMPANY_PHONE }}" target="_blank" rel="noopener"
        class="flex min-h-12 items-center gap-3 rounded-lg px-3 text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-700">
       <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-sm font-bold text-[#0068FF]">ZL</span>
       <span><strong class="block text-sm">Chat Zalo</strong><span class="text-sm text-slate-500">Trao đổi nhanh với kỹ sư</span></span>
+    </a>
+    {% endcomment %}
+    {% endif %}
+    {% if MESSENGER_URL %}
+    <a href="{{ MESSENGER_URL }}" target="_blank" rel="noopener"
+       class="flex min-h-12 items-center gap-3 rounded-lg px-3 text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-700">
+      <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 text-white">
+        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2C6.477 2 2 6.145 2 11.243c0 2.912 1.446 5.51 3.708 7.212V22l3.412-1.872c.91.252 1.876.386 2.88.386 5.523 0 10-4.145 10-9.243S17.523 2 12 2zm.993 12.464-2.557-2.73-4.992 2.73 5.49-5.827 2.62 2.73 4.928-2.73-5.49 5.827z"/>
+        </svg>
+      </span>
+      <span><strong class="block text-sm">Facebook Messenger</strong><span class="text-sm text-slate-500">Nhắn tin với chúng tôi</span></span>
     </a>
     {% endif %}
     <a href="{% url 'orders:quote_request' %}" class="mt-1 flex min-h-12 items-center justify-center rounded-lg bg-brand-600 px-4 text-sm font-bold text-white transition-colors hover:bg-brand-700">

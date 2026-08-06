@@ -208,6 +208,10 @@ COMPANY_NAME    = config("COMPANY_NAME",    default="IoTech")
 COMPANY_ADDRESS = config("COMPANY_ADDRESS", default="")
 COMPANY_PHONE   = config("COMPANY_PHONE",   default="")
 COMPANY_EMAIL   = config("COMPANY_EMAIL",   default="")
+MESSENGER_URL   = config(
+    "MESSENGER_URL",
+    default="https://m.me/1165618003296928",
+)
 
 # ---------------------------------------------------------------------------
 # Analytics (optional)

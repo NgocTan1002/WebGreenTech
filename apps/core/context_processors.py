@@ -74,6 +74,7 @@ def global_context(request):
         'COMPANY_PHONE': settings.COMPANY_PHONE,
         'COMPANY_EMAIL': settings.COMPANY_EMAIL,
         'COMPANY_ADDRESS': settings.COMPANY_ADDRESS,
+        'MESSENGER_URL': settings.MESSENGER_URL,
         'GA_TRACKING_ID': getattr(settings, 'GA_TRACKING_ID', ''),
         'cart_count': cart_count,
     }

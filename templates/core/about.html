@@ -5,6 +5,15 @@
 {% block title %}Về chúng tôi — {{ COMPANY_NAME }}{% endblock %}
 {% block meta_description %}{{ COMPANY_NAME }} cung cấp thiết bị IoT công nghiệp, cảm biến, gateway và giải pháp tự động hoá thông minh cho nông nghiệp, nhà máy và quản lý năng lượng tại Việt Nam và Đông Nam Á.{% endblock %}
 
+{% block extra_head %}
+<style>
+  .about-page :is(h1, h2, h3) {
+    font-family: "Be Vietnam Pro", sans-serif !important;
+    letter-spacing: -0.025em;
+  }
+</style>
+{% endblock %}
+
 {% block jsonld %}
 <script type="application/ld+json">
 {
@@ -23,6 +32,8 @@
 {% endblock %}
 
 {% block content %}
+
+<div class="about-page">
 
 {# ══════════════════════════════════════════════════ HERO ══════════════════════════════════════════════════ #}
 <section class="relative bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 pt-24 pb-16 overflow-hidden">
@@ -673,5 +684,7 @@
     </div>
   </div>
 </section>
+
+</div>
 
 {% endblock %}
