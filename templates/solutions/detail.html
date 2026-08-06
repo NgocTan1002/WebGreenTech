@@ -5,6 +5,51 @@
 {% block title %}{{ solution.title }} — {{ COMPANY_NAME }}{% endblock %}
 {% block meta_description %}{{ solution.short_description|truncatechars:160 }}{% endblock %}
 
+{% block extra_head %}
+<style>
+  .solution-overview {
+    white-space: normal;
+  }
+
+  .solution-overview p {
+    margin: 0.4rem 0 !important;
+    line-height: 1.7 !important;
+  }
+
+  .solution-overview p:empty,
+  .solution-overview p:has(> br:only-child) {
+    display: none;
+  }
+
+  .solution-overview ul,
+  .solution-overview ol {
+    margin: 0.65rem 0 !important;
+    padding-left: 1.5rem !important;
+  }
+
+  .solution-overview ul {
+    list-style: disc outside !important;
+  }
+
+  .solution-overview ol {
+    list-style: decimal outside !important;
+  }
+
+  .solution-overview li {
+    margin: 0.25rem 0 !important;
+    padding-left: 0.15rem;
+  }
+
+  .solution-overview li::marker {
+    color: #1752a4;
+  }
+
+  .solution-overview li > p {
+    margin: 0 !important;
+  }
+</style>
+{% endblock %}
+
 {% block jsonld %}
 <script type="application/ld+json">
 {
@@ -28,15 +73,15 @@
   {# Hero background #}
   {% if solution.hero_image %}
   <div class="absolute inset-0">
-    <img src="{{ MEDIA_URL }}{{ solution.hero_image }}" alt="{{ solution.title }}"
-        class="w-full h-full object-cover opacity-30 dark:opacity-25"
+    <img src="{{ solution.hero_image|media_url }}" alt="{{ solution.title }}"
+        class="w-full h-full object-cover opacity-55 dark:opacity-40"
         fetchpriority="high"
         decoding="async" />
   </div>
   {% elif solution.thumbnail %}
   <div class="absolute inset-0">
-    <img src="{{ MEDIA_URL }}{{ solution.thumbnail }}" alt="{{ solution.title }}"
-        class="w-full h-full object-cover opacity-25 dark:opacity-20"
+    <img src="{{ solution.thumbnail|media_url }}" alt="{{ solution.title }}"
+        class="w-full h-full object-cover opacity-50 dark:opacity-35"
         fetchpriority="high"
         decoding="async" />
   </div>
@@ -278,13 +323,16 @@
 </div>
 
 {# ══════════════════════════════════════════════════ VIDEO (if exists) ══════════════════════════════════════════════════ #}
-{% if solution.hero_video_url %}
+{% if hero_video_embed_url %}
 <section class="bg-slate-50 dark:bg-slate-950 py-8">
   <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 aspect-video">
-      <iframe src="{{ MEDIA_URL }}{{ solution.hero_video_url }}"
+      <iframe src="{{ hero_video_embed_url }}"
+              title="Video giới thiệu {{ solution.title }}"
               class="w-full h-full"
               frameborder="0"
+              loading="lazy"
+              referrerpolicy="strict-origin-when-cross-origin"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowfullscreen>
       </iframe>
@@ -306,8 +354,7 @@
         </h2>
         <div class="mt-6 w-12 h-0.5 bg-brand-600"></div>
       </div>
-      <div class="prose prose-slate dark:prose-invert prose-sm lg:prose-base max-w-none
-                  whitespace-pre-line
+      <div class="solution-overview prose prose-slate dark:prose-invert prose-sm lg:prose-base max-w-none
                   prose-headings:font-display prose-headings:uppercase
                   prose-headings:text-slate-900 dark:prose-headings:text-white
                   prose-p:text-slate-600 dark:prose-p:text-slate-400 prose-p:leading-relaxed
@@ -691,7 +738,7 @@
                       transition-all duration-300 overflow-hidden">
         <div class="relative aspect-square bg-slate-50 dark:bg-slate-900/50 overflow-hidden">
           {% if product.thumbnail %}
-          <img src="{{ MEDIA_URL }}{{ product.thumbnail }}"
+          <img src="{{ product.thumbnail|media_url }}"
                alt="{{ product.product_name }}"
                class="w-full h-full object-contain p-4
                       transition-transform duration-300 group-hover:scale-[1.06]"
@@ -772,7 +819,7 @@
                       hover:border-brand-300 dark:hover:border-brand-700/60 transition-all duration-300 overflow-hidden">
         <div class="relative aspect-square bg-slate-50 dark:bg-slate-900/50 overflow-hidden">
           {% if product.thumbnail %}
-          <img src="{{ MEDIA_URL }}{{ product.thumbnail }}"
+          <img src="{{ product.thumbnail|media_url }}"
                alt="{{ product.product_name }}"
                class="w-full h-full object-contain p-4
                       transition-transform duration-300 group-hover:scale-[1.06]"

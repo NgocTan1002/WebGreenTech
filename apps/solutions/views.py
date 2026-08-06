@@ -5,6 +5,7 @@ from apps.core.db import (
     get_solutions, get_solution_detail,
     get_solution_products, increment_solution_views,
 )
+from apps.solutions.utils import normalize_video_embed_url
  
  
 class SolutionListView(TemplateView):
@@ -110,6 +111,9 @@ class SolutionDetailView(TemplateView):
 
         context.update({
             "solution":          solution,
+            "hero_video_embed_url": normalize_video_embed_url(
+                solution.get("hero_video_url")
+            ),
             "all_products":      all_products,
             "featured_products": featured_products,
             "deployment_images": deployment_images,

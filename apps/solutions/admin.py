@@ -12,6 +12,7 @@ from .models import (
     SolutionProduct,
     WorkflowStep,
 )
+from .utils import normalize_video_embed_url
 
 
 class SolutionAdminForm(forms.ModelForm):
@@ -72,6 +73,18 @@ class SolutionAdminForm(forms.ModelForm):
             self.cleaned_data.get('benefits') or '',
             ('title', 'metric', 'description', 'icon'),
         )
+
+    def clean_hero_video_url(self):
+        value = self.cleaned_data.get('hero_video_url') or ''
+        if not value:
+            return ''
+
+        embed_url = normalize_video_embed_url(value)
+        if not embed_url:
+            raise forms.ValidationError(
+                'Chỉ hỗ trợ liên kết video YouTube hoặc Vimeo hợp lệ.'
+            )
+        return embed_url
 
     @staticmethod
     def _parse_rows(value, keys):
