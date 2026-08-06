@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   {# ── Theme init: chạy trước khi render để tránh flash ── #}
   <script>
@@ -26,31 +26,28 @@
       theme: {
         extend: {
           fontFamily: {
-            display: ['"Barlow Condensed"', 'sans-serif'],
+            display: ['"Space Grotesk"', 'sans-serif'],
             sans:    ['"Space Grotesk"', 'sans-serif'],
-            mono:    ['"IBM Plex Mono"', 'monospace'],
+            mono:    ['"Space Grotesk"', 'sans-serif'],
           },
           colors: {
             brand: {
-              50:  '#eff1ff',
-              100: '#e0e4ff',
-              200: '#c7cdff',
-              300: '#a5aeff',
-              400: '#8188ff',
-              500: '#6366ff',
-              600: '#2e3de6',
-              700: '#2832c9',
-              800: '#2329a3',
-              900: '#232881',
-              950: '#16194d',
+              50:  '#f1f6fd',
+              100: '#e2ecfa',
+              200: '#c4d9f3',
+              300: '#98bde8',
+              400: '#6499d7',
+              500: '#1752A4',
+              600: '#16498f',
+              700: '#153f7b',
+              800: '#173766',
+              900: '#182f54',
+              950: '#101f38',
             },
           },
           animation: {
             'fade-up':    'fadeUp .6s ease both',
             'fade-in':    'fadeIn .4s ease both',
-            'shimmer':    'shimmer 2s linear infinite',
-            'ticker':     'ticker 20s linear infinite',
-            'ring':       'ring 2s ease-in-out infinite',
           },
           keyframes: {
             fadeUp:  { from: { opacity: '0', transform: 'translateY(18px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
@@ -93,7 +90,7 @@
       .btn-primary {
         @apply inline-flex items-center gap-2 font-bold text-sm tracking-wide
               px-6 py-3 rounded-lg transition-all duration-200
-              shadow-lg shadow-brand-500/20 hover:shadow-brand-400/30
+              shadow-sm hover:shadow-md
               /* dark */
               bg-brand-500 hover:bg-brand-400 text-slate-950
               /* light: hơi đậm hơn để tương phản trên nền trắng */
@@ -137,10 +134,10 @@
 
       /* ── Cards ───────────────────────────────────────────────── */
       .card-industrial {
-        @apply rounded-xl border transition-all duration-300 backdrop-blur-sm
+        @apply rounded-xl border transition-all duration-200
               /* light */
               bg-white border-slate-200
-              hover:border-brand-400/60 hover:shadow-md hover:shadow-brand-100
+              hover:border-brand-400/60 hover:shadow-sm
               /* dark */
               dark:bg-slate-900/60 dark:border-slate-800
               dark:hover:border-brand-500/40 dark:hover:bg-slate-900;
@@ -148,7 +145,7 @@
 
       /* ── Section label ───────────────────────────────────────── */
       .section-label {
-        @apply font-mono text-[10px] uppercase tracking-[.2em]
+        @apply font-sans text-xs font-semibold tracking-wide
               flex items-center gap-2
               text-brand-600 dark:text-brand-400;
       }
@@ -210,7 +207,7 @@
 
       /* ── Backgrounds đặc thù ─────────────────────────────────── */
       .noise-overlay {
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+        display: none;
       }
 
       /* light mode: giảm opacity noise để không quá rõ trên nền trắng */
@@ -222,17 +219,12 @@
       @media (min-width: 1024px) { :root { --header-h: 84px; } }
 
       .grid-bg {
-        background-image:
-          linear-gradient(rgba(6,184,224,.04) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(6,184,224,.04) 1px, transparent 1px);
-        background-size: 40px 40px;
+        background-image: none;
       }
 
       /* light mode: tăng độ đậm để grid lines visible */
       :root:not(.dark) .grid-bg {
-        background-image:
-          linear-gradient(rgba(8,145,178,.10) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(8,145,178,.10) 1px, transparent 1px);
+        background-image: none;
       }
           .user-menu-item {
             @apply flex items-center gap-3 w-full px-4 py-2.5 text-sm
@@ -246,7 +238,7 @@
 
     @layer utilities {
       .text-display {
-        @apply font-display font-bold uppercase tracking-tight;
+        @apply font-display font-bold tracking-tight;
       }
 
       .clip-text {
@@ -755,7 +747,7 @@
     </main>
  
     {# Sticky contact buttons #}
-    <aside class="fixed right-4 bottom-10 sm:right-5 sm:bottom-24 z-50
+    <aside class="fixed right-4 bottom-6 sm:right-5 sm:bottom-8 z-50
                   flex flex-col items-end gap-2">
  
       {# Accessible label only #}
@@ -773,8 +765,8 @@
           <a href="https://zalo.me/{{ COMPANY_PHONE|default:'0123456789' }}"
              target="_blank" rel="noopener"
              title="Chat Zalo"
-              class="w-12 h-12 flex items-center justify-center rounded-full
-                     shadow-lg transition-all duration-200
+              class="w-11 h-11 flex items-center justify-center rounded-full
+                     shadow-md transition-all duration-200
                      bg-[#0068FF] hover:bg-[#0052CC]
                      shadow-blue-500/30 hover:shadow-blue-500/50
                      hover:-translate-y-0.5">
@@ -848,7 +840,7 @@
           </div>
         </div>
         {# ── Messenger ── #}
-        <div class="group relative">
+        <div class="group relative hidden">
           <a href="https://m.me/1165618003296928"
              target="_blank" rel="noopener"
              title="Chat Messenger"
@@ -901,11 +893,10 @@
         <div class="group relative">
           <a href="tel:{{ COMPANY_PHONE }}"
              title="Gọi: {{ COMPANY_PHONE }}"
-              class="w-12 h-12 flex items-center justify-center rounded-full
-                     shadow-lg transition-all duration-200
-                     bg-[#0068FF] hover:bg-[#0052CC]
-                     shadow-blue-500/30 hover:shadow-blue-500/50
-                     hover:-translate-y-0.5 animate-ring">
+              class="w-11 h-11 flex items-center justify-center rounded-full
+                     shadow-md transition-all duration-200
+                     bg-brand-600 hover:bg-brand-700
+                     shadow-brand-500/20 hover:shadow-brand-500/30">
             <svg class="w-5 h-5 text-white"
                  fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -929,7 +920,7 @@
  
         {# ── Email ── #}
         {% if COMPANY_EMAIL %}
-        <div class="group relative">
+        <div class="group relative hidden">
           <a href="mailto:{{ COMPANY_EMAIL }}"
              title="{{ COMPANY_EMAIL }}"
               class="w-12 h-12 flex items-center justify-center rounded-full
@@ -959,7 +950,7 @@
         </div>
         {% endif %}
         {# ── CTA Báo giá ── #}
-        <div class="group relative">
+        <div class="group relative hidden">
           <a href="{% url 'orders:quote_request' %}"
              title="Yêu cầu báo giá"
               class="w-12 h-12 flex items-center justify-center rounded-full
@@ -994,21 +985,6 @@
   <footer class="border-t transition-colors
                 bg-slate-50 border-slate-200
                 dark:bg-[#050a0f] dark:border-slate-800/60">
-
-    <div class="ticker-strip border-b overflow-hidden py-2.5 
-                bg-brand-50 border-slate-200 
-                dark:bg-brand-950/20 dark:border-slate-800/60">
-      <div class="flex items-center whitespace-nowrap animate-ticker">
-        {% for _ in "1234" %}
-        <span class="font-mono text-[10px] leading-none uppercase tracking-[.3em] px-8 
-                    text-brand-600 dark:text-brand-500/60">
-          Industrial IoT &nbsp;·&nbsp; Smart Agriculture &nbsp;·&nbsp;
-          Factory Automation &nbsp;·&nbsp; Energy Management &nbsp;·&nbsp;
-          Remote Monitoring &nbsp;·&nbsp; Predictive Maintenance
-        </span>
-        {% endfor %}
-      </div>
-    </div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-10">
       <div class="grid grid-cols-1 lg:grid-cols-10 gap-10 mb-14">
