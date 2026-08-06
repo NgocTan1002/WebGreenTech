@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Xác nhận đơn hàng {{ order.order_number }} — {{ COMPANY_NAME }}</title>
+  <title>{% if is_quote_request %}Đã tiếp nhận yêu cầu báo giá{% else %}Xác nhận đơn hàng{% endif %} {{ order.order_number }} — {{ COMPANY_NAME }}</title>
   <style>
     body { font-family: Arial, Helvetica, sans-serif; background: #f1f5f9; margin: 0; padding: 0; -webkit-text-size-adjust: 100%; }
     .wrapper { max-width: 600px; margin: 24px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 8px rgba(0,0,0,.08); }
@@ -73,18 +73,24 @@
   <!-- HEADER -->
   <div class="header">
     <p class="header-logo">{{ COMPANY_NAME }}</p>
-    <p class="header-sub">Xác nhận đơn hàng</p>
+    <p class="header-sub">{% if is_quote_request %}Đã tiếp nhận yêu cầu báo giá{% else %}Xác nhận đơn hàng{% endif %}</p>
   </div>
 
   <!-- BODY -->
   <div class="body">
 
     <p class="greeting">Xin chào {{ order.first_name }} {{ order.last_name }}{% if order.company_name %} — <strong>{{ order.company_name }}</strong>{% endif %},</p>
-    <p class="intro">Chúng tôi đã nhận được đơn hàng của bạn và sẽ xử lý trong thời gian sớm nhất. Đội kỹ thuật sẽ liên hệ xác nhận trong vòng <strong>24 giờ làm việc</strong>.</p>
+    <p class="intro">
+      {% if is_quote_request %}
+      Chúng tôi đã nhận được danh sách sản phẩm cần báo giá. Đội kỹ thuật sẽ kiểm tra cấu hình và gửi báo giá chi tiết trong vòng <strong>24 giờ làm việc</strong>.
+      {% else %}
+      Chúng tôi đã nhận được đơn hàng của bạn và sẽ xử lý trong thời gian sớm nhất. Đội kỹ thuật sẽ liên hệ xác nhận trong vòng <strong>24 giờ làm việc</strong>.
+      {% endif %}
+    </p>
 
     <!-- ORDER BADGE -->
     <div class="order-badge">
-      <p class="order-badge-label">Mã đơn hàng</p>
+      <p class="order-badge-label">{% if is_quote_request %}Mã yêu cầu báo giá{% else %}Mã đơn hàng{% endif %}</p>
       <p class="order-badge-number">{{ order.order_number }}</p>
     </div>
 
@@ -107,7 +113,7 @@
     </div>
 
     <!-- ITEMS TABLE -->
-    <p class="section-heading">Chi tiết đơn hàng</p>
+    <p class="section-heading">{% if is_quote_request %}Sản phẩm cần báo giá{% else %}Chi tiết đơn hàng{% endif %}</p>
     <table class="items">
       <thead>
         <tr>
@@ -125,19 +131,26 @@
             <p class="product-sku">SKU: {{ item.product_sku }}</p>
           </td>
           <td class="right">{{ item.quantity }}</td>
+          {% if item.price_pending %}
+          <td class="right" style="color:#b45309;font-weight:600;">Chờ báo giá</td>
+          <td class="right">Sẽ xác nhận</td>
+          {% else %}
           <td class="right">{{ item.unit_price|floatformat:0 }} ₫</td>
           <td class="right"><strong>{{ item.line_total|floatformat:0 }} ₫</strong></td>
+          {% endif %}
         </tr>
         {% endfor %}
       </tbody>
       <tfoot>
         <tr>
-          <td colspan="3" style="text-align:right;">Tổng cộng</td>
-          <td class="right">{{ order.total|floatformat:0 }} ₫</td>
+          <td colspan="3" style="text-align:right;">{% if is_quote_request %}Tổng giá trị{% else %}Tổng cộng{% endif %}</td>
+          <td class="right">{% if is_quote_request %}Chờ báo giá{% else %}{{ order.total|floatformat:0 }} ₫{% endif %}</td>
         </tr>
       </tfoot>
     </table>
-    <p style="font-size:11px;color:#94a3b8;margin:0 0 28px;text-align:right;">* Giá chưa bao gồm phí vận chuyển và VAT. Sẽ được xác nhận sau khi liên hệ.</p>
+    <p style="font-size:11px;color:#94a3b8;margin:0 0 28px;text-align:right;">
+      {% if is_quote_request %}* Giá chính thức, VAT và phí vận chuyển sẽ được thể hiện trong báo giá.{% else %}* Giá chưa bao gồm phí vận chuyển và VAT. Sẽ được xác nhận sau khi liên hệ.{% endif %}
+    </p>
 
     <!-- SHIPPING ADDRESS -->
     {% if order.shipping_address %}
@@ -153,7 +166,7 @@
 
     <!-- NOTES -->
     {% if order.customer_notes %}
-    <p class="section-heading">Ghi chú đơn hàng</p>
+    <p class="section-heading">{% if is_quote_request %}Ghi chú yêu cầu{% else %}Ghi chú đơn hàng{% endif %}</p>
     <div class="notes-box">
       <p>{{ order.customer_notes }}</p>
     </div>
@@ -165,14 +178,14 @@
       <div class="step">
         <div class="step-num"><div class="step-circle">1</div></div>
         <div class="step-body">
-          <p class="step-title">Xác nhận đơn hàng</p>
-          <p class="step-desc">Kỹ sư của chúng tôi sẽ liên hệ qua email hoặc điện thoại trong vòng 24 giờ làm việc để xác nhận đơn.</p>
+          <p class="step-title">{% if is_quote_request %}Kiểm tra yêu cầu{% else %}Xác nhận đơn hàng{% endif %}</p>
+          <p class="step-desc">{% if is_quote_request %}Kỹ sư kiểm tra cấu hình, số lượng và nhu cầu sử dụng của bạn.{% else %}Kỹ sư của chúng tôi sẽ liên hệ qua email hoặc điện thoại trong vòng 24 giờ làm việc để xác nhận đơn.{% endif %}</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num"><div class="step-circle">2</div></div>
         <div class="step-body">
-          <p class="step-title">Xác nhận giá & Điều khoản</p>
+          <p class="step-title">{% if is_quote_request %}Gửi báo giá chính thức{% else %}Xác nhận giá & Điều khoản{% endif %}</p>
           <p class="step-desc">Chúng tôi sẽ gửi báo giá chính thức và thống nhất điều khoản thanh toán, thời gian giao hàng.</p>
         </div>
       </div>
@@ -187,7 +200,7 @@
 
     <!-- CTA BUTTON -->
     <div class="btn-wrap">
-      <a href="{{ SITE_URL }}/orders/confirmation/{{ order.order_number }}/" class="btn">Xem chi tiết đơn hàng</a>
+      <a href="{% if is_quote_request %}{{ SITE_URL }}/orders/quote/success/{% else %}{{ SITE_URL }}/orders/confirmation/{{ order.order_number }}/{% endif %}" class="btn">{% if is_quote_request %}Xem quy trình báo giá{% else %}Xem chi tiết đơn hàng{% endif %}</a>
     </div>
 
     <hr class="divider">
@@ -196,7 +209,7 @@
     <p class="contact-line">Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ đội kỹ thuật:</p>
     <p class="contact-line">📧 <a href="mailto:{{ COMPANY_EMAIL }}">{{ COMPANY_EMAIL }}</a></p>
     <p class="contact-line">📞 <a href="tel:{{ COMPANY_PHONE }}">{{ COMPANY_PHONE }}</a></p>
-    <p class="contact-line" style="margin-top:12px;font-size:12px;color:#94a3b8;">Email này được gửi tự động sau khi đơn hàng được tiếp nhận. Vui lòng không trả lời email này nếu bạn không đặt hàng.</p>
+    <p class="contact-line" style="margin-top:12px;font-size:12px;color:#94a3b8;">Email này được gửi tự động sau khi {% if is_quote_request %}yêu cầu báo giá{% else %}đơn hàng{% endif %} được tiếp nhận.</p>
 
   </div>
 

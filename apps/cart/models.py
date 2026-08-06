@@ -56,7 +56,19 @@ class CartItem(TimeStampedModel):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='cart_items')
     quantity = models.PositiveIntegerField(default=1)
-    unit_price = models.DecimalField(max_digits=15, decimal_places=0)
+    pricing_type = models.CharField(
+        max_length=20,
+        choices=Product.PRICING_CHOICES,
+        default=Product.PRICING_FIXED,
+        verbose_name='Loại giá tại thời điểm thêm',
+    )
+    unit_price = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        null=True,
+        blank=True,
+        verbose_name='Đơn giá tạm tính',
+    )
 
     class Meta:
         unique_together = ('cart', 'product')
@@ -68,9 +80,23 @@ class CartItem(TimeStampedModel):
 
     @property
     def line_total(self):
+        if self.price_pending:
+            return None
         return Decimal(str(self.unit_price)) * self.quantity
 
+    @property
+    def price_pending(self):
+        return self.pricing_type != Product.PRICING_FIXED or self.unit_price is None
+
     def save(self, *args, **kwargs):
-        if not self.unit_price:
-            self.unit_price = self.product.price or 0
+        if self.product_id:
+            self.pricing_type = (
+                Product.PRICING_QUOTE
+                if self.product.requires_quote
+                else self.product.pricing_type
+            )
+            if self.pricing_type != Product.PRICING_FIXED:
+                self.unit_price = None
+            elif self.unit_price is None:
+                self.unit_price = self.product.display_price
         super().save(*args, **kwargs)

@@ -35,29 +35,42 @@ BEGIN
     FROM cart_cartitem ci
     WHERE ci.cart_id = p_cart_id;
 
-    IF v_subtotal = 0 THEN
+    IF NOT EXISTS (
+        SELECT 1 FROM cart_cartitem WHERE cart_id = p_cart_id
+    ) THEN
         RAISE EXCEPTION 'Giỏ hàng trống, không thể tạo đơn hàng.';
+    END IF;
+
+    IF p_order_type = 'purchase' AND EXISTS (
+        SELECT 1
+        FROM cart_cartitem
+        WHERE cart_id = p_cart_id
+          AND (pricing_type <> 'fixed' OR unit_price IS NULL)
+    ) THEN
+        RAISE EXCEPTION 'Không thể tạo đơn mua hàng khi còn sản phẩm chờ báo giá.';
     END IF;
 
     INSERT INTO orders_order (
         id, order_number, order_type, status,
         customer_id, email, first_name, last_name,
         company_name, phone, shipping_address, billing_address,
-        customer_notes, subtotal, total, currency,
+        customer_notes, subtotal, total,
         created_at, updated_at
     ) VALUES (
         v_order_id, v_order_number, p_order_type, 'pending',
         p_customer_id, p_email, p_first_name, p_last_name,
         p_company_name, p_phone, p_shipping_addr, p_shipping_addr,
-        p_notes, v_subtotal, v_subtotal, 'VND',
+        p_notes, v_subtotal, v_subtotal,
         NOW(), NOW()
     );
 
     INSERT INTO orders_orderitem (
-        order_id, product_id, product_name, product_sku, quantity, unit_price
+        order_id, product_id, product_name, product_sku,
+        quantity, pricing_type, unit_price
     )
     SELECT
-        v_order_id, ci.product_id, p.name, p.sku, ci.quantity, ci.unit_price
+        v_order_id, ci.product_id, p.name, p.sku,
+        ci.quantity, ci.pricing_type, ci.unit_price
     FROM cart_cartitem ci
     JOIN products_product p ON p.id = ci.product_id
     WHERE ci.cart_id = p_cart_id;

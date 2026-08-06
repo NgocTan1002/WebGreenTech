@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
 {% load currency %}
-{% block title %}Thanh toán — {{ COMPANY_NAME }}{% endblock %}
-{% block meta_description %}Xác nhận thông tin đơn hàng — {{ COMPANY_NAME }}{% endblock %}
+{% block title %}{% if has_pending_quote %}Gửi yêu cầu báo giá{% else %}Đặt hàng{% endif %} — {{ COMPANY_NAME }}{% endblock %}
+{% block meta_description %}Xác nhận thông tin sản phẩm và thông tin liên hệ — {{ COMPANY_NAME }}{% endblock %}
 {% block content %}
 <div class="min-h-screen bg-slate-50 dark:bg-[#080d12] pt-24 pb-16">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -20,11 +20,13 @@
   <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
   </svg>
-  <span class="text-slate-600 dark:text-slate-400">Thanh toán</span>
+  <span class="text-slate-600 dark:text-slate-400">
+    {% if has_pending_quote %}Gửi yêu cầu báo giá{% else %}Đặt hàng{% endif %}
+  </span>
 </nav>
 
 <h1 class="font-display font-bold uppercase text-slate-900 dark:text-white text-3xl lg:text-4xl tracking-tight mb-10">
-  Xác nhận đơn hàng
+  {% if has_pending_quote %}Xác nhận yêu cầu báo giá{% else %}Xác nhận đơn hàng{% endif %}
 </h1>
 
 {% if not cart_items %}
@@ -42,7 +44,7 @@
     Giỏ hàng trống
   </h2>
   <p class="text-slate-500 dark:text-slate-400 text-sm max-w-sm leading-relaxed mb-8">
-    Bạn chưa có sản phẩm nào trong giỏ hàng. Vui lòng thêm sản phẩm trước khi thanh toán.
+    Bạn chưa có sản phẩm nào trong giỏ hàng. Vui lòng thêm sản phẩm trước khi tiếp tục.
   </p>
   <a href="{% url 'cart:detail' %}" class="btn-primary">
     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -281,7 +283,7 @@
       <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
 
         <h2 class="font-display font-bold uppercase text-slate-900 dark:text-white text-xl tracking-tight mb-5">
-          Tóm tắt đơn hàng
+          {% if has_pending_quote %}Tóm tắt yêu cầu{% else %}Tóm tắt đơn hàng{% endif %}
         </h2>
 
         {# Cart items list #}
@@ -293,7 +295,7 @@
                         border-slate-100 dark:border-slate-800
                         bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center">
               {% if item.thumbnail %}
-              <img src="{{ item.thumbnail }}" alt="{{ item.product_name }}"
+              <img src="{{ item.thumbnail|media_url }}" alt="{{ item.product_name }}"
                    class="w-full h-full object-contain p-1.5" loading="lazy" />
               {% else %}
               <svg class="w-6 h-6 text-slate-300 dark:text-slate-600" fill="none"
@@ -313,14 +315,20 @@
                 {{ item.product_sku }}
               </p>
               <p class="text-slate-500 dark:text-slate-500 text-xs mt-1">
+                {% if item.price_pending %}
+                <span class="font-semibold text-amber-600 dark:text-amber-400">Chờ báo giá</span> × {{ item.quantity }}
+                {% else %}
                 {{ item.unit_price|vnd }} × {{ item.quantity }}
+                {% endif %}
               </p>
             </div>
 
             {# Line total #}
             <div class="flex-shrink-0 text-right">
               <p class="text-slate-800 dark:text-slate-200 text-sm font-semibold">
+                {% if item.price_pending %}Sẽ xác nhận{% else %}
                 {{ item.line_total|vnd }}
+                {% endif %}
               </p>
             </div>
           </div>
@@ -330,9 +338,11 @@
         {# Subtotal #}
         <div class="border-t border-slate-100 dark:border-slate-800 pt-4 mb-5">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-slate-500 dark:text-slate-400 text-sm">Tạm tính</span>
+            <span class="text-slate-500 dark:text-slate-400 text-sm">
+              {% if has_pending_quote %}Giá đã xác định{% else %}Tạm tính{% endif %}
+            </span>
             <span class="text-slate-800 dark:text-slate-200 font-semibold text-sm">
-              {{ subtotal|vnd }}
+              {% if has_pending_quote and not subtotal %}—{% else %}{{ subtotal|vnd }}{% endif %}
             </span>
           </div>
           <div class="flex items-center justify-between">
@@ -341,12 +351,21 @@
           </div>
         </div>
 
+        {% if has_pending_quote %}
+        <div class="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3
+                    dark:border-amber-800/50 dark:bg-amber-950/30">
+          <p class="text-xs leading-relaxed text-amber-800 dark:text-amber-300">
+            Một số sản phẩm đang chờ xác định giá. Báo giá chính thức sẽ được gửi sau khi kỹ sư tiếp nhận yêu cầu.
+          </p>
+        </div>
+        {% endif %}
+
         {# Total #}
         <div class="border-t border-slate-200 dark:border-slate-700 pt-4 mb-6">
           <div class="flex items-center justify-between">
-            <span class="text-slate-900 dark:text-white font-bold">Tổng cộng</span>
+            <span class="text-slate-900 dark:text-white font-bold">Tổng giá trị</span>
             <span class="text-brand-600 dark:text-brand-400 font-display font-bold text-xl">
-              {{ subtotal|vnd }}
+              {% if has_pending_quote %}Chờ báo giá{% else %}{{ subtotal|vnd }}{% endif %}
             </span>
           </div>
         </div>
@@ -358,12 +377,16 @@
             <path stroke-linecap="round" stroke-linejoin="round"
                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
-          Đặt hàng
+          {% if has_pending_quote %}Gửi yêu cầu báo giá{% else %}Đặt hàng{% endif %}
         </button>
 
         {# Trust note #}
         <p class="text-slate-400 dark:text-slate-600 text-xs font-mono text-center mt-4 leading-relaxed">
-          Đơn hàng sẽ được xác nhận trong vòng 24 giờ
+          {% if has_pending_quote %}
+          Chúng tôi sẽ phản hồi và gửi báo giá trong vòng 24 giờ làm việc
+          {% else %}
+          Đơn hàng sẽ được xác nhận trong vòng 24 giờ làm việc
+          {% endif %}
         </p>
 
         {# Back to cart link #}

@@ -7,12 +7,13 @@
 
 {# ══════════════════════════════════════════════════════════════════ HERO SUCCESS ══════════════════════════════════════════════════════════════════ #}
 <section class="relative min-h-[60vh] flex items-center justify-center overflow-hidden
-               bg-slate-950 dark:bg-slate-950 pt-24 pb-16">
+               bg-white dark:bg-slate-950 pt-24 pb-16">
 
   {# Background overlays #}
   <div class="absolute inset-0 grid-bg"></div>
   <div class="absolute inset-0 noise-overlay"></div>
-  <div class="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-transparent to-slate-950/80"></div>
+  <div class="absolute inset-0 bg-gradient-to-b from-brand-50/80 via-white/60 to-slate-50
+              dark:from-slate-950/60 dark:via-transparent dark:to-slate-950/80"></div>
 
   <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
 
@@ -31,23 +32,24 @@
     </div>
 
     {# H1 #}
-    <h1 class="font-display font-bold uppercase text-white text-3xl sm:text-4xl lg:text-5xl
+    <h1 class="font-display font-bold uppercase text-slate-900 dark:text-white text-3xl sm:text-4xl lg:text-5xl
                tracking-tight mb-5 animate-fade-up">
       Yêu cầu báo giá đã được gửi!
     </h1>
 
     {# Subtitle #}
-    <p class="max-w-lg mx-auto text-slate-400 text-sm sm:text-base leading-relaxed mb-6 animate-fade-up">
+    <p class="max-w-lg mx-auto text-slate-600 dark:text-slate-400 text-sm sm:text-base leading-relaxed mb-6 animate-fade-up">
       Chúng tôi đã tiếp nhận yêu cầu của bạn. Kỹ sư chuyên môn sẽ phản hồi trong
-      <span class="text-brand-400 font-semibold">4 giờ làm việc</span> và gửi báo giá chi tiết trong
-      <span class="text-brand-400 font-semibold">24 giờ</span>.
+      <span class="text-brand-600 dark:text-brand-400 font-semibold">4 giờ làm việc</span> và gửi báo giá chi tiết trong
+      <span class="text-brand-600 dark:text-brand-400 font-semibold">24 giờ</span>.
     </p>
 
     {# Email confirmation note #}
     <div class="inline-flex items-center gap-2 font-mono text-xs tracking-wide
-                border border-slate-700 rounded-full px-4 py-2 mb-10
-                text-slate-400 bg-slate-900/60 backdrop-blur-sm">
-      <svg class="w-3.5 h-3.5 text-brand-400 flex-shrink-0" fill="none" viewBox="0 0 24 24"
+                border border-slate-200 dark:border-slate-700 rounded-full px-4 py-2 mb-10
+                text-slate-600 dark:text-slate-400 bg-white/80 dark:bg-slate-900/60
+                shadow-sm dark:shadow-none backdrop-blur-sm">
+      <svg class="w-3.5 h-3.5 text-brand-600 dark:text-brand-400 flex-shrink-0" fill="none" viewBox="0 0 24 24"
            stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round"
               d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>

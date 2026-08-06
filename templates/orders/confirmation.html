@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load currency %}
+
+{% block title %}Đặt hàng thành công — {{ COMPANY_NAME }}{% endblock %}
+{% block meta_description %}Đơn hàng của bạn đã được tiếp nhận — {{ COMPANY_NAME }}{% endblock %}
+
+{% block content %}
+<section class="min-h-screen bg-slate-50 dark:bg-[#080d12] pt-28 pb-16">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6">
+    <div class="rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-sm
+                dark:border-slate-800 dark:bg-slate-900 sm:p-10">
+      <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl
+                  bg-emerald-100 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400">
+        <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+
+      <p class="mb-2 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">
+        Đặt hàng thành công
+      </p>
+      <h1 class="font-display text-3xl font-bold uppercase tracking-tight text-slate-900 dark:text-white">
+        Đơn hàng đã được tiếp nhận
+      </h1>
+      <p class="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+        Mã đơn hàng của bạn là
+        <strong class="text-slate-800 dark:text-slate-200">{{ order.order_number }}</strong>.
+        Chúng tôi sẽ liên hệ xác nhận và thông báo lịch giao hàng trong vòng 24 giờ làm việc.
+      </p>
+
+      <div class="mt-8 overflow-hidden rounded-2xl border border-slate-200 text-left dark:border-slate-800">
+        {% for item in order_items %}
+        <div class="flex items-center justify-between gap-4 px-5 py-4
+                    {% if not forloop.last %}border-b border-slate-100 dark:border-slate-800{% endif %}">
+          <div class="min-w-0">
+            <p class="truncate text-sm font-semibold text-slate-800 dark:text-slate-200">{{ item.product_name }}</p>
+            <p class="mt-1 font-mono text-[11px] text-slate-400">{{ item.product_sku }} · SL {{ item.quantity }}</p>
+          </div>
+          <p class="flex-shrink-0 text-sm font-semibold text-slate-800 dark:text-slate-200">
+            {{ item.line_total|vnd }}
+          </p>
+        </div>
+        {% endfor %}
+        <div class="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-5 py-4
+                    dark:border-slate-700 dark:bg-slate-800/40">
+          <span class="font-semibold text-slate-700 dark:text-slate-300">Tổng cộng</span>
+          <span class="font-display text-xl font-bold text-brand-600 dark:text-brand-400">{{ order.total|vnd }}</span>
+        </div>
+      </div>
+
+      <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+        <a href="{% url 'products:list' %}" class="btn-primary justify-center">Tiếp tục mua sắm</a>
+        <a href="{% url 'core:home' %}" class="btn-ghost justify-center">Về trang chủ</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

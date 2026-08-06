@@ -3,13 +3,19 @@ from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
+from django.db import transaction
+from django.db.models import Q
 
 from .models import Order, OrderItem, QuoteRequest
 from .forms import CheckoutForm, QuoteRequestForm
 from apps.cart.services import CartService
 from apps.products.models import Product
 from apps.contacts.tasks import send_contact_notification
-from apps.orders.tasks import send_quote_notification_email
+from apps.orders.tasks import (
+    send_order_confirmation_email,
+    send_quote_notification_email,
+)
+from apps.core.db import get_cart_detail, get_cart_summary
 
 
 class CheckoutView(TemplateView):
@@ -19,8 +25,14 @@ class CheckoutView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         cart = CartService.get_or_create_cart(self.request)
+        cart_items = get_cart_detail(str(cart.id))
+        summary = get_cart_summary(str(cart.id))
         context['cart'] = cart
-        context['cart_items'] = cart.items.select_related('product').all()
+        context['cart_items'] = cart_items
+        context['subtotal'] = summary['subtotal']
+        context['has_pending_quote'] = any(
+            item.get('price_pending') for item in cart_items
+        )
 
         user = self.request.user
         context['form'] = CheckoutForm(
@@ -43,8 +55,16 @@ class CheckoutView(TemplateView):
             return redirect('cart:detail')
 
         if form.is_valid():
+            has_pending_quote = cart.items.filter(
+                ~Q(pricing_type=Product.PRICING_FIXED) | Q(unit_price__isnull=True)
+            ).exists()
+            order_type = (
+                Order.ORDER_TYPE_QUOTE
+                if has_pending_quote
+                else Order.ORDER_TYPE_PURCHASE
+            )
             order = Order.objects.create(
-                order_type=Order.ORDER_TYPE_QUOTE,
+                order_type=order_type,
                 customer=request.user if request.user.is_authenticated else None,
                 email=form.cleaned_data['email'],
                 first_name=form.cleaned_data['first_name'],
@@ -63,16 +83,34 @@ class CheckoutView(TemplateView):
                     product_name=item.product.name,
                     product_sku=item.product.sku,
                     quantity=item.quantity,
+                    pricing_type=item.pricing_type,
                     unit_price=item.unit_price,
                 )
-
             order.calculate_totals()  # fix: method đúng tên
+            transaction.on_commit(
+                lambda order_id=str(order.id):
+                send_order_confirmation_email.delay(order_id)
+            )
 
             cart.is_active = False
             cart.save(update_fields=['is_active'])
             request.session.pop('cart_session_key', None)  # fix: dùng pop tránh KeyError
 
-            return redirect('orders:confirmation', order_number=order.order_number)
+            if has_pending_quote:
+                messages.success(
+                    request,
+                    f'Yêu cầu báo giá {order.order_number} đã được tiếp nhận.',
+                )
+                return redirect('orders:quote_success')
+
+            messages.success(
+                request,
+                f'Đơn hàng {order.order_number} đã được tiếp nhận.',
+            )
+            return redirect(
+                'orders:confirmation',
+                order_number=order.order_number,
+            )
 
         context = self.get_context_data()
         context['form'] = form

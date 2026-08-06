@@ -6,9 +6,10 @@ from pathlib import Path
 from decimal import Decimal
 
 from django.conf import settings
+from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db import connection
-from django.test import TransactionTestCase
+from django.db import DatabaseError, connection, transaction
+from django.test import TransactionTestCase, override_settings
 
 from apps.core import db as core_db
 from apps.customers.models import Customer
@@ -27,6 +28,7 @@ from apps.solutions.models import (
     SolutionProduct,
 )
 from apps.cart.models import Cart
+from apps.orders.models import Order
 
 
 DUMMY_PNG = base64.b64decode(
@@ -74,11 +76,16 @@ class SqlFunctionsLoaderMixin:
                     cursor.execute(sql[idx + 1 :].strip())
 
 
+@override_settings(
+    EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    CELERY_TASK_ALWAYS_EAGER=True,
+    CELERY_TASK_EAGER_PROPAGATES=True,
+)
 class CoreDbFunctionTests(TransactionTestCase, SqlFunctionsLoaderMixin):
     # Pick functions that are likely compatible with current Django models.
     FUNCTION_FILES = [
         # "fn_get_product.sql",
-        # "fn_get_product_detail.sql",
+        "fn_get_product_detail.sql",
         # "fn_get_posts.sql",
         # "fn_count_products_in_category.sql",
         # "fn_create_order_from_cart.sql",
@@ -421,3 +428,152 @@ class CoreDbFunctionTests(TransactionTestCase, SqlFunctionsLoaderMixin):
         response = self.client.get("/cart/")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, f'/media/{self.product.thumbnail.name}')
+        self.assertContains(response, "Tiến hành đặt hàng")
+        self.assertNotContains(response, "Gửi yêu cầu báo giá")
+
+        checkout_response = self.client.post("/orders/checkout/", {
+            "email": "fixed-buyer@example.com",
+            "first_name": "Tran",
+            "last_name": "Binh",
+            "company_name": "Fixed Price Company",
+            "phone": "0912345678",
+        })
+        order = Order.objects.get(email="fixed-buyer@example.com")
+        self.assertEqual(order.order_type, Order.ORDER_TYPE_PURCHASE)
+        self.assertFalse(order.has_pending_quote)
+        self.assertRedirects(
+            checkout_response,
+            f"/orders/confirmation/{order.order_number}/",
+        )
+        customer_emails = [
+            message for message in mail.outbox
+            if "fixed-buyer@example.com" in message.to
+        ]
+        self.assertEqual(len(customer_emails), 1)
+        self.assertIn("Xác nhận đơn hàng", customer_emails[0].subject)
+
+    def test_quote_product_is_pending_price_and_submits_quote_request(self):
+        quote_product = Product.objects.create(
+            name="Industrial Gateway Quote",
+            slug="industrial-gateway-quote",
+            sku="SKU-QUOTE-01",
+            category=self.child_category,
+            brand=self.brand,
+            pricing_type=Product.PRICING_QUOTE,
+            price=None,
+            sale_price=None,
+            stock_status=Product.STOCK_IN,
+            stock_quantity=10,
+            short_description="Quote-only product",
+            status="published",
+        )
+
+        product_response = self.client.get(quote_product.get_absolute_url())
+        self.assertEqual(product_response.status_code, 200)
+        self.assertContains(product_response, "Thêm vào yêu cầu báo giá")
+
+        core_db.upsert_cart_item(
+            cart_id=str(self.cart.id),
+            product_id=quote_product.id,
+            quantity=2,
+            unit_price=None,
+        )
+        detail = core_db.get_cart_detail(str(self.cart.id))
+        self.assertEqual(detail[0]["pricing_type"], Product.PRICING_QUOTE)
+        self.assertTrue(detail[0]["price_pending"])
+        self.assertIsNone(detail[0]["unit_price"])
+        self.assertIsNone(detail[0]["line_total"])
+
+        with self.assertRaises(DatabaseError):
+            with transaction.atomic():
+                core_db.create_order_from_cart(
+                    cart_id=str(self.cart.id),
+                    order_type=Order.ORDER_TYPE_PURCHASE,
+                    customer_id=None,
+                    email="buyer@example.com",
+                    first_name="Nguyen",
+                    last_name="An",
+                    company_name="Green Factory",
+                    phone="0901234567",
+                    shipping_address={},
+                )
+
+        session = self.client.session
+        session["cart_session_key"] = self.cart.session_key
+        session.save()
+
+        cart_response = self.client.get("/cart/")
+        self.assertEqual(cart_response.status_code, 200)
+        self.assertContains(cart_response, "Chờ báo giá")
+        self.assertContains(cart_response, "Gửi yêu cầu báo giá")
+        self.assertNotContains(cart_response, "Miễn phí")
+
+        checkout_response = self.client.post("/orders/checkout/", {
+            "email": "buyer@example.com",
+            "first_name": "Nguyen",
+            "last_name": "An",
+            "company_name": "Green Factory",
+            "phone": "0901234567",
+            "notes": "Please quote this product",
+        })
+        self.assertRedirects(
+            checkout_response,
+            "/orders/quote/success/",
+            fetch_redirect_response=False,
+        )
+        success_response = self.client.get("/orders/quote/success/")
+        self.assertEqual(success_response.status_code, 200)
+        self.assertContains(success_response, "bg-white dark:bg-slate-950")
+        self.assertNotContains(
+            success_response,
+            "bg-slate-950 dark:bg-slate-950",
+        )
+
+        order = Order.objects.get(email="buyer@example.com")
+        self.assertEqual(order.order_type, Order.ORDER_TYPE_QUOTE)
+        self.assertTrue(order.has_pending_quote)
+        order_item = order.items.get(product=quote_product)
+        self.assertEqual(order_item.pricing_type, Product.PRICING_QUOTE)
+        self.assertIsNone(order_item.unit_price)
+        customer_emails = [
+            message for message in mail.outbox
+            if "buyer@example.com" in message.to
+        ]
+        self.assertEqual(len(customer_emails), 1)
+        self.assertIn("Đã tiếp nhận yêu cầu báo giá", customer_emails[0].subject)
+        self.assertIn("Chờ báo giá", customer_emails[0].body)
+
+    def test_contact_price_product_redirects_to_prefilled_contact_form(self):
+        contact_product = Product.objects.create(
+            name="Custom Control Cabinet",
+            slug="custom-control-cabinet",
+            sku="SKU-CONTACT-01",
+            category=self.child_category,
+            brand=self.brand,
+            pricing_type=Product.PRICING_CONTACT,
+            price=None,
+            stock_status=Product.STOCK_IN,
+            stock_quantity=1,
+            short_description="Contact for consultation",
+            status="published",
+        )
+
+        product_response = self.client.get(contact_product.get_absolute_url())
+        self.assertEqual(product_response.status_code, 200)
+        self.assertContains(product_response, "Liên hệ tư vấn")
+
+        add_response = self.client.post(
+            f"/cart/add/{contact_product.slug}/",
+            {"quantity": 1},
+        )
+        self.assertRedirects(
+            add_response,
+            f"/contact/?product={contact_product.slug}",
+            fetch_redirect_response=False,
+        )
+
+        contact_response = self.client.get(
+            f"/contact/?product={contact_product.slug}"
+        )
+        self.assertEqual(contact_response.status_code, 200)
+        self.assertContains(contact_response, "Custom Control Cabinet")

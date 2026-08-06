@@ -1190,7 +1190,7 @@
           </div>
 
           {# ── CTA row ── #}
-          {% if product.pricing_type == 'quote' or product.requires_quote or product.stock_status == 'out_of_stock' %}
+          {% if product.pricing_type != 'fixed' or product.requires_quote or product.stock_status == 'out_of_stock' %}
           {# Quote / out-of-stock: chỉ có nút Xem chi tiết #}
           <a href="{% url 'products:detail' product.slug %}"
              class="flex items-center justify-center gap-1.5
@@ -1648,9 +1648,11 @@
 
     <div class="flex flex-col sm:flex-row justify-center gap-3" data-reveal>
       {% url 'contacts:demo_request' as url_demo %}
-      <a href="{{ url_demo|default:'#' }}" class="btn-primary justify-center text-sm px-8 py-3.5">
+      <a href="{{ url_demo|default:'#' }}"
+        class="btn-primary justify-center text-sm px-8 py-3.5 text-white">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.361a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.361a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
         </svg>
         Đặt lịch demo miễn phí
       </a>

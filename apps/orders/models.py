@@ -2,6 +2,7 @@ import random
 import uuid
 from decimal import Decimal
 from django.db import models
+from django.db.models import Q
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
@@ -104,10 +105,19 @@ class Order(TimeStampedModel):
         return f"{prefix}-{timezone.now().strftime('%Y%m%d')}-{random.randint(10000, 99999)}"
 
     def calculate_totals(self):
-        """Tính lại subtotal và total từ các OrderItem."""
-        self.subtotal = sum(item.line_total for item in self.items.all())
+        """Tính phần giá đã biết; dòng chờ báo giá không được coi là 0 đồng."""
+        self.subtotal = sum(
+            (item.line_total or Decimal('0'))
+            for item in self.items.all()
+        )
         self.total    = self.subtotal
         self.save(update_fields=['subtotal', 'total'])
+
+    @property
+    def has_pending_quote(self):
+        return self.items.filter(
+            ~Q(pricing_type=Product.PRICING_FIXED) | Q(unit_price__isnull=True)
+        ).exists()
 
 
 class OrderItem(models.Model):
@@ -122,7 +132,19 @@ class OrderItem(models.Model):
     product_name = models.CharField(max_length=255)
     product_sku  = models.CharField(max_length=100)
     quantity     = models.PositiveIntegerField()
-    unit_price   = models.DecimalField(max_digits=15, decimal_places=0)
+    pricing_type = models.CharField(
+        max_length=20,
+        choices=Product.PRICING_CHOICES,
+        default=Product.PRICING_FIXED,
+        verbose_name='Loại giá tại thời điểm gửi',
+    )
+    unit_price = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        null=True,
+        blank=True,
+        verbose_name='Đơn giá tạm tính',
+    )
 
     class Meta:
         verbose_name = 'Dòng đơn hàng'
@@ -133,7 +155,13 @@ class OrderItem(models.Model):
 
     @property
     def line_total(self):
+        if self.price_pending:
+            return None
         return self.unit_price * self.quantity
+
+    @property
+    def price_pending(self):
+        return self.pricing_type != Product.PRICING_FIXED or self.unit_price is None
 
 
 class QuoteRequest(TimeStampedModel):

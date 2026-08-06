@@ -3,18 +3,16 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.utils import timezone
 from .models import Order, OrderItem, QuoteRequest, QuoteRequestItem
-
-
 # ── Inlines ───────────────────────────────────────────────────────────────────
-
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     extra = 0
-    fields = ['product', 'product_sku', 'product_name', 'quantity', 'unit_price', 'line_total_display']
-    readonly_fields = ['product_sku', 'product_name', 'line_total_display']
-
+    fields = ['product', 'product_sku', 'product_name', 'quantity', 'pricing_type', 'unit_price', 'line_total_display']
+    readonly_fields = ['product_sku', 'product_name', 'pricing_type', 'line_total_display']
     def line_total_display(self, obj):
         if obj.pk:
+            if obj.price_pending:
+                return 'Chờ báo giá'
             return f'{int(obj.line_total):,} ₫'
         return '—'
     line_total_display.short_description = 'Thành tiền'

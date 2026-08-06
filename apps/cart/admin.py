@@ -5,11 +5,13 @@ from .models import Cart, CartItem
 class CartItemInline(admin.TabularInline):
     model = CartItem
     extra = 0
-    fields = ['product', 'quantity', 'unit_price', 'line_total_display']
-    readonly_fields = ['line_total_display']
+    fields = ['product', 'quantity', 'pricing_type', 'unit_price', 'line_total_display']
+    readonly_fields = ['pricing_type', 'line_total_display']
 
     def line_total_display(self, obj):
         if obj.pk:
+            if obj.price_pending:
+                return 'Chờ báo giá'
             return f'{int(obj.line_total):,} ₫'
         return '—'
     line_total_display.short_description = 'Thành tiền'

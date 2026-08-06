@@ -10,6 +10,25 @@ class ContactView(CreateView):
     template_name = 'contacts/contact.html'
     success_url = reverse_lazy('contacts:success')
 
+    def get_initial(self):
+        initial = super().get_initial()
+        product_slug = self.request.GET.get('product')
+        if product_slug:
+            from apps.products.models import Product
+            try:
+                product = Product.objects.get(slug=product_slug, status='published')
+                initial.update({
+                    'inquiry_type': ContactInquiry.INQUIRY_SALES,
+                    'subject': f'Tư vấn sản phẩm {product.name}',
+                    'message': (
+                        f'Tôi quan tâm đến sản phẩm {product.name} '
+                        f'(SKU: {product.sku}). Vui lòng liên hệ tư vấn thêm.'
+                    ),
+                })
+            except Product.DoesNotExist:
+                pass
+        return initial
+
     def form_valid(self, form): 
         inquiry = form.save(commit=False)
         inquiry.ip_address = self.request.META.get('REMOTE_ADDR')

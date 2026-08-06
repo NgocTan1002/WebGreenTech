@@ -118,13 +118,21 @@
             {# Unit price #}
             <div class="text-right">
               <span class="sm:hidden text-slate-400 dark:text-slate-500 text-xs mr-1">Đơn giá:</span>
+              {% if item.price_pending %}
+              <span class="text-amber-600 dark:text-amber-400 text-sm font-semibold">Chờ báo giá</span>
+              {% else %}
               <span class="text-slate-600 dark:text-slate-400 text-sm">{{ item.unit_price|floatformat:0 }} ₫</span>
+              {% endif %}
             </div>
 
             {# Line total #}
             <div class="text-right">
               <span class="sm:hidden text-slate-400 dark:text-slate-500 text-xs mr-1">Thành tiền:</span>
+              {% if item.price_pending %}
+              <span class="text-slate-500 dark:text-slate-400 text-sm">Sẽ xác nhận</span>
+              {% else %}
               <span class="text-slate-800 dark:text-slate-200 text-sm font-semibold">{{ item.line_total|floatformat:0 }} ₫</span>
+              {% endif %}
             </div>
           </div>
           {% endfor %}
@@ -133,11 +141,15 @@
           <div class="border-t border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/20 px-6 py-4 space-y-2">
             <div class="flex items-center justify-between">
               <span class="text-slate-500 dark:text-slate-400 text-sm">Tạm tính</span>
-              <span class="text-slate-700 dark:text-slate-300 text-sm font-semibold">{{ order.subtotal|floatformat:0 }} ₫</span>
+              <span class="text-slate-700 dark:text-slate-300 text-sm font-semibold">
+                {% if order.has_pending_quote and not order.subtotal %}—{% else %}{{ order.subtotal|floatformat:0 }} ₫{% endif %}
+              </span>
             </div>
             <div class="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
               <span class="text-slate-900 dark:text-white font-bold">Tổng cộng</span>
-              <span class="text-brand-600 dark:text-brand-400 font-display font-bold text-xl">{{ order.total|floatformat:0 }} ₫</span>
+              <span class="text-brand-600 dark:text-brand-400 font-display font-bold text-xl">
+                {% if order.has_pending_quote %}Chờ báo giá{% else %}{{ order.total|floatformat:0 }} ₫{% endif %}
+              </span>
             </div>
           </div>
         </div>
@@ -151,7 +163,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
             </svg>
             <div>
-              <p class="text-yellow-800 dark:text-yellow-300 text-xs font-semibold uppercase tracking-wider mb-1.5">Ghi chú đơn hàng</p>
+              <p class="text-yellow-800 dark:text-yellow-300 text-xs font-semibold uppercase tracking-wider mb-1.5">Ghi chú yêu cầu</p>
               <p class="text-yellow-700 dark:text-yellow-400/80 text-sm leading-relaxed">{{ order.customer_notes }}</p>
             </div>
           </div>

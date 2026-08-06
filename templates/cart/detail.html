@@ -18,7 +18,7 @@
     </nav>
 
     <h1 class="font-display font-bold uppercase text-2xl sm:text-3xl text-slate-900 dark:text-white mb-8 tracking-tight">
-      Giỏ hàng của bạn
+      {% if has_pending_quote %}Danh sách yêu cầu báo giá{% else %}Giỏ hàng của bạn{% endif %}
     </h1>
 
     {% if cart_items %}
@@ -66,8 +66,16 @@
           {# Price + actions #}
           <div class="flex flex-col items-end gap-3 flex-shrink-0">
             <div class="text-right">
+              {% if item.price_pending %}
+              <p class="text-xs text-amber-600 dark:text-amber-400 font-semibold">
+                {% if item.pricing_type == 'contact' %}Liên hệ để biết giá{% else %}Chờ báo giá{% endif %}
+                × {{ item.quantity }}
+              </p>
+              <p class="font-semibold text-sm text-slate-500 dark:text-slate-400 mt-0.5">Sẽ xác nhận</p>
+              {% else %}
               <p class="text-xs text-slate-400 dark:text-slate-600 font-mono">{{ item.unit_price|vnd }} × {{ item.quantity }}</p>
               <p class="font-bold text-base text-slate-900 dark:text-white mt-0.5">{{ item.line_total|vnd }}</p>
+              {% endif %}
             </div>
 
             {# Quantity update #}
@@ -121,13 +129,18 @@
         <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 lg:sticky lg:top-24">
 
           <h2 class="font-display font-bold uppercase text-slate-900 dark:text-white text-xl tracking-tight mb-6">
-            Tóm tắt đơn hàng
+            {% if has_pending_quote %}Tóm tắt yêu cầu{% else %}Tóm tắt đơn hàng{% endif %}
           </h2>
 
           <div class="space-y-3 mb-5">
             <div class="flex items-center justify-between text-sm">
-              <span class="text-slate-500 dark:text-slate-400">Tạm tính ({{ total_items }} sản phẩm)</span>
-              <span class="font-semibold text-slate-800 dark:text-slate-200">{{ subtotal|vnd }}</span>
+              <span class="text-slate-500 dark:text-slate-400">
+                {% if has_pending_quote %}Giá đã xác định{% else %}Tạm tính{% endif %}
+                ({{ total_items }} sản phẩm)
+              </span>
+              <span class="font-semibold text-slate-800 dark:text-slate-200">
+                {% if has_pending_quote and not subtotal %}—{% else %}{{ subtotal|vnd }}{% endif %}
+              </span>
             </div>
             <div class="flex items-center justify-between text-sm">
               <span class="text-slate-500 dark:text-slate-400">Phí vận chuyển</span>
@@ -135,10 +148,21 @@
             </div>
           </div>
 
+          {% if has_pending_quote %}
+          <div class="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3
+                      dark:border-amber-800/50 dark:bg-amber-950/30">
+            <p class="text-xs leading-relaxed text-amber-800 dark:text-amber-300">
+              Danh sách có sản phẩm chưa xác định giá. Tổng giá trị cuối cùng sẽ được gửi trong báo giá chính thức.
+            </p>
+          </div>
+          {% endif %}
+
           <div class="border-t border-slate-100 dark:border-slate-800 pt-4 mb-6">
             <div class="flex items-center justify-between">
-              <span class="font-bold text-slate-900 dark:text-white">Tổng cộng</span>
-              <span class="font-display font-bold text-xl text-brand-600 dark:text-brand-400">{{ subtotal|vnd }}</span>
+              <span class="font-bold text-slate-900 dark:text-white">Tổng giá trị</span>
+              <span class="font-display font-bold text-xl text-brand-600 dark:text-brand-400">
+                {% if has_pending_quote %}Chờ báo giá{% else %}{{ subtotal|vnd }}{% endif %}
+              </span>
             </div>
           </div>
 
@@ -148,7 +172,7 @@
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
-              Tiến hành thanh toán
+              {% if has_pending_quote %}Gửi yêu cầu báo giá{% else %}Tiến hành đặt hàng{% endif %}
             </a>
             <a href="{% url 'orders:quote_request' %}"
                class="flex items-center justify-center gap-2 w-full border border-slate-200 dark:border-slate-700 hover:border-brand-400 dark:hover:border-brand-600 text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 font-semibold text-sm py-3 px-5 rounded-xl transition-all duration-200">
@@ -163,7 +187,7 @@
             <svg class="w-3.5 h-3.5 text-slate-300 dark:text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
             </svg>
-            <p class="text-[11px] font-mono text-slate-400 dark:text-slate-600">Thanh toán an toàn · SSL mã hoá</p>
+            <p class="text-[11px] font-mono text-slate-400 dark:text-slate-600">Thông tin được bảo mật · SSL mã hoá</p>
           </div>
 
         </div>
