@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% load currency %}
+
+{% block title %}{{ category.meta_title|default:category.name }} — {{ COMPANY_NAME }}{% endblock %}
+{% block meta_description %}{{ category.meta_description|default:category.description|default:category.name|striptags|truncatechars:155 }}{% endblock %}
+
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "{{ category.name|escapejs }}",
+  "description": "{{ category.description|default:category.name|striptags|escapejs }}",
+  "url": "{{ SITE_URL }}{{ request.path }}",
+  "numberOfItems": {{ total }}
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="relative overflow-hidden border-b border-slate-200 bg-white dark:border-slate-800/60 dark:bg-slate-950">
+  <div class="absolute inset-0 grid-bg opacity-30 dark:opacity-20 pointer-events-none"></div>
+  <div class="noise-overlay pointer-events-none"></div>
+  <div class="absolute -top-32 -right-24 h-96 w-96 rounded-full bg-brand-400/10 blur-3xl pointer-events-none"></div>
+
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-9 lg:py-12">
+    <nav aria-label="Breadcrumb" class="mb-7 flex flex-wrap items-center gap-2">
+      <a href="{% url 'core:home' %}" class="font-mono text-[10px] uppercase tracking-widest text-slate-400 transition-colors hover:text-brand-500">Trang chủ</a>
+      <span class="text-slate-300 dark:text-slate-700">/</span>
+      <a href="{% url 'categories:list' %}" class="font-mono text-[10px] uppercase tracking-widest text-slate-400 transition-colors hover:text-brand-500">Danh mục</a>
+      {% for item in breadcrumb %}
+        {% if item.id != category.id %}
+        <span class="text-slate-300 dark:text-slate-700">/</span>
+        <a href="{% url 'categories:detail' item.slug %}" class="font-mono text-[10px] uppercase tracking-widest text-slate-400 transition-colors hover:text-brand-500">{{ item.name }}</a>
+        {% endif %}
+      {% endfor %}
+      <span class="text-slate-300 dark:text-slate-700">/</span>
+      <span class="font-mono text-[10px] uppercase tracking-widest text-brand-600 dark:text-brand-400">{{ category.name }}</span>
+    </nav>
+
+    <div class="grid items-center gap-7 lg:grid-cols-[1fr_auto]">
+      <div>
+        <div class="mb-3 flex flex-wrap items-center gap-3">
+          <span class="rounded-full border border-brand-200 bg-brand-50 px-3 py-1 font-mono text-[9px] uppercase tracking-[.18em] text-brand-700 dark:border-brand-800/60 dark:bg-brand-950/50 dark:text-brand-400">Danh mục sản phẩm</span>
+          <span class="font-mono text-[10px] uppercase tracking-widest text-slate-400">{{ total }} sản phẩm</span>
+        </div>
+        <h1 class="font-display text-3xl font-black uppercase tracking-tight text-slate-900 sm:text-4xl lg:text-5xl dark:text-white">{{ category.name }}</h1>
+        {% if category.description %}
+        <p class="mt-4 max-w-3xl text-sm leading-7 text-slate-600 lg:text-base dark:text-slate-400">{{ category.description|linebreaksbr }}</p>
+        {% endif %}
+      </div>
+      {% if category.thumbnail %}
+      <div class="hidden h-32 w-32 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-3 shadow-sm sm:block dark:border-slate-700 dark:bg-slate-900">
+        <img src="{{ category.thumbnail.url }}" alt="{{ category.name }}" class="h-full w-full object-contain">
+      </div>
+      {% endif %}
+    </div>
+
+    {% if child_categories %}
+    <div class="mt-8 border-t border-slate-200/80 pt-6 dark:border-slate-800">
+      <p class="mb-3 font-mono text-[9px] uppercase tracking-[.2em] text-slate-400">Khám phá danh mục con</p>
+      <div class="flex gap-2 overflow-x-auto pb-2">
+        {% for child in child_categories %}
+        <a href="{{ child.get_absolute_url }}" class="group inline-flex shrink-0 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-all hover:-translate-y-0.5 hover:border-brand-400 hover:text-brand-600 hover:shadow-md dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-brand-600 dark:hover:text-brand-400">
+          {% if child.thumbnail %}<img src="{{ child.thumbnail.url }}" alt="" class="h-7 w-7 object-contain">{% endif %}
+          {{ child.name }}
+          <span class="text-slate-300 transition-transform group-hover:translate-x-0.5 dark:text-slate-600">→</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="min-h-[45vh] bg-slate-50 dark:bg-slate-950">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-10">
+    <form method="get" action="" class="mb-7 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+      <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(220px,1.5fr)_minmax(150px,1fr)_130px_130px_auto_auto]">
+        <label class="relative block">
+          <span class="sr-only">Tìm trong danh mục</span>
+          <svg class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"/></svg>
+          <input type="search" name="q" value="{{ request.GET.q }}" placeholder="Tên sản phẩm hoặc mã SKU" class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-3 text-sm text-slate-800 outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:focus:ring-brand-900/40">
+        </label>
+
+        <label>
+          <span class="sr-only">Thương hiệu</span>
+          <select name="brand" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-brand-400 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300">
+            <option value="">Tất cả thương hiệu</option>
+            {% for brand in brands %}<option value="{{ brand.id }}" {% if active_brand == brand.id|stringformat:'s' %}selected{% endif %}>{{ brand.name }}</option>{% endfor %}
+          </select>
+        </label>
+
+        <label><span class="sr-only">Giá từ</span><input type="number" min="0" name="min_price" value="{{ request.GET.min_price }}" placeholder="Giá từ" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none focus:border-brand-400 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"></label>
+        <label><span class="sr-only">Giá đến</span><input type="number" min="0" name="max_price" value="{{ request.GET.max_price }}" placeholder="Giá đến" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none focus:border-brand-400 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"></label>
+
+        <label class="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2.5 text-xs font-medium text-slate-600 dark:border-slate-700 dark:text-slate-400">
+          <input type="checkbox" name="in_stock" value="1" {% if request.GET.in_stock %}checked{% endif %} class="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+          Còn hàng
+        </label>
+        <button type="submit" class="btn-primary justify-center px-5 py-2.5 text-sm">Lọc sản phẩm</button>
+      </div>
+
+      <div class="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-3 dark:border-slate-800">
+        <p class="font-mono text-[10px] uppercase tracking-widest text-slate-400"><strong class="text-slate-700 dark:text-slate-300">{{ total }}</strong> kết quả</p>
+        <div class="flex items-center gap-2">
+          {% if request.GET.q or active_brand or request.GET.min_price or request.GET.max_price or request.GET.in_stock %}
+          <a href="{{ request.path }}" class="text-xs text-slate-500 transition hover:text-red-500">Xóa bộ lọc</a>
+          {% endif %}
+          <label for="sort" class="font-mono text-[9px] uppercase tracking-widest text-slate-400">Sắp xếp</label>
+          <select id="sort" name="sort" onchange="this.form.submit()" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 outline-none focus:border-brand-400 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300">
+            <option value="featured" {% if current_sort == 'featured' %}selected{% endif %}>Nổi bật</option>
+            <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Mới nhất</option>
+            <option value="price_asc" {% if current_sort == 'price_asc' %}selected{% endif %}>Giá tăng dần</option>
+            <option value="price_desc" {% if current_sort == 'price_desc' %}selected{% endif %}>Giá giảm dần</option>
+            <option value="name" {% if current_sort == 'name' %}selected{% endif %}>Tên A–Z</option>
+          </select>
+        </div>
+      </div>
+    </form>
+
+    {% if products %}
+    <div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 lg:gap-4">
+      {% for product in products %}
+      <article class="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-brand-300 hover:shadow-xl hover:shadow-slate-200/60 dark:border-slate-700/60 dark:bg-slate-900 dark:hover:border-brand-700/60 dark:hover:shadow-slate-950/60">
+        <a href="{% url 'products:detail' product.slug %}" class="relative block aspect-square overflow-hidden bg-slate-50 dark:bg-slate-800/50">
+          {% if product.thumbnail %}
+          <img src="{{ product.thumbnail|media_url }}" alt="{{ product.name }}" loading="lazy" class="h-full w-full object-contain p-3 transition-transform duration-500 group-hover:scale-105">
+          {% else %}
+          <span class="flex h-full items-center justify-center text-slate-300 dark:text-slate-600"><svg class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m20 7-8-4-8 4m16 0-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></span>
+          {% endif %}
+          <div class="absolute left-2 top-2 flex flex-col gap-1">
+            {% if product.is_new %}<span class="tag-blue px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-widest">Mới</span>{% endif %}
+            {% if product.is_featured %}<span class="tag-amber px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-widest">Nổi bật</span>{% endif %}
+          </div>
+        </a>
+
+        <div class="flex flex-1 flex-col gap-2 p-3">
+          <div class="flex items-center justify-between gap-2 font-mono text-[9px] uppercase tracking-wider text-slate-400">
+            <span class="truncate">{{ product.sku }}</span>
+            {% if product.brand_name %}<span class="truncate text-right">{{ product.brand_name }}</span>{% endif %}
+          </div>
+          <a href="{% url 'products:detail' product.slug %}" class="line-clamp-2 flex-1 text-xs font-semibold leading-snug text-slate-800 transition-colors hover:text-brand-600 dark:text-slate-200 dark:hover:text-brand-400">{{ product.name }}</a>
+          <div class="mt-auto">
+            {% if product.pricing_type == 'fixed' %}
+              {% if product.sale_price %}<span class="font-display text-sm font-bold text-brand-600 dark:text-brand-400">{{ product.sale_price|vnd }}</span><span class="ml-1 font-mono text-[9px] text-slate-400 line-through">{{ product.price|vnd }}</span>
+              {% else %}<span class="font-display text-sm font-bold text-slate-800 dark:text-slate-200">{{ product.price|vnd }}</span>{% endif %}
+            {% elif product.pricing_type == 'quote' %}<span class="rounded-md border border-amber-200 bg-amber-50 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-amber-700 dark:border-amber-700/40 dark:bg-amber-900/20 dark:text-amber-400">Báo giá</span>
+            {% else %}<span class="font-mono text-[9px] uppercase tracking-widest text-slate-500">Liên hệ</span>{% endif %}
+          </div>
+          <div class="flex items-center gap-1.5">
+            {% if product.stock_status == 'in_stock' %}<span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span><span class="font-mono text-[9px] uppercase text-emerald-600 dark:text-emerald-500">Còn hàng</span>
+            {% elif product.stock_status == 'low_stock' %}<span class="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-400"></span><span class="font-mono text-[9px] uppercase text-amber-600 dark:text-amber-400">Sắp hết</span>
+            {% elif product.stock_status == 'pre_order' %}<span class="h-1.5 w-1.5 rounded-full bg-blue-400"></span><span class="font-mono text-[9px] uppercase text-blue-600 dark:text-blue-400">Đặt trước</span>
+            {% else %}<span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span><span class="font-mono text-[9px] uppercase text-slate-400">Hết hàng</span>{% endif %}
+          </div>
+          <a href="{% url 'products:detail' product.slug %}" class="mt-1 flex w-full items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 font-mono text-[9px] uppercase tracking-widest text-slate-600 transition-all hover:border-brand-500 hover:bg-brand-500 hover:text-white dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-400 dark:hover:border-brand-500 dark:hover:bg-brand-500 dark:hover:text-white">Xem chi tiết</a>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-white px-6 py-20 text-center dark:border-slate-800 dark:bg-slate-900/50">
+      <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 text-slate-400 dark:bg-slate-800"><svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"/></svg></div>
+      <h2 class="font-display text-xl font-bold text-slate-800 dark:text-slate-200">Chưa tìm thấy sản phẩm phù hợp</h2>
+      <p class="mx-auto mt-2 max-w-md text-sm text-slate-500">Hãy thử bỏ bớt bộ lọc hoặc liên hệ với chúng tôi để được tư vấn sản phẩm phù hợp.</p>
+      <div class="mt-6 flex flex-wrap justify-center gap-3"><a href="{{ request.path }}" class="btn-ghost px-5 py-2.5 text-sm">Xóa bộ lọc</a><a href="{% url 'contacts:contact' %}" class="btn-primary px-5 py-2.5 text-sm">Liên hệ tư vấn</a></div>
+    </div>
+    {% endif %}
+
+    {% if total_pages > 1 %}
+    <nav aria-label="Phân trang" class="mt-10 flex items-center justify-center gap-2">
+      {% if has_previous %}<a href="?q={{ request.GET.q|urlencode }}&brand={{ active_brand }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}&in_stock={{ request.GET.in_stock }}&sort={{ current_sort }}&page={{ prev_page }}" class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs text-slate-600 transition hover:border-brand-400 hover:text-brand-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">← Trước</a>{% endif %}
+      <span class="rounded-xl bg-brand-500 px-4 py-2 font-mono text-xs font-bold text-white" aria-current="page">{{ page }} / {{ total_pages }}</span>
+      {% if has_next %}<a href="?q={{ request.GET.q|urlencode }}&brand={{ active_brand }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}&in_stock={{ request.GET.in_stock }}&sort={{ current_sort }}&page={{ next_page }}" class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs text-slate-600 transition hover:border-brand-400 hover:text-brand-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">Sau →</a>{% endif %}
+    </nav>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
