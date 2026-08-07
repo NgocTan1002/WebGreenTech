@@ -187,13 +187,14 @@ class SolutionAdmin(admin.ModelAdmin):
                     'solution_category',
                     'status',
                     'is_featured',
+                    'sort_order',
                     'view_count'
                     ]
     list_display_links = ['thumbnail_preview', 'title']
     list_filter = ['status', 'solution_category', 'is_featured']
     search_fields = ['title', 'short_description']
     prepopulated_fields = {'slug': ('title',)}
-    list_editable = ['status', 'is_featured']
+    list_editable = ['status', 'is_featured', 'sort_order']
     list_select_related = ['solution_category']
     save_on_top = True
 
@@ -266,9 +267,13 @@ class SolutionAdmin(admin.ModelAdmin):
         cache.delete(f'solution_detail_{obj.slug}')
         if old_slug and old_slug != obj.slug:
             cache.delete(f'solution_detail_{old_slug}')
+        cache.delete('home_page_context')
+        cache.delete('global_context_data')
 
     def delete_model(self, request, obj):
         cache.delete(f'solution_detail_{obj.slug}')
+        cache.delete('home_page_context')
+        cache.delete('global_context_data')
         super().delete_model(request, obj)
 
 @admin.register(SolutionCategory)
