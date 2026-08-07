@@ -272,7 +272,19 @@
 
       .font-display.uppercase {
         text-transform: none !important;
-        letter-spacing: -0.025em !important;
+        letter-spacing: -0.01em !important;
+      }
+
+      .font-display.tracking-tight,
+      .font-display.tracking-tighter {
+        letter-spacing: -0.01em !important;
+      }
+
+      h1.font-display.tracking-tight,
+      h1.font-display.tracking-tighter,
+      h2.font-display.tracking-tight,
+      h2.font-display.tracking-tighter {
+        line-height: 1.15 !important;
       }
 
       .gtc-section-kicker {
@@ -288,6 +300,7 @@
         @apply font-display font-bold tracking-tight text-slate-900 dark:text-white;
         font-size: clamp(1.875rem, 4vw, 2.75rem);
         line-height: 1.15;
+        letter-spacing: -0.01em;
       }
 
       .gtc-card {
