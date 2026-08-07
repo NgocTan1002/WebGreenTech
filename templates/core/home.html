@@ -721,13 +721,17 @@
 
     {# ── Section header ── #}
     <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-10" data-reveal>
-      <div>
+      <div class="flex-1 min-w-0">
         <p class="gtc-section-kicker mb-3">Dự án tiêu biểu</p>
-        <h2 class="gtc-section-title max-w-3xl">
+
+        <h2 class="gtc-section-title max-w-5xl">
           Năng lực được chứng minh tại công trình
         </h2>
-        <p class="mt-4 max-w-2xl text-base leading-relaxed text-slate-600 dark:text-slate-400">
-          Khám phá cách đội ngũ kỹ thuật GTC khảo sát, tích hợp và đưa hệ thống vào vận hành trong điều kiện thực tế.
+
+        <p class="mt-4 max-w-4xl text-base leading-relaxed
+                  text-slate-600 dark:text-slate-400">
+          Khám phá cách đội ngũ kỹ thuật GTC khảo sát, tích hợp và đưa hệ thống
+          vào vận hành trong điều kiện thực tế.
         </p>
       </div>
       <a href="{% url 'solutions:list' %}"
